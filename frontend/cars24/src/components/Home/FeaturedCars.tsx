@@ -57,53 +57,54 @@ export default function FeaturedCars() {
   const [activeCars, setActiveCars] = useState(featuredCars.slice(0, 3));
 
   return (
-    <div className="py-10">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Featured articles</h2>
-        <Link href="/blog" className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
+    <div className="py-8 sm:py-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-5 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Featured articles</h2>
+        <Link href="/blog" className="text-blue-600 hover:text-blue-700 font-medium flex items-center text-sm sm:text-base">
           View all
           <ArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {activeCars.map((car) => (
           <div key={car.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-            <div className="relative h-48 overflow-hidden">
+            <div className="relative h-40 sm:h-48 overflow-hidden">
               <img 
                 src={car.image}
                 alt={car.title}
                 className="w-full h-full object-cover transition-transform hover:scale-105"
+                loading="lazy"
               />
-              <button className="absolute top-2 right-2 p-1.5 bg-white/80 rounded-full hover:bg-white">
+              <button className="absolute top-2 right-2 p-1.5 bg-white/80 rounded-full hover:bg-white touch-manipulation transition-colors" aria-label="Add to wishlist">
                 <Heart className="h-4 w-4 text-gray-500 hover:text-red-500" />
               </button>
             </div>
-            <div className="p-4">
-              <h3 className="font-bold text-lg mb-2 line-clamp-2 text-black">{car.title}</h3>
+            <div className="p-3 sm:p-4">
+              <h3 className="font-bold text-base sm:text-lg mb-2 line-clamp-2 text-black">{car.title}</h3>
               <div className="mb-3">
-                <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mb-2">
                   {car.summary}
                 </p>
                 <Link href={`/blog/${car.id}`}>
-                  <Button variant="link" className="px-0 text-blue-600 hover:text-blue-700 h-auto">
+                  <Button variant="link" className="px-0 text-blue-600 hover:text-blue-700 h-auto text-xs sm:text-sm">
                     Read more
                   </Button>
                 </Link>
               </div>
-              <div className="flex items-center text-xs text-gray-500 border-t pt-3">
-                <div className="h-6 w-6 rounded-full bg-gray-200 mr-2 flex-shrink-0 overflow-hidden">
+              <div className="flex items-center text-xs text-gray-500 border-t pt-2 sm:pt-3 gap-1 overflow-x-auto">
+                <div className="h-6 w-6 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
                   <img 
                     src={`https://i.pravatar.cc/24?u=${car.id}`} 
                     alt={car.author}
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <span>{car.author}</span>
-                <span className="mx-2">•</span>
-                <span>{car.date}</span>
-                <span className="mx-2">•</span>
-                <span>{car.comments} comments</span>
+                <span className="truncate">{car.author}</span>
+                <span className="flex-shrink-0">•</span>
+                <span className="flex-shrink-0">{car.date}</span>
+                <span className="hidden sm:inline flex-shrink-0">•</span>
+                <span className="hidden sm:inline flex-shrink-0">{car.comments} comments</span>
               </div>
             </div>
           </div>

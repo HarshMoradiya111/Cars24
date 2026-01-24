@@ -49,31 +49,31 @@ const services = [
 
 export default function ServiceCards() {
   return (
-    <div className="py-10">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="py-8 sm:py-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {services.map((service) => (
           <div 
             key={service.id}
             className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow border border-gray-100"
           >
-            <div className={`${service.color} px-6 py-8 text-white relative h-40`}>
-              <service.icon className="h-8 w-8 mb-3" />
-              <h3 className="text-xl font-bold mb-1">{service.title}</h3>
-              <p className="text-sm opacity-90">{service.description}</p>
+            <div className={`${service.color} px-4 sm:px-6 py-6 sm:py-8 text-white relative min-h-32 sm:h-40 flex flex-col justify-start`}>
+              <service.icon className="h-6 w-6 sm:h-8 sm:w-8 mb-2 sm:mb-3" />
+              <h3 className="text-base sm:text-lg md:text-xl font-bold mb-1">{service.title}</h3>
+              <p className="text-xs sm:text-sm opacity-90 line-clamp-2">{service.description}</p>
             </div>
-            <div className="p-6 bg-white">
-              <ul className="mb-4">
+            <div className="p-4 sm:p-6 bg-white">
+              <ul className="mb-3 sm:mb-4 space-y-1.5">
                 {service.features.map((feature, index) => (
-                  <li key={index} className="flex items-center mb-2 text-sm text-black">
-                    <span className="flex-shrink-0 h-1.5 w-1.5 rounded-full bg-green-500 mr-2"></span>
-                    {feature}
+                  <li key={index} className="flex items-start gap-2 text-xs sm:text-sm text-black">
+                    <span className="flex-shrink-0 h-1.5 w-1.5 rounded-full bg-green-500 mt-1"></span>
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <Link href={service.link}>
-                <Button variant="outline" className="w-full justify-between text-blue-500">
+                <Button variant="outline" className="w-full justify-between text-blue-500 text-xs sm:text-sm">
                   {service.linkText}
-                  <ChevronRight className="h-4 w-4 ml-2" />
+                  <ChevronRight className="h-4 w-4 ml-2 flex-shrink-0" />
                 </Button>
               </Link>
             </div>

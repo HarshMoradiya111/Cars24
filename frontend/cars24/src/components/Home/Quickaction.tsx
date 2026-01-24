@@ -60,19 +60,19 @@ export default function QuickActions() {
 
   return (
     <>
-      <div className="py-8 px-4 sm:px-0 relative z-20 -mt-12">
-        <div className="flex flex-wrap justify-center bg-white rounded-lg shadow-md p-4 mx-auto max-w-6xl">
+      <div className="py-6 sm:py-8 px-0 relative z-20 -mt-10 sm:-mt-12">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 bg-white rounded-lg shadow-md p-3 sm:p-4 mx-auto max-w-6xl">
           {actions.map((action) => (
             <Link
               key={action.name}
               href={action.href}
-              className="w-1/2 sm:w-1/3 lg:w-1/6 p-3 text-center transition-transform hover:scale-105"
+              className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center transition-all hover:scale-105 active:scale-95 touch-manipulation"
             >
-              <div className="flex flex-col items-center">
-                <div className={`${action.color} p-3 rounded-full mb-2`}>
-                  <action.icon className="h-5 w-5" />
+              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                <div className={`${action.color} p-2.5 sm:p-3 rounded-full flex-shrink-0`}>
+                  <action.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs sm:text-sm font-medium text-gray-700 line-clamp-2">
                   {action.name}
                 </span>
               </div>
@@ -80,13 +80,13 @@ export default function QuickActions() {
           ))}
           <button
             onClick={() => setShowMaintenance(true)}
-            className="w-1/2 sm:w-1/3 lg:w-1/6 p-3 text-center transition-transform hover:scale-105"
+            className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center transition-all hover:scale-105 active:scale-95 touch-manipulation"
           >
-            <div className="flex flex-col items-center">
-              <div className="bg-orange-50 text-orange-600 p-3 rounded-full mb-2">
-                <Wrench className="h-5 w-5" />
+            <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+              <div className="bg-orange-50 text-orange-600 p-2.5 sm:p-3 rounded-full flex-shrink-0">
+                <Wrench className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-xs sm:text-sm font-medium text-gray-700 line-clamp-2">
                 Maintenance
               </span>
             </div>

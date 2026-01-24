@@ -5,6 +5,8 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <meta charSet="utf-8" />
+        <meta name="description" content="Cars24 - Better drives, better lives" />
+        <meta name="theme-color" content="#1e40af" />
       </Head>
       <body className="antialiased">
         <Main />

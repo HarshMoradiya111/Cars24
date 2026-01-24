@@ -39,28 +39,28 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer className="bg-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col items-center mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="flex flex-col items-center mb-8 sm:mb-12">
           <div className="flex items-center mb-2">
-            <span className="bg-blue-600 text-white font-bold py-1 px-2 rounded-md text-lg">
+            <span className="bg-blue-600 text-white font-bold py-1 px-1.5 sm:px-2 rounded-md text-sm sm:text-lg">
               CARS
             </span>
-            <span className="text-orange-500 font-bold text-lg">24</span>
+            <span className="text-orange-500 font-bold text-sm sm:text-lg">24</span>
           </div>
-          <p className="text-sm text-gray-600">better drives, better lives</p>
+          <p className="text-xs sm:text-sm text-gray-600">better drives, better lives</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
               COMPANY
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-blue-600"
+                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -70,15 +70,15 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
               DISCOVER
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {discoverLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-blue-600"
+                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -88,15 +88,15 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
               HELP & SUPPORT
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-blue-600"
+                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -106,36 +106,38 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center border-t border-gray-200 pt-8">
-          <div className="flex mb-4 md:mb-0">
-            <p className="text-sm text-gray-500">
+        <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-200 pt-6 sm:pt-8 gap-4 sm:gap-0">
+          <div>
+            <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
               © 2025 Cars24. All rights reserved.
             </p>
           </div>
 
-          <div className="flex space-x-6 items-center">
-            <span className="text-sm text-gray-500 mr-2">SOCIAL LINKS</span>
-            {socialLinks.map((link, index) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={index}
-                  href={link.href}
-                  className="text-gray-400 hover:text-gray-500"
-                >
-                  <span className="sr-only">{link.icon.name}</span>
-                  <Icon className="h-5 w-5" />
-                </Link>
-              );
-            })}
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 sm:items-center w-full sm:w-auto">
+            <span className="text-xs sm:text-sm text-gray-500 text-center sm:text-right sm:mr-4">SOCIAL LINKS</span>
+            <div className="flex justify-center space-x-4">
+              {socialLinks.map((link, index) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    className="text-gray-400 hover:text-gray-500 transition-colors touch-manipulation"
+                    aria-label={link.icon.name}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-200 pt-8">
-          <p className="text-sm text-gray-500 text-center">WE ARE GLOBAL</p>
-          <div className="flex justify-center space-x-4 mt-2">
+        <div className="mt-6 sm:mt-8 border-t border-gray-200 pt-6 sm:pt-8">
+          <p className="text-xs sm:text-sm text-gray-500 text-center font-medium uppercase">We are global</p>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-3 sm:mt-4">
             <div className="flex items-center">
-              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-1">
+              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-2 flex-shrink-0">
                 <img
                   src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
                   alt="India flag"
@@ -145,7 +147,7 @@ const Footer = () => {
               <span className="text-xs text-gray-500">India</span>
             </div>
             <div className="flex items-center">
-              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-1">
+              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-2 flex-shrink-0">
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg"
                   alt="UAE flag"
