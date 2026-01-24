@@ -8,11 +8,11 @@ let requestNotificationPermission: any = async () => null;
 if (typeof window !== "undefined") {
   (async () => {
     try {
-      const module = await import("@/lib/firebase-config");
+      const module = await import("@/lib/firebase");
       setupMessageListener = module.setupMessageListener;
       requestNotificationPermission = module.requestNotificationPermission;
     } catch (error) {
-      console.log("Firebase config not available");
+      console.log("Firebase not available");
     }
   })();
 }
