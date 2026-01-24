@@ -1,21 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-// Firebase imports - optional, will fail gracefully if not installed
-let setupMessageListener: any = () => {};
-let requestNotificationPermission: any = async () => null;
-
-if (typeof window !== "undefined") {
-  (async () => {
-    try {
-      const module = await import("@/lib/firebase");
-      setupMessageListener = module.setupMessageListener;
-      requestNotificationPermission = module.requestNotificationPermission;
-    } catch (error) {
-      console.log("Firebase not available");
-    }
-  })();
-}
+import { enableNotifications } from "@/lib/notifications";
 
 export interface NotificationPreferences {
   appointmentConfirmation: boolean;
@@ -107,31 +92,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Set up message listener for foreground notifications
+  // Set up notification handling
   useEffect(() => {
-    setupMessageListener((payload: any) => {
-      const notifData = payload.data || {};
-      const type = notifData.type as keyof NotificationPreferences | undefined;
+    if (typeof window === "undefined") return;
 
-      // Check if this notification type is enabled
-      if (type && !preferences[type]) {
-        return; // Skip if preference is disabled
-      }
-
-      // Show foreground notification using Notification API
-      if (preferences.enabled && isSupported) {
-        new Notification(
-          payload.notification?.title || "CARS24 Notification",
-          {
-            body: payload.notification?.body || "You have a new notification",
-            icon: notifData.icon || "/cars24-icon.png",
-            badge: "/cars24-badge.png",
-            tag: notifData.tag || "notification",
-            data: notifData,
-          }
-        );
-      }
-    });
+    // Initialize notification handling when preferences are updated
+    if (preferences.enabled && isSupported) {
+      console.log("📱 Notification context initialized");
+    }
   }, [preferences, isSupported]);
 
   const updatePreferences = (prefs: Partial<NotificationPreferences>) => {
@@ -168,11 +136,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const requestPermission = async (): Promise<boolean> => {
     try {
-      if (!requestNotificationPermission) {
-        console.error("Notification service not available");
-        return false;
-      }
-      const token = await requestNotificationPermission();
+      const token = await enableNotifications();
       if (token) {
         setFcmToken(token);
         if (typeof window !== "undefined") {
