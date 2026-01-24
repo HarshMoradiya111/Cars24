@@ -95,8 +95,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   // Set up notification handling
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    // Initialize notification handling when preferences are updated
     if (preferences.enabled && isSupported) {
       console.log("📱 Notification context initialized");
     }
