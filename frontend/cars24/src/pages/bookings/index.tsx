@@ -221,19 +221,24 @@ const PurchasedCarsPage = () => {
     );
   }
   const parseAmount = (raw: string) => {
-    const digits = (raw || "").toString().replace(/[^0-9]/g, "");
+    if (!raw) return null;
+    const lakhMatch = raw.match(/([0-9]+(?:\.[0-9]+)?)\s*lakh/i);
+    if (lakhMatch) {
+      const lakhValue = parseFloat(lakhMatch[1]);
+      return Math.round(lakhValue * 100000);
+    }
+    const digits = raw.toString().replace(/[^0-9]/g, "");
     return digits ? parseInt(digits, 10) : null;
   };
 
   const formatCurrency = (value: string, fallback = "N/A") => {
-    if (!value) return fallback;
-    if (/lakh/i.test(value)) {
-      return value.replace(/\$/g, "₹");
-    }
     const amount = parseAmount(value);
     if (amount === null) return fallback;
-    const lakhValue = amount / 100000;
-    return `₹ ${lakhValue.toFixed(2)} lakh`;
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   return (
