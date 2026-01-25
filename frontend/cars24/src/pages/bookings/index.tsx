@@ -19,10 +19,13 @@ import {
   Landmark,
   CreditCard,
   DollarSign,
+  ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getBookingbyuser } from "@/lib/Bookingapi";
+import { BookingListSkeleton, EmptyState, LoadingSpinner } from "@/components/ui/SkeletonLoaders";
+import { Button } from "@/components/ui/button";
 
 const PurchasedCarsPage = () => {
   const fallbackPurchasedCars = [
@@ -184,22 +187,30 @@ const PurchasedCarsPage = () => {
   };
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [purchasedCars, setpurchasedCars] = useState<any>(null);
+  
   useEffect(() => {
     const fetchpurchasedCars = async () => {
+      setLoading(true);
+      setError(false);
+      
       try {
         if (!user) {
           setpurchasedCars(fallbackPurchasedCars);
           return;
         }
+        
         const list = await getBookingbyuser(user.id);
+        
         if (!list || list.length === 0) {
           setpurchasedCars(fallbackPurchasedCars);
         } else {
           setpurchasedCars(list);
         }
       } catch (error) {
-        console.error(error);
+        console.error("[Bookings] Failed to fetch bookings:", error);
+        setError(true);
         setpurchasedCars(fallbackPurchasedCars);
       } finally {
         setLoading(false);
@@ -208,16 +219,52 @@ const PurchasedCarsPage = () => {
 
     fetchpurchasedCars();
   }, [user]);
+  
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900" />
+      <div className="min-h-screen bg-gray-100 py-8 px-4">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-800">Your Bookings</h1>
+          <p className="text-gray-600">Loading your car bookings...</p>
+        </div>
+        <div className="max-w-5xl mx-auto">
+          <BookingListSkeleton count={2} />
+        </div>
       </div>
     );
   }
-  if (!purchasedCars) {
+  
+  if (error && (!purchasedCars || purchasedCars.length === 0)) {
     return (
-      <div className="text-center mt-10 text-red-500">Boooking not found.</div>
+      <div className="min-h-screen bg-gray-100 py-8 px-4">
+        <EmptyState
+          title="Failed to Load Bookings"
+          description="We couldn't fetch your bookings. Please try again later."
+          icon={<AlertCircle className="h-16 w-16" />}
+          action={
+            <Button onClick={() => window.location.reload()} variant="default">
+              Retry
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+  
+  if (!purchasedCars || purchasedCars.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-100 py-8 px-4">
+        <EmptyState
+          title="No Bookings Found"
+          description="You haven't made any car bookings yet. Start browsing our collection!"
+          icon={<ShoppingBag className="h-16 w-16" />}
+          action={
+            <Link href="/buy-car">
+              <Button variant="default">Browse Cars</Button>
+            </Link>
+          }
+        />
+      </div>
     );
   }
   const parseAmount = (raw: string) => {

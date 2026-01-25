@@ -3,6 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { createBooking } from "@/lib/Bookingapi";
 import { getcarByid } from "@/lib/Carapi";
 import { calculateRecommendedPrice, detectCarType, Region } from "@/lib/pricingEngine";
+import { LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import {
   AlertCircle,
   Calendar,
@@ -343,8 +344,8 @@ const index = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900" />
+      <div className="min-h-screen bg-gray-50">
+        <LoadingSpinner message="Loading car details..." />
       </div>
     );
   }

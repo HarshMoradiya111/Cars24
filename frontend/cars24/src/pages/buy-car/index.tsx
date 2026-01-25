@@ -2,14 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { CarGridSkeleton, EmptyState } from "@/components/ui/SkeletonLoaders";
 // API fetch disabled to show only user-added cars
-import { ChevronDown, Heart, Search, Sliders } from "lucide-react";
+import { ChevronDown, Heart, Search, Sliders, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import SafeImage from "@/components/ui/SafeImage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useWishlist } from "@/context/WishlistContext";
 import { calculateRecommendedPrice, detectCarType, Region } from "@/lib/pricingEngine";
 import { getcarSummaries } from "@/lib/Carapi";
+import Fuse from "fuse.js";
 
 // const cars = [
 //   {
@@ -120,6 +122,8 @@ interface Car {
   price: string;
   location: string;
   image: string;
+  year?: number;
+  brand?: string;
   recommendedPrice?: number;
   pricingExplanation?: string;
 }
@@ -160,20 +164,63 @@ const formatCurrency = (value: string, fallback = "N/A") => {
   const lakhValue = amount / 100000;
   return `₹ ${lakhValue.toFixed(2)} lakh`;
 };
-function LoaderCard() {
-  const showDemoBanner = process.env.NEXT_PUBLIC_SHOW_DEMO_BANNER !== "false";
-  return (
-    <div className="bg-white rounded-lg shadow-md animate-pulse overflow-hidden">
-      <div className="h-48 bg-gray-200"></div>
-      <div className="p-4 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-3 bg-gray-200 rounded w-full"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-        <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-      </div>
-    </div>
-  );
-}
+
+const parseKmValue = (raw: string) => {
+  if (!raw) return null;
+  const digits = raw.replace(/[^0-9]/g, "");
+  return digits ? parseInt(digits, 10) : null;
+};
+
+const extractYear = (raw: string) => {
+  const match = raw.match(/(19|20)\d{2}/);
+  return match ? parseInt(match[0], 10) : null;
+};
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+const detectBrand = (title: string) => {
+  const brands = [
+    "Maruti",
+    "Suzuki",
+    "Hyundai",
+    "Honda",
+    "Tata",
+    "Toyota",
+    "Kia",
+    "Renault",
+    "Mahindra",
+    "Volkswagen",
+    "Skoda",
+    "Scoda",
+    "Ford",
+    "Nissan",
+    "MG",
+    "Jeep",
+    "Mercedes",
+    "Mercedes-Benz",
+    "BMW",
+    "Audi",
+    "Volvo",
+    "Jaguar",
+    "Land Rover",
+    "Lexus",
+    "Porsche",
+    "Mini",
+    "Fiat",
+    "Citroen",
+    "Peugeot",
+    "Chevrolet",
+    "Datsun",
+    "Isuzu",
+    "Mitsubishi",
+    "Opel",
+  ];
+  const lower = title.toLowerCase();
+  for (const b of brands) {
+    if (lower.includes(b.toLowerCase())) return b;
+  }
+  return undefined;
+};
 const index = () => {
   const { toggle, isSaved } = useWishlist();
   const [priceRange, setPriceRange] = useState([0, 5000000]); // 0 to 50 lakh
@@ -181,37 +228,70 @@ const index = () => {
   const [cars, setCars] = useState<Car[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [userLocation, setUserLocation] = useState<string>("New Delhi");
+  const [userLocation, setUserLocation] = useState<string>("");
   const [selectedRegion, setSelectedRegion] = useState<Region>("Metro");
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Car[]>([]);
+  const [fuelFilters, setFuelFilters] = useState<string[]>([]);
+  const [transmissionFilters, setTransmissionFilters] = useState<string[]>([]);
+  const [mileageRange, setMileageRange] = useState<[number, number]>([0, 200000]);
+  const currentYear = new Date().getFullYear();
+  const [yearRange, setYearRange] = useState<[number, number]>([2005, currentYear]);
   const [sortOption, setSortOption] = useState("default");
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Loading cars...");
+  const priceStats = useMemo(() => {
+    if (!cars || cars.length === 0) return { min: 0, max: 5000000 };
+    const amounts = cars.map((c) => parseAmount(c.price) || 0).filter((n) => n >= 0);
+    const min = amounts.length ? Math.min(...amounts) : 0;
+    const max = amounts.length ? Math.max(...amounts, 5000000) : 5000000;
+    return { min, max };
+  }, [cars]);
+
+  const availableBrands = useMemo(() => {
+    if (!cars) return [] as string[];
+    const set = new Set<string>();
+    cars.forEach((car) => {
+      if (car.brand) {
+        set.add(car.brand);
+      } else {
+        const inferred = detectBrand(car.title);
+        if (inferred) set.add(inferred);
+      }
+    });
+    return Array.from(set).sort();
+  }, [cars]);
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+    setLoadingMessage("Loading cars...");
+    
+    // Update loading message after 3 seconds
+    const messageTimer = setTimeout(() => {
+      if (isMounted && loading) {
+        setLoadingMessage("Still loading... The server might be starting up (this can take up to 30s on first load)");
+      }
+    }, 3000);
 
     const loadCars = async () => {
       try {
-        console.log("[buy-car] Loading cars from API...");
-        const startTime = performance.now();
         const summaries = await getcarSummaries({ userLocation });
-        const apiTime = performance.now() - startTime;
-        console.log(`[buy-car] API response received in ${apiTime.toFixed(0)}ms:`, summaries);
 
         if (!Array.isArray(summaries)) {
           console.warn("[buy-car] API returned non-array:", typeof summaries);
           throw new Error("API returned non-array response");
         }
 
-        const transformStart = performance.now();
         const carsWithPricing = summaries.map((c: any) => {
           const basePrice = parseAmount(c.price) || 0;
           const carType = detectCarType(c.title);
           const pricing = calculateRecommendedPrice(basePrice, carType, selectedRegion);
+          const title = c.title || c.name || "";
+          const yearFromData = c.specs?.year ?? extractYear(title);
           return {
             id: c.id || c._id || c.carId || "",
-            title: c.title || c.name || "",
+            title,
             km: c.specs?.km || c.km || "N/A",
             fuel: c.specs?.fuel || c.fuel || "N/A",
             transmission: c.specs?.transmission || c.transmission || "N/A",
@@ -220,14 +300,15 @@ const index = () => {
             price: c.price || "N/A",
             location: c.location || "N/A",
             image: Array.isArray(c.images) && c.images.length > 0 ? c.images[0] : c.image || "",
+            year: yearFromData,
+            brand: c.brand || c.make || detectBrand(title),
             recommendedPrice: pricing.recommendedPrice,
             pricingExplanation: pricing.explanation,
           } as Car;
         });
-        const transformTime = performance.now() - transformStart;
-        console.log(`[buy-car] Transformed ${carsWithPricing.length} cars in ${transformTime.toFixed(0)}ms`);
 
         if (isMounted) {
+          console.log(`[buy-car] Loaded ${carsWithPricing.length} cars from API`);
           setCars(carsWithPricing);
           setError(false);
         }
@@ -248,57 +329,127 @@ const index = () => {
 
     return () => {
       isMounted = false;
+      clearTimeout(messageTimer);
     };
   }, [selectedRegion, userLocation]);
+
+  useEffect(() => {
+    if (!cars || cars.length === 0) return;
+    setPriceRange([priceStats.min, priceStats.max]);
+  }, [cars, priceStats.min, priceStats.max]);
+
+  const fuse = useMemo(() => {
+    if (!cars || cars.length === 0) return null;
+    return new Fuse(cars, {
+      keys: [
+        { name: "title", weight: 0.5 },
+        { name: "location", weight: 0.2 },
+        { name: "fuel", weight: 0.15 },
+        { name: "transmission", weight: 0.15 },
+      ],
+      includeScore: true,
+      threshold: 0.3,
+      distance: 120,
+      minMatchCharLength: 1,
+    });
+  }, [cars]);
+
+  const searchResults = useMemo(() => {
+    if (!cars) return null;
+    if (!searchQuery.trim() || !fuse) return cars;
+    const results = fuse.search(searchQuery.trim());
+    return results
+      .sort((a, b) => (a.score || 0) - (b.score || 0))
+      .map((r) => r.item);
+  }, [cars, fuse, searchQuery]);
+
+  useEffect(() => {
+    if (!fuse || !searchQuery.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    const query = searchQuery.trim().toLowerCase();
+    const raw = fuse.search(query, { limit: 15 }).map((r) => r.item);
+    const uniqueByTitle: Record<string, Car> = {};
+    raw.forEach((item) => {
+      const titleLower = item.title?.toLowerCase() || "";
+      const brandLower = item.brand?.toLowerCase() || "";
+      if (!titleLower.includes(query) && !brandLower.includes(query)) return;
+      if (item.title && !uniqueByTitle[item.title]) {
+        uniqueByTitle[item.title] = item;
+      }
+    });
+    const nextSuggestions = Object.values(uniqueByTitle).slice(0, 5);
+    setSuggestions(nextSuggestions);
+  }, [fuse, searchQuery]);
   
   // Filter and sort cars
-  const filteredAndSortedCars = React.useMemo(() => {
-    if (!cars) return null;
-    
-    console.log("[buy-car] Cars before filter:", cars.length, "Price range:", priceRange);
-    
-    // Filter by search query
-    let filtered = cars.filter((car) => {
+  const filteredAndSortedCars = useMemo(() => {
+    if (!cars || !searchResults) return null;
+
+    const base = searchQuery.trim() ? searchResults : cars;
+
+    const filtered = base.filter((car) => {
       const carPrice = parseAmount(car.price) || 0;
-      const matchesSearch = searchQuery === "" || 
-        car.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        car.fuel.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        car.transmission.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Filter by price range
+      const kmValue = parseKmValue(car.km) ?? 0;
+      const yearValue = car.year ?? extractYear(car.title);
+
       const matchesPrice = carPrice >= priceRange[0] && carPrice <= priceRange[1];
-      
-      // Filter by brand
-      const matchesBrand = selectedBrands.length === 0 || 
-        selectedBrands.some(brand => car.title.toLowerCase().includes(brand.toLowerCase()));
-      
+      const matchesBrand =
+        selectedBrands.length === 0 ||
+        selectedBrands.some((brand) => {
+          const brandLower = brand.toLowerCase();
+          return (
+            (car.brand && car.brand.toLowerCase() === brandLower) ||
+            car.title.toLowerCase().includes(brandLower)
+          );
+        });
+      const matchesFuel = fuelFilters.length === 0 || fuelFilters.includes(car.fuel);
+      const matchesTransmission =
+        transmissionFilters.length === 0 || transmissionFilters.includes(car.transmission);
+      const matchesMileage = kmValue >= mileageRange[0] && kmValue <= mileageRange[1];
+      const matchesYear =
+        yearValue === null || yearValue === undefined
+          ? true
+          : yearValue >= yearRange[0] && yearValue <= yearRange[1];
+
       if (!matchesPrice) {
-        console.log(`[buy-car] Car filtered by price: ${car.title} (₹${carPrice}) outside range [${priceRange[0]}, ${priceRange[1]}]`);
+        console.log(
+          `[buy-car] Car filtered by price: ${car.title} (₹${carPrice}) outside range [${priceRange[0]}, ${priceRange[1]}]`
+        );
       }
-      
-      return matchesSearch && matchesPrice && matchesBrand;
+
+      return (
+        matchesPrice &&
+        matchesBrand &&
+        matchesFuel &&
+        matchesTransmission &&
+        matchesMileage &&
+        matchesYear
+      );
     });
-    
+
     console.log("[buy-car] Cars after filter:", filtered.length);
-    
-    // Sort cars
+
     const sorted = [...filtered];
-    if (sortOption === "price-low") {
-      sorted.sort((a, b) => (parseAmount(a.price) || 0) - (parseAmount(b.price) || 0));
-    } else if (sortOption === "price-high") {
-      sorted.sort((a, b) => (parseAmount(b.price) || 0) - (parseAmount(a.price) || 0));
-    } else if (sortOption === "km-low") {
-      sorted.sort((a, b) => (parseInt(a.km.replace(/,/g, '')) || 0) - (parseInt(b.km.replace(/,/g, '')) || 0));
-    } else if (sortOption === "year-new") {
-      sorted.sort((a, b) => {
-        const yearA = parseInt(a.title.match(/\d{4}/)?.[0] || '0');
-        const yearB = parseInt(b.title.match(/\d{4}/)?.[0] || '0');
-        return yearB - yearA;
-      });
+    if (!searchQuery.trim() || sortOption !== "default") {
+      if (sortOption === "price-low") {
+        sorted.sort((a, b) => (parseAmount(a.price) || 0) - (parseAmount(b.price) || 0));
+      } else if (sortOption === "price-high") {
+        sorted.sort((a, b) => (parseAmount(b.price) || 0) - (parseAmount(a.price) || 0));
+      } else if (sortOption === "km-low") {
+        sorted.sort((a, b) => (parseKmValue(a.km) || 0) - (parseKmValue(b.km) || 0));
+      } else if (sortOption === "year-new") {
+        sorted.sort((a, b) => {
+          const yearA = extractYear(a.title) || 0;
+          const yearB = extractYear(b.title) || 0;
+          return yearB - yearA;
+        });
+      }
     }
-    
+
     return sorted;
-  }, [cars, searchQuery, priceRange, selectedBrands, sortOption]);
+  }, [cars, searchResults, searchQuery, priceRange, selectedBrands, sortOption, fuelFilters, transmissionFilters, mileageRange, yearRange]);
   
   const showDemoBanner = process.env.NEXT_PUBLIC_SHOW_DEMO_BANNER !== "false";
   return (
@@ -337,8 +488,8 @@ const index = () => {
                     Price Range
                   </label>
                   <Slider
-                    defaultValue={[0, 5000000]}
-                    max={5000000}
+                    defaultValue={[priceStats.min, priceStats.max]}
+                    max={priceStats.max}
                     step={10000}
                     value={priceRange}
                     onValueChange={setPriceRange}
@@ -358,7 +509,7 @@ const index = () => {
                     Brand
                   </label>
                   <div className="space-y-2">
-                    {["Maruti", "Hyundai", "Honda", "Tata"].map((brand) => (
+                    {(availableBrands.length ? availableBrands : ["Maruti", "Hyundai", "Honda", "Tata"]).map((brand) => (
                       <label key={brand} className="flex items-center">
                         <input
                           type="checkbox"
@@ -377,6 +528,80 @@ const index = () => {
                         <span className="ml-2 text-sm">{brand}</span>
                       </label>
                     ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Fuel Type</label>
+                  <div className="space-y-2">
+                    {["Petrol", "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
+                      <label key={fuel} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          checked={fuelFilters.includes(fuel)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFuelFilters([...fuelFilters, fuel]);
+                            } else {
+                              setFuelFilters(fuelFilters.filter((f) => f !== fuel));
+                            }
+                          }}
+                        />
+                        <span className="ml-2 text-sm">{fuel}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Transmission</label>
+                  <div className="space-y-2">
+                    {["Manual", "Auto", "Automatic"].map((mode) => (
+                      <label key={mode} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          checked={transmissionFilters.includes(mode)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setTransmissionFilters([...transmissionFilters, mode]);
+                            } else {
+                              setTransmissionFilters(transmissionFilters.filter((m) => m !== mode));
+                            }
+                          }}
+                        />
+                        <span className="ml-2 text-sm">{mode}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Mileage (km)</label>
+                  <Slider
+                    defaultValue={[0, 200000]}
+                    min={0}
+                    max={200000}
+                    step={1000}
+                    value={mileageRange}
+                    onValueChange={(value) => setMileageRange(value as [number, number])}
+                  />
+                  <div className="flex justify-between mt-2 text-sm text-gray-600">
+                    <span>{numberFormatter.format(mileageRange[0])} km</span>
+                    <span>{numberFormatter.format(mileageRange[1])} km</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Year</label>
+                  <Slider
+                    defaultValue={[2005, currentYear]}
+                    min={1995}
+                    max={currentYear}
+                    step={1}
+                    value={yearRange}
+                    onValueChange={(value) => setYearRange(value as [number, number])}
+                  />
+                  <div className="flex justify-between mt-2 text-sm text-gray-600">
+                    <span>{yearRange[0]}</span>
+                    <span>{yearRange[1]}</span>
                   </div>
                 </div>
               </div>
@@ -404,6 +629,23 @@ const index = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  {suggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-md z-20 max-h-60 overflow-y-auto">
+                      {suggestions.map((suggestion) => (
+                        <button
+                          key={suggestion.id}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                          onClick={() => {
+                            setSearchQuery(suggestion.title);
+                            setSuggestions([]);
+                          }}
+                        >
+                          <div className="font-medium text-gray-800">{suggestion.title}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="relative">
                   <Button
@@ -455,17 +697,44 @@ const index = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAndSortedCars === null
-                ? Array.from({ length: 6 }).map((_N_E_STYLE_LOAD, index) => (
-                    <LoaderCard key={index} />
-                  ))
-                : filteredAndSortedCars.map((car) => (
-                    <Link
-                      key={car.id}
-                      href={`/buy-car/${car.id}`}
-                      className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-                    >
+            {/* Cars Grid or Loading State */}
+            {loading ? (
+              <div className="space-y-4">
+                <div className="text-center py-4">{loadingMessage}
+                  <p className="text-sm text-gray-600">Loading cars... This may take a moment if the server is starting up.</p>
+                </div>
+                <CarGridSkeleton count={6} />
+              </div>
+            ) : filteredAndSortedCars && filteredAndSortedCars.length === 0 ? (
+              <EmptyState
+                title="No Cars Found"
+                description="Try adjusting your filters or search query to find more cars."
+                icon={<ShoppingCart className="h-16 w-16" />}
+                action={
+                  <Button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setPriceRange([0, 5000000]);
+                      setSelectedBrands([]);
+                      setFuelFilters([]);
+                      setTransmissionFilters([]);
+                      setMileageRange([0, 200000]);
+                      setYearRange([2005, currentYear]);
+                    }}
+                    variant="default"
+                  >
+                    Clear All Filters
+                  </Button>
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredAndSortedCars?.map((car) => (
+                  <Link
+                    key={car.id}
+                    href={`/buy-car/${car.id}`}
+                    className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                  >
                       {/* Image with full width and large height */}
                       <div className="relative w-full h-64 sm:h-72 bg-gray-100 overflow-hidden flex-shrink-0">
                         <SafeImage
@@ -551,7 +820,8 @@ const index = () => {
                       </div>
                     </Link>
                   ))}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
