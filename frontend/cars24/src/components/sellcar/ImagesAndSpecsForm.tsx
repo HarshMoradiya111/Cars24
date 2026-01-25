@@ -43,11 +43,7 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
 }) => {
   const [isValid, setIsValid] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-
-  const placeholderImages = [
-    "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  ];
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const { specs } = carDetails;
@@ -63,15 +59,66 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
     setIsValid(!!specsFilled && hasImages);
   }, [carDetails]);
 
-  // In a real implementation, this would handle file uploads
+  // Handle actual file uploads
   const handleImageUpload = () => {
-    // Simulating image upload by using placeholder images
-    if (carDetails.images.length < 10) {
-      const randomImage =
-        placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-      updateCarDetails({
-        images: [...carDetails.images, randomImage],
-      });
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages: string[] = [...carDetails.images];
+    
+    for (let i = 0; i < files.length && newImages.length < 10; i++) {
+      const file = files[i];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload only image files');
+        continue;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        continue;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        updateCarDetails({
+          images: [...carDetails.images, imageUrl],
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDragDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = e.dataTransfer.files;
+    if (files && fileInputRef.current) {
+      // Create a DataTransfer to set files on the input
+      const dataTransfer = new DataTransfer();
+      for (let i = 0; i < files.length; i++) {
+        dataTransfer.items.add(files[i]);
+      }
+      fileInputRef.current.files = dataTransfer.files;
+      
+      // Trigger file change handler
+      const event = new Event('change', { bubbles: true });
+      fileInputRef.current.dispatchEvent(event);
+      handleFileChange({ target: fileInputRef.current } as React.ChangeEvent<HTMLInputElement>);
     }
   };
 
@@ -116,8 +163,19 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
       setDragActive(false);
     }
   };
+  
   return (
     <div className="space-y-8 py-4">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      
       <div>
         <h2 className="text-xl font-semibold mb-1">
           Car Images & Specifications
@@ -136,10 +194,7 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
-          onDrop={(e) => {
-            handleDrag(e);
-            handleImageUpload();
-          }}
+          onDrop={handleDragDrop}
         >
           <Upload className="h-10 w-10 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-600">Drag photos here or</p>

@@ -177,6 +177,19 @@ Create test user via signup or use:
 {
   "email": "test@example.com",
   "password": "test123456",
+## 💡 Pricing Engine (Recommended Price)
+
+Adjusts displayed prices based on region, season, and fuel trends.
+
+- Backend endpoints:
+  - `GET /api/Car/summaries?userLocation=City&fuelIndex=1.0` → adds `RecommendedPrice` per car.
+  - `GET /api/Car/{id}?userLocation=City&fuelIndex=1.0` → adds `RecommendedPrice` and `PricingNotes`.
+  - `POST /api/Pricing/recommend` → compute recommendation from `title`, `basePrice`, `carLocation`, optional `userLocation`, `fuelIndex`, `date`.
+- Config: `backend/Cars24API/appsettings.json` → `PricingRules.FuelPriceIndex` and `FuelSpikeThreshold`.
+- Frontend:
+  - Location input on Buy Car pages influences recommendations.
+  - Detail page shows trend notes to educate users.
+
   "fullName": "Test User",
   "phone": "1234567890"
 }

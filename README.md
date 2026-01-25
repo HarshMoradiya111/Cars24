@@ -88,7 +88,29 @@ Your Browser (Frontend)
 - Interactive cost breakdown
 - Located in: `frontend/cars24/src/components/Home/MaintenanceCalculator.tsx`
 
-### 🔔 Smart Notifications
+### � Dynamic Pricing Engine
+- **Rule-based price recommendations** based on market conditions
+- **Seasonal multipliers**: SUVs gain value in monsoon; hatchbacks peak in summer
+- **Regional adjustments**: Metro, Hilly, and Rural pricing variations
+- **Car type analysis**: Different cars perform differently in different seasons/regions
+- Shows both Base Price and Recommended Price on all car listings
+- Example: "SUV demand increases during monsoon in hilly regions"
+- Located in: `frontend/cars24/src/lib/pricingEngine.ts`
+
+#### How It Works
+1. **Select Region**: Choose Metro, Hilly, or Rural from the filter panel
+2. **Dynamic Calculation**: Prices auto-adjust based on:
+   - Current season (detected automatically)
+   - Selected region
+   - Car type (SUV, Sedan, Hatchback, etc.)
+3. **Explanation Provided**: Each car shows why its recommended price differs from base price
+
+#### Examples
+- **SUV in Hilly Region during Monsoon**: +20% (high demand for off-road capability)
+- **Hatchback in Metro**: +10% (compact cars preferred in cities)
+- **Coupe in Rural Area**: -20% (low demand for sports cars outside metros)
+
+### �🔔 Smart Notifications
 - Get notified when prices drop
 - Appointment reminders
 - New car listings alerts

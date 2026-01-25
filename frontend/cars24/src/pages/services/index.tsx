@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Wrench,
@@ -133,6 +133,18 @@ const benefits = [
 ];
 
 const ServicesPage = () => {
+  const handleBookService = (service: typeof services[0]) => {
+    alert(`Service Booking Details:\n\nService: ${service.name}\nPrice: ${service.price}\nDuration: ${service.duration}\n\nWhat's Included:\n${service.includes.map((item, i) => `${i + 1}. ${item}`).join('\n')}\n\nThank you for choosing our service! Our team will contact you shortly to confirm your appointment.`);
+  };
+
+  const handleCallUs = () => {
+    alert('Calling Customer Service: 1800-123-4567\n\nOur service advisors are available 24/7 to help you!');
+  };
+
+  const handleFindServiceCenter = () => {
+    alert('Service Centers Near You:\n\n1. Cars24 Service Center - Sector 18, Noida\n2. Cars24 Service Center - Connaught Place, Delhi\n3. Cars24 Service Center - MG Road, Gurgaon\n\nWould you like directions to the nearest center?');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -210,7 +222,10 @@ const ServicesPage = () => {
                   </ul>
                 </div>
 
-                <Button className="w-full bg-green-600 hover:bg-green-700">
+                <Button 
+                  onClick={() => handleBookService(service)}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
                   Book Service
                 </Button>
               </div>
@@ -274,6 +289,7 @@ const ServicesPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
+                  onClick={handleCallUs}
                   size="lg"
                   className="bg-white text-green-600 hover:bg-gray-100"
                 >
@@ -281,6 +297,7 @@ const ServicesPage = () => {
                   Call Us Now
                 </Button>
                 <Button
+                  onClick={handleFindServiceCenter}
                   size="lg"
                   variant="outline"
                   className="border-white text-white hover:bg-green-700"

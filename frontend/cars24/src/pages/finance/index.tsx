@@ -19,6 +19,10 @@ const FinancePage = () => {
   const [interestRate, setInterestRate] = useState(9.5);
   const [tenure, setTenure] = useState(5);
 
+  const handleApplyLoan = () => {
+    alert(`Loan Application Details:\n\nLoan Amount: ₹${loanAmount.toLocaleString("en-IN")}\nInterest Rate: ${interestRate}% per annum\nTenure: ${tenure} years\nMonthly EMI: ₹${calculateEMI().toLocaleString("en-IN")}\n\nThank you for your interest! Our team will contact you shortly.`);
+  };
+
   const calculateEMI = () => {
     const principal = loanAmount;
     const rate = interestRate / 12 / 100;
@@ -67,7 +71,7 @@ const FinancePage = () => {
                   type="number"
                   value={loanAmount}
                   onChange={(e) => setLoanAmount(Number(e.target.value))}
-                  className="mb-2"
+                  className="mb-2 placeholder:text-black text-black"
                 />
                 <Slider
                   value={[loanAmount]}
@@ -92,7 +96,7 @@ const FinancePage = () => {
                   value={interestRate}
                   onChange={(e) => setInterestRate(Number(e.target.value))}
                   step="0.1"
-                  className="mb-2"
+                  className="mb-2 placeholder:text-black text-black"
                 />
                 <Slider
                   value={[interestRate]}
@@ -116,7 +120,7 @@ const FinancePage = () => {
                   type="number"
                   value={tenure}
                   onChange={(e) => setTenure(Number(e.target.value))}
-                  className="mb-2"
+                  className="mb-2 placeholder:text-black text-black"
                 />
                 <Slider
                   value={[tenure]}
@@ -163,7 +167,10 @@ const FinancePage = () => {
                 </div>
               </div>
 
-              <Button className="w-full mt-6 bg-blue-600 hover:bg-blue-700">
+              <Button 
+                onClick={handleApplyLoan}
+                className="w-full mt-6 bg-blue-600 hover:bg-blue-700"
+              >
                 Apply for Loan
               </Button>
             </div>

@@ -109,7 +109,7 @@ const Footer = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-200 pt-6 sm:pt-8 gap-4 sm:gap-0">
           <div>
             <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-              © 2025 Cars24. All rights reserved.
+              © 2026 Cars24. All rights reserved.
             </p>
           </div>
 

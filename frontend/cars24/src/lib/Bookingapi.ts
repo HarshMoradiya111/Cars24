@@ -8,42 +8,42 @@
  * Framework: ASP.NET Core Web API
  */
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || "https://cars-24-clone-net-nextjs.onrender.com/api"}/Booking`;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_API_URL is not configured");
+}
+
+const BASE_URL = `${API_BASE}/api/Booking`;
 
 export const createBooking = async (userid: string, Booking: any) => {
-  try {
-    const response = await fetch(`${BASE_URL}?userId=${userid}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(Booking),
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("createBooking failed:", err);
-    return { id: "fallback", status: "pending" } as any;
+  const response = await fetch(`${BASE_URL}?userId=${userid}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(Booking),
+  });
+
+  if (!response.ok) {
+    throw new Error(`createBooking failed with HTTP ${response.status}`);
   }
+
+  return response.json();
 };
 
 export const getBookingbyid = async (id: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/${id}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("getBookingbyid failed:", err);
-    return null as any;
+  const response = await fetch(`${BASE_URL}/${id}`);
+  if (!response.ok) {
+    throw new Error(`getBookingbyid failed with HTTP ${response.status}`);
   }
+
+  return response.json();
 };
 export const getBookingbyuser = async (userId: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/user/${userId}/bookings`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("getBookingbyuser failed:", err);
-    return [] as any[];
+  const response = await fetch(`${BASE_URL}/user/${userId}/bookings`);
+  if (!response.ok) {
+    throw new Error(`getBookingbyuser failed with HTTP ${response.status}`);
   }
+
+  return response.json();
 };

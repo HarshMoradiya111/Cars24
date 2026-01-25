@@ -1,5 +1,7 @@
-import { AlertCircle, CreditCard, DollarSign, Tag } from "lucide-react";
+import { AlertCircle, CreditCard, DollarSign, Tag, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { getRecommendation } from "@/lib/pricing";
+import { detectLocationFromIP } from "@/lib/utils";
 type CarDetails = {
   id: string;
   title: string;
@@ -32,6 +34,10 @@ const PricingForm: React.FC<PricingFormprop> = ({
   prevStep,
 }) => {
   const [isValid, setIsValid] = useState(false);
+  const [recommendedPrice, setRecommendedPrice] = useState<number | null>(null);
+  const [pricingNotes, setPricingNotes] = useState<string[]>([]);
+  const [loadingRec, setLoadingRec] = useState<boolean>(false);
+  const [showInfo, setShowInfo] = useState<boolean>(false);
   useEffect(() => {
     setIsValid(!!carDetails.price);
   }, [carDetails.price]);
@@ -45,6 +51,44 @@ const PricingForm: React.FC<PricingFormprop> = ({
 
   const handleEmiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateCarDetails({ emi: e.target.value });
+  };
+
+  useEffect(() => {
+    // Debounced recommendation when title, price, and location present
+    const t = setTimeout(async () => {
+      const { title, price, location } = carDetails;
+      if (!title || !price) {
+        setRecommendedPrice(null);
+        setPricingNotes([]);
+        return;
+      }
+      let userLoc = location;
+      if (!userLoc) {
+        userLoc = (await detectLocationFromIP()) || undefined;
+      }
+      setLoadingRec(true);
+      const rec = await getRecommendation({
+        title,
+        basePrice: price, // in rupees (commas ok)
+        carLocation: location || undefined,
+        userLocation: userLoc,
+      });
+      setLoadingRec(false);
+      if (rec) {
+        setRecommendedPrice(rec.recommendedPrice ?? null);
+        setPricingNotes(rec.pricingNotes ?? []);
+      } else {
+        setRecommendedPrice(null);
+        setPricingNotes([]);
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [carDetails.title, carDetails.price, carDetails.location]);
+
+  const formatLakh = (amount: number | null) => {
+    if (amount === null) return "";
+    const v = amount / 100000;
+    return `₹ ${v.toFixed(2)} lakh`;
   };
   return (
     <form onSubmit={handleSubmit} className="space-y-8 py-4">
@@ -76,11 +120,34 @@ const PricingForm: React.FC<PricingFormprop> = ({
               required
             />
           </div>
-          <div className="mt-1 flex items-center">
-            <AlertCircle className="h-4 w-4 text-blue-500 mr-1" />
-            <p className="text-sm text-blue-600">
-              Setting the right price increases your chances of selling quickly
-            </p>
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="flex items-center">
+              <AlertCircle className="h-4 w-4 text-blue-500 mr-1" />
+              <p className="text-sm text-blue-600">
+                Setting the right price increases your chances of selling quickly
+              </p>
+            </div>
+            <div className="rounded border border-green-200 bg-green-50 p-2">
+              <p className="text-xs text-green-800">
+                {loadingRec
+                  ? "Calculating recommended price..."
+                  : recommendedPrice !== null
+                  ? `Recommended Price: ${formatLakh(recommendedPrice)}`
+                  : "Enter title, location, and price to see recommendations"}
+              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <button type="button" className="text-green-700 text-xs inline-flex items-center"
+                  onClick={() => setShowInfo((v) => !v)}>
+                  <Info className="h-3 w-3 mr-1" /> What affects this?
+                </button>
+                <a href="/faq" className="text-green-700 text-xs underline">Learn more</a>
+              </div>
+              {showInfo && (
+                <div className="mt-2 text-xs text-green-800">
+                  We adjust for region and season: SUVs/off-road trend up in monsoon or hilly regions; hatchbacks soften in metro areas during fuel price spikes. Your base price is multiplied accordingly.
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -167,6 +234,16 @@ const PricingForm: React.FC<PricingFormprop> = ({
           </div>
         </div>
       </div>
+      {pricingNotes.length > 0 && (
+        <div className="bg-green-50 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-green-800">Market trend insights</h3>
+          <ul className="mt-1 text-sm text-green-700 list-disc list-inside">
+            {pricingNotes.map((n, i) => (
+              <li key={i}>{n}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="pt-4 flex justify-between">
         <button
           type="button"

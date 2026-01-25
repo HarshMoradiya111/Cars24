@@ -8,7 +8,12 @@
  * Framework: ASP.NET Core Web API
  */
 
-const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || "https://cars-24-clone-net-nextjs.onrender.com/api"}/Car`;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_API_URL is not configured");
+}
+
+const BASE_URL = `${API_BASE}/api/Car`;
 
 type CarDetails = {
   title: string;
@@ -28,38 +33,73 @@ type CarDetails = {
   highlights: string[];
 };
 export const createCar = async (carDetails: CarDetails) => {
-  try {
-    const response = await fetch(`${BASE_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(carDetails),
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("createCar failed:", err);
-    return null as any;
+  const response = await fetch(`${BASE_URL}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(carDetails),
+  });
+
+  if (!response.ok) {
+    throw new Error(`createCar failed with HTTP ${response.status}`);
   }
+
+  return response.json();
 };
-export const getcarByid = async (id: string) => {
-  try {
-    const response = await fetch(`${BASE_URL}/${id}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("getcarByid failed:", err);
-    return null as any;
+export const getcarByid = async (id: string, opts?: { userLocation?: string; fuelIndex?: number }) => {
+  const params = new URLSearchParams();
+  if (opts?.userLocation) params.set("userLocation", opts.userLocation);
+  if (typeof opts?.fuelIndex === "number") params.set("fuelIndex", String(opts.fuelIndex));
+  const qs = params.toString();
+
+  const response = await fetch(`${BASE_URL}/${id}${qs ? `?${qs}` : ""}`);
+  if (!response.ok) {
+    throw new Error(`getcarByid failed with HTTP ${response.status}`);
   }
+
+  return response.json();
 };
-export const getcarSummaries = async () => {
-  try {
-    const response = await fetch(`${BASE_URL}/summaries`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (err) {
-    console.warn("getcarSummaries failed:", err);
-    return [] as any[];
+export const getcarSummaries = async (opts?: { userLocation?: string; fuelIndex?: number }) => {
+  const params = new URLSearchParams();
+  if (opts?.userLocation) params.set("userLocation", opts.userLocation);
+  if (typeof opts?.fuelIndex === "number") params.set("fuelIndex", String(opts.fuelIndex));
+  const qs = params.toString();
+
+  const response = await fetch(`${BASE_URL}/summaries${qs ? `?${qs}` : ""}`);
+  if (!response.ok) {
+    throw new Error(`getcarSummaries failed with HTTP ${response.status}`);
   }
+
+  return response.json();
+};
+
+export const deleteCar = async (id: string) => {
+  const response = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`deleteCar failed with HTTP ${response.status}`);
+  }
+
+  return response.json();
+};
+
+export const removeDuplicates = async () => {
+  const response = await fetch(`${BASE_URL}/remove-duplicates`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`removeDuplicates failed with HTTP ${response.status}`);
+  }
+
+  return response.json();
 };

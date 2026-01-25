@@ -17,6 +17,10 @@ const faqs = [
     q: "Can I sell my car online?",
     a: "Yes. Start with the Sell Car flow, schedule an inspection, and receive an offer after evaluation.",
   },
+  {
+    q: "How is the Recommended Price calculated?",
+    a: "We apply small multipliers to the base price based on real-world conditions. SUVs and off-road vehicles often see increased demand during monsoon or in hilly regions, while hatchbacks can soften in metro areas during fuel price spikes. Your selected location (or IP-detected region) and current season help determine these adjustments, and we show market trend notes alongside the recommended price.",
+  },
 ];
 
 const FaqPage = () => (

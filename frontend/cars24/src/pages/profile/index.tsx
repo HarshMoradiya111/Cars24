@@ -67,7 +67,10 @@ const index = () => {
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Quick Actions</h2>
                   <div className="space-y-2">
-                    <button className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-gray-50">
+                    <button 
+                      onClick={() => alert('Account Settings\n\nManage your account preferences:\n\n• Change password\n• Email notifications\n• Privacy settings\n• Two-factor authentication\n• Connected devices\n\nThis feature will be available soon!')}
+                      className="w-full flex items-center space-x-2 p-3 text-left rounded-lg hover:bg-gray-50"
+                    >
                       <Settings className="w-5 h-5 text-gray-400" />
                       <span>Account Settings</span>
                     </button>

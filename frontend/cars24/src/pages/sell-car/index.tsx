@@ -75,18 +75,14 @@ const index = () => {
     try {
       const car = await createCar(carDetails);
       if (car?.id) {
-        toast.success("Car listed Successfully");
+        toast.success("Car listed successfully!");
         router.push(`/bookappointment/${car?.id}`);
       } else {
-        const offlineId = uuidv4();
-        toast.warning("Car saved locally (offline mode)");
-        router.push(`/bookappointment/${offlineId}`);
+        toast.error("Failed to create car. Please try again.");
       }
     } catch (error) {
-      console.error(error);
-      const offlineId = uuidv4();
-      toast.warning("Car saved locally (offline mode)");
-      router.push(`/bookappointment/${offlineId}`);
+      console.error("Error creating car:", error);
+      toast.error(`Error: ${error instanceof Error ? error.message : "Failed to create car"}`);
     }
   };
   return (
