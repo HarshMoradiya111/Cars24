@@ -8,6 +8,7 @@ import ServiceCards from "@/components/Home/ServiceCards";
 import CarCategories from "@/components/Home/CarCategories";
 import FeaturedCars from "@/components/Home/FeaturedCars";
 import CustomerReviews from "@/components/Home/CustomerReviews";
+import LocationSection from "@/components/Home/LocationSection";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <ServiceCards />
         <CarCategories />
         <FeaturedCars />
+        <LocationSection />
         <CustomerReviews />
       </div>
     </div>

@@ -24,6 +24,7 @@ import {
 import { Button } from "./ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import CitySelector from "./CitySelector";
 const Header = () => {
   const navItems = [
     { name: "Buy used car", href: "/buy-car" },
@@ -95,6 +96,9 @@ const Header = () => {
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center space-x-2 sm:space-x-4">
+          <div className="relative">
+            <CitySelector />
+          </div>
           <Link href="/wishlist" className="flex items-center justify-center">
             <Button
               variant="ghost"
@@ -223,6 +227,15 @@ const Header = () => {
 
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
+                <div className="py-6">
+                  <div className="px-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                      Location
+                    </p>
+                    <CitySelector />
+                  </div>
+                </div>
+                
                 <div className="space-y-2 py-6">
                   {navItems.map((item) => (
                     <Link

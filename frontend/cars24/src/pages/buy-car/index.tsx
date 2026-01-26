@@ -4,11 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { CarGridSkeleton, EmptyState } from "@/components/ui/SkeletonLoaders";
 // API fetch disabled to show only user-added cars
-import { ChevronDown, Heart, Search, Sliders, ShoppingCart } from "lucide-react";
+import { ChevronDown, Heart, Search, Sliders, ShoppingCart, MapPin } from "lucide-react";
 import Link from "next/link";
 import SafeImage from "@/components/ui/SafeImage";
 import React, { useEffect, useMemo, useState } from "react";
 import { useWishlist } from "@/context/WishlistContext";
+import { useLocation } from "@/context/LocationContext";
 import { calculateRecommendedPrice, detectCarType, Region } from "@/lib/pricingEngine";
 import { getcarSummaries } from "@/lib/Carapi";
 import Fuse from "fuse.js";
@@ -223,6 +224,7 @@ const detectBrand = (title: string) => {
 };
 const index = () => {
   const { toggle, isSaved } = useWishlist();
+  const { selectedCity } = useLocation();
   const [priceRange, setPriceRange] = useState([0, 5000000]); // 0 to 50 lakh
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [cars, setCars] = useState<Car[] | null>(null);
@@ -404,6 +406,11 @@ const index = () => {
             car.title.toLowerCase().includes(brandLower)
           );
         });
+      
+      // City-based filtering - match if location contains selected city
+      const matchesCity = !selectedCity || 
+        car.location.toLowerCase().includes(selectedCity.toLowerCase());
+      
       const matchesFuel = fuelFilters.length === 0 || fuelFilters.includes(car.fuel);
       const matchesTransmission =
         transmissionFilters.length === 0 || transmissionFilters.includes(car.transmission);
@@ -422,6 +429,7 @@ const index = () => {
       return (
         matchesPrice &&
         matchesBrand &&
+        matchesCity &&
         matchesFuel &&
         matchesTransmission &&
         matchesMileage &&
@@ -449,7 +457,7 @@ const index = () => {
     }
 
     return sorted;
-  }, [cars, searchResults, searchQuery, priceRange, selectedBrands, sortOption, fuelFilters, transmissionFilters, mileageRange, yearRange]);
+  }, [cars, searchResults, searchQuery, priceRange, selectedBrands, selectedCity, sortOption, fuelFilters, transmissionFilters, mileageRange, yearRange]);
   
   const showDemoBanner = process.env.NEXT_PUBLIC_SHOW_DEMO_BANNER !== "false";
   return (
@@ -460,6 +468,32 @@ const index = () => {
             <p className="text-sm text-yellow-800">
               ⚠️ Using demo data - Backend API not connected. Configure MongoDB to see live data.
             </p>
+          </div>
+        )}
+        {selectedCity && (
+          <div className="mb-4 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <p className="text-xs sm:text-sm text-blue-800">
+                Showing cars available in <strong>{selectedCity}</strong>
+              </p>
+            </div>
+            <Link href="/locations" className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium active:text-blue-900 w-full sm:w-auto text-center sm:text-left">
+              View Locations →
+            </Link>
+          </div>
+        )}
+        {selectedCity === null && (
+          <div className="mb-4 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-green-600 flex-shrink-0" />
+              <p className="text-xs sm:text-sm text-green-800">
+                Showing available cars from <strong>all cities</strong>
+              </p>
+            </div>
+            <Link href="/locations" className="text-xs sm:text-sm text-green-600 hover:text-green-800 font-medium active:text-green-900 w-full sm:w-auto text-center sm:text-left">
+              View Locations →
+            </Link>
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

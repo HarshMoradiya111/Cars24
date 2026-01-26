@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { LocationProvider } from "@/context/LocationContext";
 import { useToast, ToastContainer } from "@/components/ui/ToastContainer";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
@@ -28,7 +29,9 @@ export default function App(props: AppProps) {
     <AuthProvider>
       <WishlistProvider>
         <NotificationProvider>
-          <AppContent {...props} />
+          <LocationProvider>
+            <AppContent {...props} />
+          </LocationProvider>
         </NotificationProvider>
       </WishlistProvider>
     </AuthProvider>
