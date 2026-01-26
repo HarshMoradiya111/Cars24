@@ -15,6 +15,7 @@ import { getcarSummaries } from "@/lib/Carapi";
 import Fuse from "fuse.js";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
+import { useRouter } from "next/router";
 
 // const cars = [
 //   {
@@ -227,6 +228,7 @@ const detectBrand = (title: string) => {
 const index = () => {
   const { toggle, isSaved } = useWishlist();
   const { selectedCity } = useLocation();
+  const router = useRouter();
   const [priceRange, setPriceRange] = useState([0, 5000000]); // 0 to 50 lakh
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [cars, setCars] = useState<Car[]>([]);
@@ -245,6 +247,13 @@ const index = () => {
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading cars...");
+
+  // Get search query from URL on mount
+  useEffect(() => {
+    if (router.query.search && typeof router.query.search === 'string') {
+      setSearchQuery(router.query.search);
+    }
+  }, [router.query.search]);
   
   const priceStats = useMemo(() => {
     if (!cars || cars.length === 0) return { min: 0, max: 5000000 };

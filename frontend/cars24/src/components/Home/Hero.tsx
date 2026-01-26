@@ -1,9 +1,27 @@
 import { Search } from "lucide-react";
 import React, { useState } from "react";
 import { Input } from "../ui/input";
+import { useRouter } from "next/router";
 
 const Hero = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/buy-car?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push('/buy-car');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="relative w-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
       {/* Background image */}
@@ -40,7 +58,7 @@ const Hero = () => {
 
         {/* Search bar and quick filters */}
         <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 md:p-6 max-w-4xl w-full">
-          <div className="grid grid-cols-1 gap-3 sm:gap-4">
+          <form onSubmit={handleSearch} className="grid grid-cols-1 gap-3 sm:gap-4">
             {/* Search input */}
             <div className="relative">
               <div className="flex items-center border border-gray-300 rounded-md overflow-hidden bg-white">
@@ -51,12 +69,19 @@ const Hero = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   placeholder="Search for your favorite cars"
                   className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm sm:text-base text-black"
                 />
+                <button
+                  type="submit"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
+                >
+                  Search
+                </button>
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
