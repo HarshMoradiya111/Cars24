@@ -13,6 +13,7 @@ import {
   Phone,
   User,
   Info,
+  RefreshCw,
 } from "lucide-react";
 import { Heart } from "lucide-react";
 import { useRouter } from "next/router";
@@ -21,6 +22,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useWishlist } from "@/context/WishlistContext";
 import { detectLocationFromIP } from "@/lib/utils";
+import LoadingState from "@/components/ui/LoadingState";
+import EmptyStateComponent from "@/components/ui/EmptyState";
 const fallbackCarDetails = {
   id: "fronx-2023",
   title: "2023 Maruti FRONX DELTA PLUS 1.2L AGS",
@@ -108,8 +111,10 @@ const index = () => {
   });
   const router = useRouter();
   const { id } = router.query;
-  const [carDetails, setcarDetails] = useState<any>(null);
+  const [carDetails, setcarDetails] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [step, setstep] = useState(1);
   const [userLocation, setUserLocation] = useState<string>("New Delhi");
   const [selectedRegion, setSelectedRegion] = useState<Region>("Metro");
@@ -276,83 +281,179 @@ const index = () => {
     },
   ];
 
+  const fetchCar = async (isRetry = false) => {
+    if (!id) return;
+    
+    try {
+      if (isRetry) {
+        setIsRetrying(true);
+      } else {
+      const mockCars: any[] = [
+        {
+          id: "1",
+          images: [
+            "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",  // ← Change this
+            "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
+          ],
+        },
+        // ... more cars
+      ];      setLoading(true);
+      }
+      setError(undefined);
+      
+      // Reset image index when loading new car
+      setCurrentImageIndex(0);
+      
+      console.time(`API: Load Car ${id}`);
+      
+      // First check localStorage for user-sold cars (defensive)
+      const userSoldCars = localStorage.getItem('userSoldCars');
+      if (userSoldCars) {
+        try {
+          const soldCars = JSON.parse(userSoldCars);
+          const userCar = soldCars.find((c: any) => c?.id === id);
+          if (userCar) {
+            console.log('[car-details] ✓ Loaded from localStorage:', userCar?.title);
+            console.timeEnd(`API: Load Car ${id}`);
+            setcarDetails(userCar);
+            setLoading(false);
+            setIsRetrying(false);
+            return;
+          }
+        } catch (parseError) {
+          console.warn('[car-details] localStorage parse error:', parseError);
+        }
+      }
+
+      // Then try to find in mock cars
+      const mockCar = mockCars.find((c) => c?.id === id);
+      if (mockCar) {
+        console.log('[car-details] ✓ Loaded mock car:', mockCar?.title);
+        console.timeEnd(`API: Load Car ${id}`);
+        setcarDetails(mockCar);
+        setLoading(false);
+        setIsRetrying(false);
+        return;
+      }
+
+      // Then try backend API with defensive checks
+      const data = await getcarByid(id as string, { userLocation });
+      console.timeEnd(`API: Load Car ${id}`);
+      
+      if (!data || Object.keys(data).length === 0) {
+        console.warn('[car-details] API returned empty data, using fallback');
+        setcarDetails(fallbackCarDetails);
+      } else {
+        // Defensive property access
+        const safeData = {
+          ...data,
+          title: data?.title || "Unknown Car",
+          price: data?.price || "N/A",
+          images: Array.isArray(data?.images) && data.images.length > 0 ? data.images : ["https://via.placeholder.com/400x300?text=No+Image"],
+          specs: data?.specs || {},
+          features: Array.isArray(data?.features) ? data.features : [],
+          highlights: Array.isArray(data?.highlights) ? data.highlights : [],
+        };
+        console.log('[car-details] ✓ Loaded from API:', safeData.title);
+        setcarDetails(safeData);
+      }
+      setError(undefined);
+    } catch (error: any) {
+      const errorMsg = error?.message || "Failed to load car details";
+      console.error('[car-details] ✗ Error:', errorMsg, error);
+      setError(errorMsg);
+      // Use fallback on error
+      setcarDetails(fallbackCarDetails);
+    } finally {
+      setLoading(false);
+      setIsRetrying(false);
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
-    async function fetchCar() {
-      try {
-        // Reset image index when loading new car
-        setCurrentImageIndex(0);
-        
-        // First check localStorage for user-sold cars or edited mock cars (priority for edits)
-        const userSoldCars = localStorage.getItem('userSoldCars');
-        if (userSoldCars) {
-          try {
-            const soldCars = JSON.parse(userSoldCars);
-            const userCar = soldCars.find((c: any) => c.id === id);
-            if (userCar) {
-              console.log('Loaded car from localStorage:', userCar.title, 'Images:', userCar.images?.length);
-              setcarDetails(userCar);
-              return;
-            }
-          } catch (parseError) {
-            console.error('Error parsing localStorage userSoldCars:', parseError);
-          }
-        }
-
-        // Then try to find in mock cars
-        const mockCar = mockCars.find((c) => c.id === id);
-        if (mockCar) {
-          console.log('Loaded mock car:', mockCar.title);
-          setcarDetails(mockCar);
-          return;
-        }
-
-        // Then try backend API
-        const data = await getcarByid(id as string, { userLocation });
-        if (!data) {
-          setcarDetails(fallbackCarDetails);
-        } else {
-          setcarDetails(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch car by id, using fallback data", error);
-        setcarDetails(fallbackCarDetails);
-      } finally {
-        setLoading(false);
-      }
-    }
+    
     // Attempt IP-based location detection if not set
     if (!userLocation) {
       detectLocationFromIP().then((loc) => {
         if (loc) setUserLocation(loc);
       });
     }
+    
     fetchCar();
   }, [id, userLocation]);
 
   // Calculate recommended price when car details or region changes
   useEffect(() => {
-    if (carDetails) {
-      const basePrice = parseAmount(carDetails.price);
+    if (carDetails && carDetails.price) {
+      const basePrice = parseAmount(carDetails?.price);
       if (basePrice) {
-        const carType = detectCarType(carDetails.title);
+        const carType = detectCarType(carDetails?.title || "");
         const pricing = calculateRecommendedPrice(basePrice, carType, selectedRegion);
         setRecommendedPrice(pricing);
       }
     }
   }, [carDetails, selectedRegion]);
 
-  if (loading) {
+  const handleRetry = () => {
+    fetchCar(true);
+  };
+
+  if (loading || isRetrying) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <LoadingSpinner message="Loading car details..." />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <RefreshCw className="w-6 h-6 text-blue-600 animate-spin" />
+                <p className="text-base font-medium text-blue-800">
+                  {isRetrying ? "Retrying..." : "Loading car details..."}
+                </p>
+              </div>
+              <p className="text-sm text-blue-600">
+                First load may take 30-50 seconds due to server cold start
+              </p>
+            </div>
+            <LoadingState type="skeleton" count={1} />
+          </div>
+        </div>
       </div>
     );
+
+    if (error && !carDetails) {
+      return (
+        <div className="min-h-screen bg-gray-50">
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto">
+              <EmptyStateComponent
+                type="error"
+                title="Failed to load car details"
+                message={error || "An error occurred while loading car details"}
+                onActionClick={handleRetry}
+                actionText="Try Again"
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
   }
   if (!carDetails) {
     return (
-      <div className="text-center mt-10 text-red-500">
-        Car details not found.
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <EmptyStateComponent
+              type="no-results"
+              title="Car not found"
+              message="The car you're looking for doesn't exist or has been removed."
+              actionText="Browse All Cars"
+              actionHref="/buy-car"
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -412,37 +513,37 @@ const index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 text-black">
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {/* Car Details Summary */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
               {/* Car Image */}
-              <div className="relative aspect-video h-64 sm:h-72 md:h-80 mb-4 rounded-lg overflow-hidden bg-gray-100 group">
+              <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mb-3 sm:mb-4 rounded-lg overflow-hidden bg-gray-100 group">
                 <img
                   key={`car-image-${currentImageIndex}`}
-                  src={carDetails.images?.[currentImageIndex] || carDetails.images?.[0]}
-                  alt={carDetails.title}
-                  className="w-full h-full object-contain"
+                  src={carDetails?.images?.[currentImageIndex] || carDetails?.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image"}
+                  alt={carDetails?.title || "Car image"}
+                  className="w-full h-full object-cover sm:object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300?text=Image+Not+Available";
                   }}
                 />
               
               {/* Image Slider Controls - Only show if more than 1 image */}
-              {carDetails.images && carDetails.images.length > 1 && (
+              {carDetails?.images && Array.isArray(carDetails.images) && carDetails.images.length > 1 && (
                 <>
                   {/* Previous Button */}
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
-                        prev === 0 ? carDetails.images.length - 1 : prev - 1
+                        prev === 0 ? (carDetails?.images?.length || 1) - 1 : prev - 1
                       )
                     }
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all z-10"
+                    className="absolute left-1 sm:left-3 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all z-10"
                     aria-label="Previous image"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
@@ -451,24 +552,24 @@ const index = () => {
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
-                        prev === carDetails.images.length - 1 ? 0 : prev + 1
+                        prev === (carDetails?.images?.length || 1) - 1 ? 0 : prev + 1
                       )
                     }
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all z-10"
+                    className="absolute right-1 sm:right-3 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 sm:p-2 transition-all z-10"
                     aria-label="Next image"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
 
                   {/* Image Counter */}
-                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full z-10">
+                  <div className="absolute bottom-12 sm:bottom-3 left-1/2 transform -translate-x-1/2 bg-black/50 text-white text-xs px-2 sm:px-3 py-1 rounded-full z-10">
                     {currentImageIndex + 1} / {carDetails.images.length}
                   </div>
 
-                  {/* Dots Indicator */}
-                  <div className="absolute bottom-3 right-3 flex gap-1 z-10">
+                  {/* Dots Indicator - Hidden on mobile, visible on larger screens */}
+                  <div className="hidden sm:flex absolute bottom-3 right-3 gap-1 z-10">
                     {carDetails.images.map((_: any, idx: number) => (
                       <button
                         key={idx}
@@ -481,8 +582,8 @@ const index = () => {
                     ))}
                   </div>
 
-                  {/* Thumbnail Strip */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 flex gap-2 overflow-x-auto">
+                  {/* Thumbnail Strip - Hidden on mobile */}
+                  <div className="hidden sm:flex absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 gap-2 overflow-x-auto">
                     {carDetails.images.map((img: string, idx: number) => (
                       <button
                         key={idx}
@@ -508,10 +609,10 @@ const index = () => {
               )}
             </div>
 
-            <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold mb-2">{carDetails.title}</h2>
-                  <p className="text-sm text-gray-400 mb-4">ID: {carDetails.id}</p>
+            <div className="flex justify-between items-start mb-3 sm:mb-4">
+                <div className="flex-1 pr-2">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2">{carDetails.title}</h2>
+                  <p className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-4">ID: {carDetails.id}</p>
                 </div>
                 <button
                   type="button"
@@ -525,27 +626,27 @@ const index = () => {
                       location: carDetails.location,
                     })
                   }
-                  className="p-2 rounded-full border border-gray-200 hover:border-red-400 hover:bg-red-50 transition-colors flex-shrink-0 ml-2"
+                  className="p-1.5 sm:p-2 rounded-full border border-gray-200 hover:border-red-400 hover:bg-red-50 transition-colors flex-shrink-0"
                   aria-label="Toggle wishlist"
                 >
                   <Heart
-                    className={`h-6 w-6 ${isSaved(carDetails.id) ? "text-red-500" : "text-gray-500"}`}
+                    className={`h-5 w-5 sm:h-6 sm:w-6 ${isSaved(carDetails.id) ? "text-red-500" : "text-gray-500"}`}
                     fill={isSaved(carDetails.id) ? "currentColor" : "none"}
                   />
                 </button>
               </div>
 
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-3 sm:mb-4 space-y-4 lg:space-y-0">
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-1">Base Price</p>
-                  <p className="text-3xl font-bold text-blue-600 mb-4">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1">Base Price</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-blue-600 mb-3 sm:mb-4">
                     {formatCurrency(carDetails.price, carDetails.price)}
                   </p>
                   
                   {recommendedPrice && (
-                    <div className="bg-green-50 p-3 rounded-lg mb-4">
-                      <p className="text-sm text-gray-600 mb-1">Recommended Price</p>
-                      <p className="text-2xl font-bold text-green-600 mb-2">
+                    <div className="bg-green-50 p-2 sm:p-3 rounded-lg mb-3 sm:mb-4">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Recommended Price</p>
+                      <p className="text-xl sm:text-2xl font-bold text-green-600 mb-2">
                         {formatCurrency(String(recommendedPrice.recommendedPrice), "")}
                       </p>
                       <p className="text-xs text-gray-700 italic">
@@ -554,7 +655,7 @@ const index = () => {
                     </div>
                   )}
 
-                  <p className="text-gray-600">
+                  <p className="text-sm sm:text-base text-gray-600">
                     EMI from
                     {(() => {
                       const emiAmount = parseAmount(carDetails.emi);
@@ -564,56 +665,57 @@ const index = () => {
                     })()}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="text-gray-600">{carDetails.location}</p>
-                  <p className="text-sm text-gray-500 mb-3">
+                <div className="lg:text-right w-full lg:w-auto lg:ml-4">
+                  <p className="text-sm sm:text-base text-gray-600">{carDetails.location}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
                     {carDetails.specs.km} driven
                   </p>
-                  <div className="mb-3">
+                  <div className="mb-2 sm:mb-3">
                     <label className="text-xs font-medium text-gray-700 block mb-1">
                       Region (for pricing)
                     </label>
                     <select
                       value={selectedRegion}
                       onChange={(e) => setSelectedRegion(e.target.value as Region)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="Metro">Metro</option>
                       <option value="Hilly">Hilly</option>
                       <option value="Rural">Rural</option>
                     </select>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center">
                     <Input
                       type="text"
                       value={userLocation}
                       onChange={(e) => setUserLocation(e.target.value)}
                       placeholder="Your location"
+                      className="text-xs sm:text-sm"
                     />
                   </div>
                 </div>
               </div>
               {/* Specs Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-gray-600">Year</p>
-                  <p className="font-medium">{carDetails.specs.year}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600">Year</p>
+                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.year}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-gray-600">Fuel Type</p>
-                  <p className="font-medium">{carDetails.specs.fuel}</p>
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600">Fuel Type</p>
+                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.fuel}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-gray-600">Transmission</p>
-                  <p className="font-medium">{carDetails.specs.transmission}</p>
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600">Transmission</p>
+                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.transmission}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-gray-600">Owner</p>
-                  <p className="font-medium">{carDetails.specs.owner}</p>
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600">Owner</p>
+                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.owner}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-gray-600">Insurance</p>
-                  <p className="font-medium">{carDetails.specs.insurance}</p>
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg col-span-2 sm:col-span-1">
+                  <p className="text-xs sm:text-sm text-gray-600">Insurance</p>
+                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.insurance}</p>
                 </div>
               </div>
               {Array.isArray(carDetails.pricingNotes) && carDetails.pricingNotes.length > 0 && (
@@ -627,23 +729,23 @@ const index = () => {
                 </div>
               )}
               {/* Highlights */}
-              <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                <h3 className="font-semibold text-blue-800 mb-2">
+              <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-2">
                   Car Highlights
                 </h3>
                 <ul className="space-y-1">
                   {carDetails.highlights.map((highlight: any, index: any) => (
-                    <li key={index} className="text-blue-700 flex items-center">
-                      <div className="w-2 h-2 bg-blue-700 rounded-full mr-2"></div>
+                    <li key={index} className="text-xs sm:text-sm text-blue-700 flex items-center">
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-700 rounded-full mr-2"></div>
                       {highlight}
                     </li>
                   ))}
                 </ul>
               </div>
               {/* Features */}
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="font-semibold text-gray-800 mb-2">Features</h3>
-                <ul className="list-disc list-inside space-y-1 text-gray-700">
+              <div className="bg-gray-100 p-3 sm:p-4 rounded-lg">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2">Features</h3>
+                <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
                   {carDetails.features.map((feature: any, index: any) => (
                     <li key={index}>{feature}</li>
                   ))}
@@ -651,17 +753,17 @@ const index = () => {
               </div>
             </div>
             {/* booking form  */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-bold mb-6">
+            <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
                 Complete Your Purchase
               </h2>
 
-              <div className="mb-6">
-                <div className="flex items-center space-x-4">
+              <div className="mb-4 sm:mb-6">
+                <div className="flex items-center justify-center space-x-2 sm:space-x-4">
                   {[1, 2, 3].map((stepNumber) => (
                     <div key={stepNumber} className="flex items-center">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-base ${
                           step === stepNumber
                             ? "bg-blue-600 text-white"
                             : step > stepNumber
@@ -673,7 +775,7 @@ const index = () => {
                       </div>
                       {stepNumber < 3 && (
                         <div
-                          className={`w-12 h-1 ${
+                          className={`w-8 sm:w-12 h-1 ${
                             step > stepNumber ? "bg-green-500" : "bg-gray-200"
                           }`}
                         ></div>
@@ -829,12 +931,12 @@ const index = () => {
                     </div>
                   </div>
                 )}
-                <div className="flex justify-between pt-6">
+                <div className="flex justify-between pt-4 sm:pt-6">
                   {step > 1 && (
                     <button
                       type="button"
                       onClick={() => setstep(step - 1)}
-                      className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                       Back
                     </button>
@@ -844,7 +946,7 @@ const index = () => {
                     <button
                       type="button"
                       onClick={() => validatestep() && setstep(step + 1)}
-                      className={`px-6 py-2 rounded-md text-white ${
+                      className={`px-4 sm:px-6 py-2 text-sm sm:text-base rounded-md text-white ml-auto ${
                         validatestep()
                           ? "bg-blue-600 hover:bg-blue-700"
                           : "bg-gray-400 cursor-not-allowed"
@@ -856,7 +958,7 @@ const index = () => {
                   ) : (
                     <button
                       type="submit"
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-green-600 text-white rounded-md hover:bg-green-700 ml-auto"
                     >
                       Complete Purchase
                     </button>

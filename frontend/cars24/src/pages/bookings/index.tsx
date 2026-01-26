@@ -20,12 +20,15 @@ import {
   CreditCard,
   DollarSign,
   ShoppingBag,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getBookingbyuser } from "@/lib/Bookingapi";
 import { BookingListSkeleton, EmptyState, LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import { Button } from "@/components/ui/button";
+import LoadingState from "@/components/ui/LoadingState";
+import EmptyStateComponent from "@/components/ui/EmptyState";
 
 const PurchasedCarsPage = () => {
   const fallbackPurchasedCars = [
@@ -187,83 +190,155 @@ const PurchasedCarsPage = () => {
   };
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [purchasedCars, setpurchasedCars] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [purchasedCars, setpurchasedCars] = useState<any[]>([]);
+  
+  const fetchBookings = async (isRetry = false) => {
+    try {
+      if (isRetry) {
+        setIsRetrying(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+
+      if (!user) {
+        console.log('[bookings] No user, using fallback data');
+        setpurchasedCars(fallbackPurchasedCars);
+        return;
+      }
+
+      console.time('API: Load Bookings');
+      const response = await getBookingbyuser(user.id);
+      console.timeEnd('API: Load Bookings');
+      
+      // Defensive: Check if response is valid
+      if (!response) {
+        console.warn('[bookings] API returned null/undefined, using fallback');
+        setpurchasedCars(fallbackPurchasedCars);
+        return;
+      }
+
+      // Safe array extraction
+      let bookingsArray: any[] = [];
+      if (Array.isArray(response)) {
+        bookingsArray = response;
+      } else if (response && typeof response === 'object') {
+        if (Array.isArray(response.data)) {
+          bookingsArray = response.data;
+        } else if (Array.isArray(response.bookings)) {
+          bookingsArray = response.bookings;
+        }
+      }
+
+      if (bookingsArray.length === 0) {
+        console.log('[bookings] No bookings found for user');
+        setpurchasedCars([]);
+      } else {
+        // Add defensive null checks on each booking
+        const safeBookings = bookingsArray.map((item: any) => ({
+          booking: {
+            id: item?.booking?.id || item?.id || `booking-${Date.now()}`,
+            preferredDate: item?.booking?.preferredDate || "N/A",
+            preferredTime: item?.booking?.preferredTime || "N/A",
+            name: item?.booking?.name || "N/A",
+            phone: item?.booking?.phone || "N/A",
+            email: item?.booking?.email || "N/A",
+            address: item?.booking?.address || "N/A",
+            paymentMethod: item?.booking?.paymentMethod || "N/A",
+            loanStatus: item?.booking?.loanStatus || "N/A",
+            downPayment: item?.booking?.downPayment || "0",
+          },
+          car: {
+            id: item?.car?.id || "unknown",
+            title: item?.car?.title || "Unknown Car",
+            images: Array.isArray(item?.car?.images) && item.car.images.length > 0 
+              ? item.car.images 
+              : ["https://via.placeholder.com/400x300?text=No+Image"],
+            location: item?.car?.location || "N/A",
+            price: item?.car?.price || "N/A",
+            emi: item?.car?.emi || "N/A",
+            specs: item?.car?.specs || {},
+            highlights: Array.isArray(item?.car?.highlights) ? item.car.highlights : [],
+            features: Array.isArray(item?.car?.features) ? item.car.features : [],
+          },
+        }));
+        console.log(`[bookings] ✓ Loaded ${safeBookings.length} bookings`);
+        setpurchasedCars(safeBookings);
+      }
+      setError(null);
+    } catch (err: any) {
+      const errorMsg = err?.message || "Failed to load bookings";
+      console.error('[bookings] ✗ Error:', errorMsg, err);
+      setError(errorMsg);
+      setpurchasedCars(fallbackPurchasedCars); // Use fallback on error
+    } finally {
+      setLoading(false);
+      setIsRetrying(false);
+    }
+  };
   
   useEffect(() => {
-    const fetchpurchasedCars = async () => {
-      setLoading(true);
-      setError(false);
-      
-      try {
-        if (!user) {
-          setpurchasedCars(fallbackPurchasedCars);
-          return;
-        }
-        
-        const list = await getBookingbyuser(user.id);
-        
-        if (!list || list.length === 0) {
-          setpurchasedCars(fallbackPurchasedCars);
-        } else {
-          setpurchasedCars(list);
-        }
-      } catch (error) {
-        console.error("[Bookings] Failed to fetch bookings:", error);
-        setError(true);
-        setpurchasedCars(fallbackPurchasedCars);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchpurchasedCars();
+    fetchBookings();
   }, [user]);
   
-  if (loading) {
+  const handleRetry = () => {
+    fetchBookings(true);
+  };
+  
+  if (loading || isRetrying) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Your Bookings</h1>
-          <p className="text-gray-600">Loading your car bookings...</p>
-        </div>
         <div className="max-w-5xl mx-auto">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-gray-800">Your Bookings</h1>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center mb-6">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <RefreshCw className="w-5 h-5 text-blue-600 animate-spin" />
+              <p className="text-sm font-medium text-blue-800">
+                {isRetrying ? "Retrying..." : "Loading your bookings..."}
+              </p>
+            </div>
+            <p className="text-xs text-blue-600">
+              First load may take 30-50 seconds due to server cold start
+            </p>
+          </div>
           <BookingListSkeleton count={2} />
         </div>
       </div>
     );
   }
   
-  if (error && (!purchasedCars || purchasedCars.length === 0)) {
+  if (error && !loading && !isRetrying) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
-        <EmptyState
-          title="Failed to Load Bookings"
-          description="We couldn't fetch your bookings. Please try again later."
-          icon={<AlertCircle className="h-16 w-16" />}
-          action={
-            <Button onClick={() => window.location.reload()} variant="default">
-              Retry
-            </Button>
-          }
-        />
+        <div className="max-w-5xl mx-auto">
+          <EmptyStateComponent
+            type="error"
+            title="Failed to load bookings"
+            message={error}
+            onActionClick={handleRetry}
+            actionText="Try Again"
+          />
+        </div>
       </div>
     );
   }
   
-  if (!purchasedCars || purchasedCars.length === 0) {
+  if (purchasedCars.length === 0 && !loading && !isRetrying) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
-        <EmptyState
-          title="No Bookings Found"
-          description="You haven't made any car bookings yet. Start browsing our collection!"
-          icon={<ShoppingBag className="h-16 w-16" />}
-          action={
-            <Link href="/buy-car">
-              <Button variant="default">Browse Cars</Button>
-            </Link>
-          }
-        />
+        <div className="max-w-5xl mx-auto">
+          <EmptyStateComponent
+            type="no-results"
+            title="No bookings found"
+            message="You haven't made any car bookings yet. Start browsing our collection!"
+            actionText="Browse Cars"
+            actionHref="/buy-car"
+          />
+        </div>
       </div>
     );
   }
