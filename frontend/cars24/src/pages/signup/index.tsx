@@ -14,6 +14,7 @@ const index = () => {
     confirmPassword: "",
     fullName: "",
     phone: "",
+    referralCode: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,13 @@ const index = () => {
       [name]: value,
     }));
   };
+
+  React.useEffect(() => {
+    const refFromUrl = navigate.query?.ref;
+    if (typeof refFromUrl === "string" && refFromUrl) {
+      setFormData((prev) => ({ ...prev, referralCode: refFromUrl }));
+    }
+  }, [navigate.query?.ref]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +46,15 @@ const index = () => {
       await signUp(formData.email, formData.password, {
         fullName: formData.fullName,
         phone: formData.phone,
+        referralCode: formData.referralCode || undefined,
       });
       toast.success("Account created successfully!");
       navigate.push("/");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Signup error:", err);
-      toast.error("Failed to create an account. Please try again.");
-      setError("Failed to create an account. Please try again.");
+      const msg = err?.message || "Failed to create an account. Please try again.";
+      toast.error(msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -162,6 +172,30 @@ const index = () => {
                 placeholder="+1 (555) 000-0000"
               />
             </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="referralCode"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Referral Code (optional)
+            </label>
+            <p className="text-xs text-gray-500 mb-2">Get 50 bonus points when you sign up with a referral code!</p>
+            <div className="mt-1">
+              <input
+                id="referralCode"
+                name="referralCode"
+                type="text"
+                value={formData.referralCode}
+                onChange={handleChange}
+                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Enter referral code"
+              />
+            </div>
+            {formData.referralCode && (
+              <p className="text-xs text-green-600 mt-1">✓ You'll earn 50 bonus points with this code!</p>
+            )}
           </div>
 
           <div>

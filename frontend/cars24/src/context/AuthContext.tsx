@@ -7,6 +7,9 @@ type User = {
   email: string;
   fullName: string;
   phone: string;
+  referralCode?: string;
+  referredBy?: string | null;
+  walletPoints?: number;
 };
 
 type AuthContextType = {
@@ -28,10 +31,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const normalizeUser = (incoming: any): User => ({
+    id: incoming?.id,
+    email: incoming?.email,
+    fullName: incoming?.fullName,
+    phone: incoming?.phone,
+    referralCode: incoming?.referralCode ?? "",
+    referredBy: incoming?.referredBy ?? null,
+    walletPoints: incoming?.walletPoints ?? 0,
+  });
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(normalizeUser(JSON.parse(storedUser)));
     }
   }, []);
 
@@ -39,8 +52,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true);
     try {
       const userData = await api.login(email, password);
-      setUser(userData.user);
-      localStorage.setItem("user", JSON.stringify(userData.user));
+      const normalized = normalizeUser(userData.user);
+      setUser(normalized);
+      localStorage.setItem("user", JSON.stringify(normalized));
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -58,9 +72,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const newUser = await api.signup(email, password, {
         fullName: userData.fullName,
         phone: userData.phone,
+        referralCode: userData.referralCode,
       });
-      setUser(newUser.user);
-      localStorage.setItem("user", JSON.stringify(newUser.user));
+      const normalized = normalizeUser(newUser.user);
+      setUser(normalized);
+      localStorage.setItem("user", JSON.stringify(normalized));
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
