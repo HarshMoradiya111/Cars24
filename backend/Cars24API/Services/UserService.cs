@@ -18,6 +18,9 @@ public class UserService
     public async Task<User?> GetByEmailAsync(string email) =>
         await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
 
+    public async Task<User?> GetByReferralCodeAsync(string referralCode) =>
+        await _users.Find(u => u.ReferralCode == referralCode).FirstOrDefaultAsync();
+
     public async Task CreateAsync(User user) =>
         await _users.InsertOneAsync(user);
 
@@ -27,7 +30,38 @@ public class UserService
     }
     public async Task UpdateAsync(string id, User user)
     {
-        _users.ReplaceOneAsync(u => u.Id == id, user);
+        await _users.ReplaceOneAsync(u => u.Id == id, user);
+    }
+
+    public async Task AddWalletPointsAsync(string userId, int points)
+    {
+        var update = Builders<User>.Update.Inc(u => u.WalletPoints, points);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
+    }
+
+    public async Task<bool> RedeemAsync(string userId, int cost)
+    {
+        var filter = Builders<User>.Filter.And(
+            Builders<User>.Filter.Eq(u => u.Id, userId),
+            Builders<User>.Filter.Gte(u => u.WalletPoints, cost)
+        );
+
+        var update = Builders<User>.Update.Inc(u => u.WalletPoints, -cost);
+
+        var result = await _users.UpdateOneAsync(filter, update);
+        return result.ModifiedCount > 0;
+    }
+
+    public async Task<string> GenerateUniqueReferralCodeAsync()
+    {
+        // Keep it short but unique enough for this app
+        string code;
+        do
+        {
+            code = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpperInvariant();
+        } while (await GetByReferralCodeAsync(code) != null);
+
+        return code;
     }
 
 }
