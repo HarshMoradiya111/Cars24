@@ -32,4 +32,10 @@ public class User
 
     public List<string> AppointmentId { get; set; } = new List<string>();
 
+    public string ReferralCode { get; set; } = string.Empty;
+
+    public string? ReferredBy { get; set; }
+
+    public int WalletPoints { get; set; } = 0;
+
 }
