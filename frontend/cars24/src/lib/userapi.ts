@@ -18,7 +18,7 @@ const BASE_URL = `${API_BASE}/api/UserAuth`;
 export const signup = async (
   email: string,
   password: string,
-  userData: { fullName: string; phone: string }
+  userData: { fullName: string; phone: string; referralCode?: string }
 ) => {
   const response = await fetch(`${BASE_URL}/signup`, {
     method: "POST",
@@ -29,7 +29,9 @@ export const signup = async (
   });
 
   if (!response.ok) {
-    throw new Error(`signup failed with HTTP ${response.status}`);
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `signup failed with HTTP ${response.status}`;
+    throw new Error(message);
   }
 
   const data = await response.json();
@@ -46,7 +48,9 @@ export const login = async (email: string, password: string) => {
   });
 
   if (!response.ok) {
-    throw new Error(`login failed with HTTP ${response.status}`);
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `login failed with HTTP ${response.status}`;
+    throw new Error(message);
   }
 
   const data = await response.json();
@@ -62,4 +66,37 @@ export const getUserById = async (userId: string) => {
 
   const data = await response.json();
   return data?.user ? data : { user: data };
+};
+
+export const getWallet = async (userId: string) => {
+  const response = await fetch(`${API_BASE}/api/user/${userId}/wallet`);
+  if (response.status === 404) {
+    return { points: 0, message: "Wallet not found" };
+  }
+  if (!response.ok) {
+    throw new Error(`getWallet failed with HTTP ${response.status}`);
+  }
+  return response.json();
+};
+
+export const redeemWallet = async (userId: string) => {
+  const response = await fetch(`${API_BASE}/api/user/${userId}/redeem`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ message: "Redeem failed" }));
+    throw new Error(err?.message || `redeem failed with HTTP ${response.status}`);
+  }
+  return response.json();
+};
+
+export const getRedemptions = async (userId: string) => {
+  const response = await fetch(`${API_BASE}/api/user/${userId}/redemptions`);
+  if (response.status === 404) {
+    return []; // Return empty array if endpoint not found or no history
+  }
+  if (!response.ok) {
+    throw new Error(`getRedemptions failed with HTTP ${response.status}`);
+  }
+  return response.json();
 };
