@@ -21,27 +21,66 @@ public class UserAuthController : ControllerBase
         if (user == null)
             return NotFound("User not found.");
 
-        return Ok(user);
+        return Ok(new
+        {
+            id = user.Id,
+            fullName = user.FullName,
+            email = user.Email,
+            phone = user.Phone,
+            referralCode = user.ReferralCode ?? string.Empty,
+            walletPoints = user.WalletPoints,
+            referredBy = user.ReferredBy
+        });
     }
     [HttpPost("signup")]
-    public async Task<IActionResult> Signup([FromBody] User user)
+    public async Task<IActionResult> Signup([FromBody] SignupRequest request)
     {
-        var existingUser = await _userService.GetByEmailAsync(user.Email);
+        var existingUser = await _userService.GetByEmailAsync(request.Email);
         if (existingUser != null)
             return BadRequest(new { message = "User already exists." });
 
-        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        await _userService.CreateAsync(user);
+        // Prepare new user
+        var newUser = new User
+        {
+            FullName = request.FullName,
+            Email = request.Email,
+            Phone = request.Phone,
+            Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            WalletPoints = 0
+        };
+
+        // Generate unique referral code
+        newUser.ReferralCode = await _userService.GenerateUniqueReferralCodeAsync();
+
+        // Apply referral if provided
+        if (!string.IsNullOrWhiteSpace(request.ReferralCode))
+        {
+            var referrer = await _userService.GetByReferralCodeAsync(request.ReferralCode.Trim());
+            if (referrer != null)
+            {
+                newUser.ReferredBy = referrer.Id;
+                newUser.WalletPoints += 50; // bonus for new user
+                if (!string.IsNullOrEmpty(referrer.Id))
+                {
+                    await _userService.AddWalletPointsAsync(referrer.Id, 100); // bonus for referrer
+                }
+            }
+        }
+
+        await _userService.CreateAsync(newUser);
 
         return Ok(new
         {
             message = "Signup successful",
             user = new
             {
-                id = user.Id, // MongoDB-generated ObjectId
-                fullName = user.FullName,
-                email = user.Email,
-                phone = user.Phone
+                id = newUser.Id, // MongoDB-generated ObjectId
+                fullName = newUser.FullName,
+                email = newUser.Email,
+                phone = newUser.Phone,
+                referralCode = newUser.ReferralCode ?? string.Empty,
+                walletPoints = newUser.WalletPoints,
+                referredBy = newUser.ReferredBy
             }
         });
     }
@@ -61,7 +100,10 @@ public class UserAuthController : ControllerBase
                 id = user.Id,
                 fullName = user.FullName,
                 email = user.Email,
-                phone = user.Phone
+                phone = user.Phone,
+                referralCode = user.ReferralCode ?? string.Empty,
+                walletPoints = user.WalletPoints,
+                referredBy = user.ReferredBy
             }
         });
     }
@@ -70,5 +112,14 @@ public class UserAuthController : ControllerBase
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class SignupRequest
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? ReferralCode { get; set; }
     }
 }
