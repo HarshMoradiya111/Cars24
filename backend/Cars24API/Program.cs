@@ -18,10 +18,17 @@ builder.Services.AddTransient<RedemptionService>(sp => new RedemptionService(bui
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
     )
 );
+
 var app = builder.Build();
+
+// Enable CORS before mapping routes
+app.UseCors("AllowAll");
 
 app.MapGet("/", () => "Welcome to Cars24 API");
 
