@@ -14,6 +14,7 @@ builder.Services.AddTransient<CarService>(sp => new CarService(builder.Configura
 builder.Services.AddTransient<BookingService>(sp => new BookingService(builder.Configuration));
 builder.Services.AddTransient<AppointmentService>(sp => new AppointmentService(builder.Configuration));
 builder.Services.AddTransient<PricingService>(sp => new PricingService(builder.Configuration));
+builder.Services.AddTransient<RedemptionService>(sp => new RedemptionService(builder.Configuration));
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
