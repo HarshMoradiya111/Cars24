@@ -7,6 +7,12 @@ import { toast } from "sonner";
 const index = () => {
   const { user, signOut } = useAuth();
   const [copying, setCopying] = useState(false);
+  
+  // Log user data for debugging
+  React.useEffect(() => {
+    console.log("Profile page - Current user:", user);
+  }, [user]);
+
   const safeUser = user || {
     id: "fallback",
     email: "user@example.com",
