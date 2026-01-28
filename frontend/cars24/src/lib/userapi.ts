@@ -87,7 +87,15 @@ export const redeemWallet = async (userId: string) => {
     const err = await response.json().catch(() => ({ message: "Redeem failed" }));
     throw new Error(err?.message || `redeem failed with HTTP ${response.status}`);
   }
-  return response.json();
+  const result = await response.json();
+  
+  // Fetch updated user data to sync with AuthContext
+  try {
+    const userData = await getUserById(userId);
+    return { ...result, user: userData?.user || userData };
+  } catch (err) {
+    return result; // Return redemption result if user fetch fails
+  }
 };
 
 export const getRedemptions = async (userId: string) => {

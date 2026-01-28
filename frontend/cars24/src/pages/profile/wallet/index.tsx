@@ -15,19 +15,21 @@ interface Redemption {
 }
 
 const WalletPage = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const router = useRouter();
-  const [points, setPoints] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [redeeming, setRedeeming] = useState<boolean>(false);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+
+  // Use user.walletPoints from AuthContext instead of local state
+  const points = user?.walletPoints ?? 0;
 
   const loadWallet = async () => {
     if (!user?.id) return;
     setLoading(true);
     try {
       const data = await getWallet(user.id);
-      setPoints(data?.points ?? 0);
+      // Point will update automatically from AuthContext
       if (data?.message) {
         toast.message(data.message);
       }
@@ -60,8 +62,13 @@ const WalletPage = () => {
     setRedeeming(true);
     try {
       const res = await redeemWallet(user.id);
-      const updated = res?.points ?? Math.max(0, points - 100);
-      setPoints(updated);
+      // Update user in AuthContext with new wallet points
+      if (res?.user) {
+        setUser({
+          ...user,
+          walletPoints: res.user.walletPoints ?? 0,
+        });
+      }
       toast.success("Redeemed successfully");
       loadRedemptions(); // Refresh history
     } catch (err: any) {
