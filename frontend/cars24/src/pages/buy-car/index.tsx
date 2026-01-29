@@ -657,12 +657,12 @@ const index = () => {
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Fuel Type</label>
-                  <div className="space-htmlFor={`fuel-${fuel}`} className="flex items-center">
+                  <div className="space-y-1.5 sm:space-y-2 max-h-28 sm:max-h-none overflow-y-auto">
+                    {["Petrol", "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
+                      <label key={fuel} htmlFor={`fuel-${fuel}`} className="flex items-center">
                         <input
                           id={`fuel-${fuel}`}
-                          name={`fuel-${fuel}`}, "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
-                      <label key={fuel} className="flex items-center">
-                        <input
+                          name={`fuel-${fuel}`}
                           type="checkbox"
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 sm:w-4 sm:h-4"
                           checked={fuelFilters.includes(fuel)}
@@ -681,12 +681,12 @@ const index = () => {
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Transmission</label>
-                  <div className="space-htmlFor={`transmission-${mode}`} className="flex items-center">
+                  <div className="space-y-1.5 sm:space-y-2">
+                    {["Manual", "Auto", "Automatic"].map((mode) => (
+                      <label key={mode} htmlFor={`transmission-${mode}`} className="flex items-center">
                         <input
                           id={`transmission-${mode}`}
-                          name={`transmission-${mode}`}, "Auto", "Automatic"].map((mode) => (
-                      <label key={mode} className="flex items-center">
-                        <input
+                          name={`transmission-${mode}`}
                           type="checkbox"
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 sm:w-4 sm:h-4"
                           checked={transmissionFilters.includes(mode)}
