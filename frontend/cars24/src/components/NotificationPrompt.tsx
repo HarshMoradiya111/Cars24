@@ -7,6 +7,7 @@ export const NotificationPrompt = () => {
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [debugInfo, setDebugInfo] = useState<any>({});
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,6 +16,17 @@ export const NotificationPrompt = () => {
       console.log('[NotificationPrompt] Checking if should show...');
       
       const debug: any = {};
+
+      const forceShow =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("forceNotificationPrompt");
+      if (forceShow) {
+        console.log('[NotificationPrompt] ✅ Force show enabled');
+        debug.forceShow = true;
+        setStatusMessage(null);
+        setDebugInfo(debug);
+        return true;
+      }
 
       if (dismissed) {
         console.log('[NotificationPrompt] ❌ Already dismissed in this session');
@@ -30,10 +42,13 @@ export const NotificationPrompt = () => {
       debug.browser = true;
       
       if (!("Notification" in window)) {
-        console.log('[NotificationPrompt] ❌ Notification API not supported');
+        console.log('[NotificationPrompt] ⚠️ Notification API not supported');
         debug.notificationAPI = false;
+        setStatusMessage(
+          "Notifications aren't supported on this browser. On iOS, you need Safari 16.4+ and HTTPS."
+        );
         setDebugInfo(debug);
-        return false;
+        return true;
       }
       
       debug.notificationAPI = true;
@@ -42,6 +57,16 @@ export const NotificationPrompt = () => {
         console.log('[NotificationPrompt] ❌ Permission already granted');
         debug.permission = Notification.permission;
         return false;
+      }
+
+      if (Notification.permission === "denied") {
+        console.log('[NotificationPrompt] ⚠️ Permission denied');
+        debug.permission = Notification.permission;
+        setStatusMessage(
+          "Notifications are blocked. Enable them in your browser settings to proceed."
+        );
+        setDebugInfo(debug);
+        return true;
       }
       
       debug.permission = Notification.permission;
@@ -68,6 +93,7 @@ export const NotificationPrompt = () => {
         }
       }
       
+      setStatusMessage(null);
       console.log('[NotificationPrompt] ✅ All checks passed, will show prompt');
       setDebugInfo(debug);
       return true;
@@ -108,10 +134,11 @@ export const NotificationPrompt = () => {
           
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Stay Updated!
+              {statusMessage ? "Notifications Unavailable" : "Stay Updated!"}
             </h3>
             <p className="text-sm text-gray-600 mb-3">
-              Enable notifications to get instant alerts about appointments, price drops, and booking updates.
+              {statusMessage ??
+                "Enable notifications to get instant alerts about appointments, price drops, and booking updates."}
             </p>
             
             <div className="flex gap-2">
