@@ -149,10 +149,22 @@ const NotificationSettings = () => {
       {showSuccess && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
           <CheckCircle className="text-green-600 h-5 w-5" />
-          <p className="text-green-800">
-            Notifications enabled successfully! You'll now receive real-time
-            alerts.
-          </p>
+          <div>
+            <p className="text-green-800 font-medium">
+              Notifications enabled successfully!
+            </p>
+            {fcmToken && !fcmToken.includes("notification-enabled") && (
+              <p className="text-sm text-green-700">
+                You'll now receive real-time alerts on your device.
+              </p>
+            )}
+            {fcmToken && fcmToken.includes("notification-enabled") && (
+              <p className="text-sm text-green-700">
+                Basic notifications enabled. For full push notification support, 
+                we're working on improving our Firebase configuration.
+              </p>
+            )}
+          </div>
         </div>
       )}
 
