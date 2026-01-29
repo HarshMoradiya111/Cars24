@@ -101,67 +101,7 @@ const PurchasedCarsPage = () => {
       },
     },
   ];
-  // Mock purchased cars data matching MongoDB schema
-  // const purchasedCars = [
-  //   {
-  //     id: "1",
-  //     car: {
-  //       id: "car1",
-  //       title: "Honda City 2020 ZX MT PETROL",
-  //       image:
-  //         "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  //       price: "$8,50,000",
-  //     },
-  //     bookingAmount: 25000,
-  //     isRefunded: false,
-  //     bookingStatus: "completed",
-  //     deliveryStatus: "scheduled",
-  //     deliveryDate: "2024-03-20",
-  //     location: "Mumbai, Maharashtra",
-  //     documents: {
-  //       registration: true,
-  //       insurance: true,
-  //       loan: "In Process",
-  //     },
-  //     nextServiceDate: "2024-08-15",
-  //     warranty: "Valid till 2026",
-  //     specs: {
-  //       km: "45,000",
-  //       fuel: "Petrol",
-  //       transmission: "Manual",
-  //     },
-  //     bookedAt: "2024-02-15",
-  //   },
-  //   {
-  //     id: "2",
-  //     car: {
-  //       id: "car2",
-  //       title: "Hyundai i20 2019 Asta",
-  //       image:
-  //         "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  //       price: "$6,75,000",
-  //     },
-  //     bookingAmount: 20000,
-  //     isRefunded: false,
-  //     bookingStatus: "completed",
-  //     deliveryStatus: "delivered",
-  //     deliveryDate: "2024-02-01",
-  //     location: "Mumbai, Maharashtra",
-  //     documents: {
-  //       registration: true,
-  //       insurance: true,
-  //       loan: "Approved",
-  //     },
-  //     nextServiceDate: "2024-07-01",
-  //     warranty: "Valid till 2025",
-  //     specs: {
-  //       km: "38,000",
-  //       fuel: "Petrol",
-  //       transmission: "Manual",
-  //     },
-  //     bookedAt: "2024-01-10",
-  //   },
-  // ];
+  
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {

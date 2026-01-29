@@ -7,7 +7,7 @@ REM Car 1
 echo Adding Car 1: Maruti Suzuki Swift...
 curl -X POST http://localhost:5203/api/Car ^
   -H "Content-Type: application/json" ^
-  -d "{\"title\":\"2023 Maruti Suzuki Swift VXI\",\"images\":[\"https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg\"],\"price\":\"₹6.80 lakh\",\"emi\":\"₹8,245/m\",\"location\":\"Rohini, New Delhi\",\"specs\":{\"year\":2023,\"km\":\"15,000\",\"fuel\":\"Petrol\",\"transmission\":\"Manual\",\"owner\":\"1st owner\",\"insurance\":\"Comprehensive\"},\"features\":[\"Power Steering\",\"Air Conditioning\",\"ABS\"],\"highlights\":[\"Well maintained\",\"Single owner\"]}"
+  -d "{\"title\":\"2023 Maruti Suzuki Swift VXI\",\"images\":[\"https://search.brave.com/images?q=Maruti+Suzuki+swift+pexel.com&context=W3sic3JjIjoiaHR0cHM6Ly93d3cuY2FyYW5kYmlrZS5jb20vX25leHQvaW1hZ2U_dXJsPWh0dHBzOi8vaW1hZ2VzLmNhcmFuZGJpa2UuY29tL2Nhci1pbWFnZXMvZ2FsbGVyeS9tYXJ1dGktc3V6dWtpL3N3aWZ0L2V4dGVyaW9yL21hcnV0aV9zdXp1a2lfc3dpZnRfcmlkZXZpZXdfMTIuanBnJnc9MjU2JnE9NzUiLCJ0ZXh0IjoiTWFydXRpIFN1enVraSBTd2lmdCBSaWRldmlldyAxMiIsInBhZ2VfdXJsIjoiaHR0cHM6Ly93d3cuY2FyYW5kYmlrZS5jb20vbWFydXRpLXN1enVraS1jYXJzL3N3aWZ0L2ltYWdlcyJ9XQ%3D%3D&sig=e5718ada5148df24e0a4579d383cef6a69d3502b14c11cb52e13a766112e688e&nonce=832c2f651c485069c49cc8f1e5419235&source=imageCluster"],\"price\":\"₹6.80 lakh\",\"emi\":\"₹8,245/m\",\"location\":\"Rohini, New Delhi\",\"specs\":{\"year\":2023,\"km\":\"15,000\",\"fuel\":\"Petrol\",\"transmission\":\"Manual\",\"owner\":\"1st owner\",\"insurance\":\"Comprehensive\"},\"features\":[\"Power Steering\",\"Air Conditioning\",\"ABS\"],\"highlights\":[\"Well maintained\",\"Single owner\"]}"
 
 REM Car 2
 echo Adding Car 2: Hyundai Creta...

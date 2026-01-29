@@ -7,6 +7,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { LocationProvider } from "@/context/LocationContext";
 import { useToast, ToastContainer } from "@/components/ui/ToastContainer";
+import { NotificationPrompt } from "@/components/NotificationPrompt";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
@@ -18,6 +19,7 @@ function AppContent({ Component, pageProps }: AppProps) {
       <Header />
       <Component {...pageProps} />
       <Footer />
+      <NotificationPrompt />
       <Toaster richColors />
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>

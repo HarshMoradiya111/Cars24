@@ -25,11 +25,19 @@ const NotificationSettings = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [simulationActive, setSimulationActive] = useState(false);
+  const [notificationSupported, setNotificationSupported] = useState(true);
 
   useEffect(() => {
     const prefs = getPreferences();
     setPreferences(prefs);
-    setPermissionGranted(Notification.permission === "granted");
+    
+    // Check if Notification API is available
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPermissionGranted(Notification.permission === "granted");
+      setNotificationSupported(true);
+    } else {
+      setNotificationSupported(false);
+    }
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -148,8 +156,30 @@ const NotificationSettings = () => {
         </div>
       )}
 
+      {/* Browser Not Supported Warning */}
+      {!notificationSupported && (
+        <div className="mb-8 p-6 bg-red-50 border-2 border-red-200 rounded-lg">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h2 className="text-xl font-semibold text-red-900 mb-2">
+                Notifications Not Supported
+              </h2>
+              <p className="text-red-800 mb-2">
+                Your browser or device doesn't support push notifications.
+              </p>
+              <ul className="text-sm text-red-700 list-disc ml-5 space-y-1">
+                <li>iOS users: Requires iOS 16.4 or later with Safari</li>
+                <li>Android users: Use Chrome or Firefox browser</li>
+                <li>Desktop users: Try Chrome, Firefox, or Edge</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Enable Notifications Section */}
-      {!permissionGranted && (
+      {notificationSupported && !permissionGranted && (
         <div className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
           <h2 className="text-xl font-semibold text-blue-900 mb-2">
             Enable Push Notifications
@@ -161,7 +191,7 @@ const NotificationSettings = () => {
           <button
             onClick={handleEnableNotifications}
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
             {loading ? "Enabling..." : "Enable Notifications"}
           </button>

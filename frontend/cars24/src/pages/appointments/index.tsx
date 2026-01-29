@@ -36,38 +36,7 @@ const AppointmentsPage = () => {
       },
     },
   ];
-  // Mock appointments data matching MongoDB schema
-  // const appointments = [
-  //   {
-  //     id: '1',
-  //     car: {
-  //       id: 'car1',
-  //       title: 'Honda City 2020 ZX MT PETROL',
-  //       image: 'https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-  //     },
-  //     scheduledDate: '2024-03-15',
-  //     scheduledTime: '10:00 AM',
-  //     location: 'Sector 18, Noida',
-  //     appointmentType: 'branch_visit',
-  //     status: 'upcoming',
-  //     notes: 'Please bring all required documents for inspection'
-  //   },
-  //   {
-  //     id: '2',
-  //     car: {
-  //       id: 'car2',
-  //       title: 'Hyundai i20 2019 Asta',
-  //       image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-  //     },
-  //     scheduledDate: '2024-03-10',
-  //     scheduledTime: '2:30 PM',
-  //     location: 'Connaught Place, New Delhi',
-  //     appointmentType: 'home_inspection',
-  //     status: 'completed',
-  //     notes: 'Car inspection completed successfully'
-  //   }
-  // ];
-
+  
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "upcoming":
