@@ -63,7 +63,7 @@ export const NotificationPrompt = () => {
         const dismissTime = parseInt(lastDismissed);
         const hoursSinceDismiss = (Date.now() - dismissTime) / (1000 * 60 * 60);
         if (hoursSinceDismiss < 24) {
-          console.log(`[NotificationPrompt] ❌ Dismissed ${Math.round(hoursSinceDismish)} hours ago (< 24h)`);
+          console.log(`[NotificationPrompt] ❌ Dismissed ${Math.round(hoursSinceDismiss)} hours ago (< 24h)`);
           return false;
         }
       }
