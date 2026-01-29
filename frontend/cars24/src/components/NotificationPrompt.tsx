@@ -17,16 +17,17 @@ export const NotificationPrompt = () => {
       
       const debug: any = {};
 
-      const forceShow =
-        typeof window !== "undefined" &&
-        new URLSearchParams(window.location.search).has("forceNotificationPrompt");
-      if (forceShow) {
-        console.log('[NotificationPrompt] ✅ Force show enabled');
-        debug.forceShow = true;
-        setStatusMessage(null);
-        setDebugInfo(debug);
-        return true;
-      }
+      try {
+        const forceShow =
+          typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).has("forceNotificationPrompt");
+        if (forceShow) {
+          console.log('[NotificationPrompt] ✅ Force show enabled');
+          debug.forceShow = true;
+          setStatusMessage(null);
+          setDebugInfo(debug);
+          return true;
+        }
 
       if (dismissed) {
         console.log('[NotificationPrompt] ❌ Already dismissed in this session');
@@ -82,21 +83,32 @@ export const NotificationPrompt = () => {
         return false;
       }
       
-      // Check if dismissed in last 24 hours
-      const lastDismissed = localStorage.getItem("notificationPromptDismissed");
-      if (lastDismissed) {
-        const dismissTime = parseInt(lastDismissed);
-        const hoursSinceDismiss = (Date.now() - dismissTime) / (1000 * 60 * 60);
-        if (hoursSinceDismiss < 24) {
-          console.log(`[NotificationPrompt] ❌ Dismissed ${Math.round(hoursSinceDismiss)} hours ago (< 24h)`);
-          return false;
+        // Check if dismissed in last 24 hours
+        try {
+          const lastDismissed = localStorage.getItem("notificationPromptDismissed");
+          if (lastDismissed) {
+            const dismissTime = parseInt(lastDismissed);
+            const hoursSinceDismiss = (Date.now() - dismissTime) / (1000 * 60 * 60);
+            if (hoursSinceDismiss < 24) {
+              console.log(`[NotificationPrompt] ❌ Dismissed ${Math.round(hoursSinceDismiss)} hours ago (< 24h)`);
+              return false;
+            }
+          }
+        } catch (error) {
+          console.log('[NotificationPrompt] ⚠️ localStorage unavailable', error);
+          debug.localStorageError = true;
         }
-      }
       
       setStatusMessage(null);
-      console.log('[NotificationPrompt] ✅ All checks passed, will show prompt');
-      setDebugInfo(debug);
-      return true;
+        console.log('[NotificationPrompt] ✅ All checks passed, will show prompt');
+        setDebugInfo(debug);
+        return true;
+      } catch (error) {
+        console.log('[NotificationPrompt] ⚠️ Prompt check failed, showing banner for diagnostics', error);
+        setStatusMessage("We couldn't read your browser storage. Tap Enable to continue.");
+        setDebugInfo({ error: String(error) });
+        return true;
+      }
     };
 
     // Show after 3 seconds delay
@@ -115,7 +127,11 @@ export const NotificationPrompt = () => {
   const handleDismiss = () => {
     setShow(false);
     setDismissed(true);
-    localStorage.setItem("notificationPromptDismissed", Date.now().toString());
+    try {
+      localStorage.setItem("notificationPromptDismissed", Date.now().toString());
+    } catch (error) {
+      console.log('[NotificationPrompt] ⚠️ Failed to persist dismissal', error);
+    }
   };
 
   const handleEnable = () => {
