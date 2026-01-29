@@ -590,10 +590,12 @@ const index = () => {
               </div>
               <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">
+                  <label htmlFor="region-select" className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">
                     Region (Pricing)
                   </label>
                   <select
+                    id="region-select"
+                    name="region"
                     value={selectedRegion}
                     onChange={(e) => setSelectedRegion(e.target.value as Region)}
                     className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -631,8 +633,10 @@ const index = () => {
                   </label>
                   <div className="space-y-1.5 sm:space-y-2 max-h-32 sm:max-h-none overflow-y-auto">
                     {(availableBrands.length ? availableBrands : ["Maruti", "Hyundai", "Honda", "Tata"]).map((brand) => (
-                      <label key={brand} className="flex items-center">
+                      <label key={brand} htmlFor={`brand-${brand}`} className="flex items-center">
                         <input
+                          id={`brand-${brand}`}
+                          name={`brand-${brand}`}
                           type="checkbox"
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 sm:w-4 sm:h-4"
                           checked={selectedBrands.includes(brand)}
@@ -653,8 +657,10 @@ const index = () => {
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Fuel Type</label>
-                  <div className="space-y-1.5 sm:space-y-2 max-h-28 sm:max-h-none overflow-y-auto">
-                    {["Petrol", "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
+                  <div className="space-htmlFor={`fuel-${fuel}`} className="flex items-center">
+                        <input
+                          id={`fuel-${fuel}`}
+                          name={`fuel-${fuel}`}, "Diesel", "CNG", "Electric", "Hybrid"].map((fuel) => (
                       <label key={fuel} className="flex items-center">
                         <input
                           type="checkbox"
@@ -675,8 +681,10 @@ const index = () => {
                 </div>
                 <div>
                   <label className="text-xs sm:text-sm font-medium mb-1.5 sm:mb-2 block">Transmission</label>
-                  <div className="space-y-1.5 sm:space-y-2">
-                    {["Manual", "Auto", "Automatic"].map((mode) => (
+                  <div className="space-htmlFor={`transmission-${mode}`} className="flex items-center">
+                        <input
+                          id={`transmission-${mode}`}
+                          name={`transmission-${mode}`}, "Auto", "Automatic"].map((mode) => (
                       <label key={mode} className="flex items-center">
                         <input
                           type="checkbox"

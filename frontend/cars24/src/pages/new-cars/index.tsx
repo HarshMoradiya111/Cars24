@@ -373,8 +373,9 @@ const NewCarsPage = () => {
                       className="flex items-center gap-2 cursor-pointer"
                     >
                       <input
-                        type="radio"
+                        id={`price-${option.value}`}
                         name="priceRange"
+                        type="radio"
                         value={option.value}
                         checked={filters.priceRange === option.value}
                         onChange={(e) =>
@@ -390,10 +391,12 @@ const NewCarsPage = () => {
 
               {/* Sort By */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-3">
                   Sort By
                 </label>
                 <select
+                  id="sortBy"
+                  name="sortBy"
                   value={filters.sortBy}
                   onChange={(e) =>
                     setFilters({ ...filters, sortBy: e.target.value })

@@ -274,6 +274,8 @@ const NotificationSettings = () => {
                 </div>
                 <label className="flex items-center cursor-pointer">
                   <input
+                    id={`pref-${option.key}`}
+                    name={`pref-${option.key}`}
                     type="checkbox"
                     checked={preferences[option.key]}
                     onChange={() => handleTogglePreference(option.key)}

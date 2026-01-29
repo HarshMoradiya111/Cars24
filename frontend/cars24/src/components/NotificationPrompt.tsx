@@ -18,26 +18,48 @@ export const NotificationPrompt = () => {
       // 4. Already granted permission
       // 5. On notification-settings page
       
-      if (dismissed) return false;
-      if (typeof window === "undefined") return false;
-      if (!("Notification" in window)) return false;
-      if (Notification.permission === "granted") return false;
-      if (router.pathname === "/notification-settings") return false;
+      console.log('[NotificationPrompt] Checking if should show...');
+      
+      if (dismissed) {
+        console.log('[NotificationPrompt] ❌ Already dismissed in this session');
+        return false;
+      }
+      if (typeof window === "undefined") {
+        console.log('[NotificationPrompt] ❌ Not in browser');
+        return false;
+      }
+      if (!("Notification" in window)) {
+        console.log('[NotificationPrompt] ❌ Notification API not supported');
+        return false;
+      }
+      if (Notification.permission === "granted") {
+        console.log('[NotificationPrompt] ❌ Permission already granted');
+        return false;
+      }
+      if (router.pathname === "/notification-settings") {
+        console.log('[NotificationPrompt] ❌ On notification-settings page');
+        return false;
+      }
       
       // Check if dismissed in last 24 hours
       const lastDismissed = localStorage.getItem("notificationPromptDismissed");
       if (lastDismissed) {
         const dismissTime = parseInt(lastDismissed);
         const hoursSinceDismiss = (Date.now() - dismissTime) / (1000 * 60 * 60);
-        if (hoursSinceDismiss < 24) return false;
+        if (hoursSinceDismiss < 24) {
+          console.log(`[NotificationPrompt] ❌ Dismissed ${Math.round(hoursSinceDismiss)} hours ago (< 24h)`);
+          return false;
+        }
       }
       
+      console.log('[NotificationPrompt] ✅ All checks passed, will show prompt');
       return true;
     };
 
     // Show after 3 seconds delay
     const timer = setTimeout(() => {
       if (checkPrompt()) {
+        console.log('[NotificationPrompt] 🔔 Showing notification prompt');
         setShow(true);
       }
     }, 3000);
