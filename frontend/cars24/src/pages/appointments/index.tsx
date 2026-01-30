@@ -4,38 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getappointmentbyuser, cancelAppointment } from "@/lib/Appointmentapi";
 
 const AppointmentsPage = () => {
-  const fallbackAppointments = [
-    {
-      appointment: {
-        id: "appt-1",
-        scheduledDate: "2024-03-15",
-        scheduledTime: "10:00 AM",
-        location: "Sector 18, Noida",
-        appointmentType: "branch_visit",
-        status: "upcoming",
-        notes: "Please bring all required documents for inspection",
-      },
-      car: {
-        id: "car1",
-        title: "Honda City 2020 ZX MT PETROL",
-      },
-    },
-    {
-      appointment: {
-        id: "appt-2",
-        scheduledDate: "2024-03-10",
-        scheduledTime: "2:30 PM",
-        location: "Connaught Place, New Delhi",
-        appointmentType: "home_inspection",
-        status: "completed",
-        notes: "Car inspection completed successfully",
-      },
-      car: {
-        id: "car2",
-        title: "Hyundai i20 2019 Asta",
-      },
-    },
-  ];
+  const fallbackAppointments = [];
   
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -159,7 +128,7 @@ const AppointmentsPage = () => {
                       )}
                     </div>
 
-                    {appointment.appointment.status === "upcoming" && (
+                    {(appointment.appointment.status === "upcoming" || appointment.appointment.status === "") && (
                       <button
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
                         onClick={async () => {
@@ -184,7 +153,7 @@ const AppointmentsPage = () => {
                     )}
                   </div>
 
-                  {appointment.appointment.status === "upcoming" && (
+                  {(appointment.appointment.status === "upcoming" || appointment.appointment.status === "") && (
                     <div className="mt-6 bg-blue-50 p-4 rounded-md">
                       <p className="text-sm text-blue-800 flex items-center">
                         <AlertCircle className="w-4 h-4 mr-2" />
@@ -215,5 +184,7 @@ const AppointmentsPage = () => {
 };
 
 export default AppointmentsPage;
+
+
 
 

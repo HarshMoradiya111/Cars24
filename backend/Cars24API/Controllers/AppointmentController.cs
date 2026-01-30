@@ -71,7 +71,7 @@ namespace Cars24API.Controllers
             }
             return Ok(results);
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("cancel/{id}")]
         public async Task<IActionResult> CancelAppointment(string id)
         {
             var appointment = await _appointmentService.GetByIdAsynch(id);

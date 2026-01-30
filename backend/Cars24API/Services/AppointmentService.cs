@@ -27,5 +27,10 @@ namespace Cars24API.Services
         {
             return await _appointment.Find(_ => true).ToListAsync();
         }
+
+        public async Task UpdateAsync(string id, Appointment appointment)
+        {
+            await _appointment.ReplaceOneAsync(a => a.Id == id, appointment);
+        }
     }
 }

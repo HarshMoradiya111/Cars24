@@ -48,7 +48,7 @@ export const getappointmentbyuser = async (userId:string) => {
   return response.json();
 };
 export const cancelAppointment = async (appointmentId: string) => {
-  const response = await fetch(\/\, {
+  const response = await fetch(`${BASE_URL}/cancel/${appointmentId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +56,7 @@ export const cancelAppointment = async (appointmentId: string) => {
   });
 
   if (!response.ok) {
-    throw new Error(cancelAppointment failed with HTTP \);
+    throw new Error(`cancelAppointment failed with HTTP ${response.status}`);
   }
 
   return response.json();

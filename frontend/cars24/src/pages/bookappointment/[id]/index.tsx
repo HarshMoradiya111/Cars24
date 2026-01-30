@@ -63,6 +63,7 @@ const BookAppointmentPage = () => {
         location: formData.location,
         appointmentType: formData.appointmentType,
         notes: formData.notes,
+        status: "upcoming",
       };
       const res = await createAppointment(user.id, payload as any);
       if (res && res.id) {
