@@ -47,3 +47,17 @@ export const getappointmentbyuser = async (userId:string) => {
 
   return response.json();
 };
+export const cancelAppointment = async (appointmentId: string) => {
+  const response = await fetch(\/\, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(cancelAppointment failed with HTTP \);
+  }
+
+  return response.json();
+};

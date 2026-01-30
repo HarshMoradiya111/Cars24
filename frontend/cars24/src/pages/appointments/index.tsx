@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Calendar, Clock, MapPin, Car, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { getappointmentbyuser } from "@/lib/Appointmentapi";
+import { getappointmentbyuser, cancelAppointment } from "@/lib/Appointmentapi";
 
 const AppointmentsPage = () => {
   const fallbackAppointments = [
@@ -162,17 +162,20 @@ const AppointmentsPage = () => {
                     {appointment.appointment.status === "upcoming" && (
                       <button
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
-                        onClick={() => {
+                        onClick={async () => {
                           if (
                             confirm(
                               "Are you sure you want to cancel this appointment?"
                             )
                           ) {
-                            // Handle cancellation
-                            console.log(
-                              "Cancelling appointment:",
-                              appointment.appointment.id
-                            );
+                            try {
+                              const result = await cancelAppointment(appointment.appointment.id);
+                              alert("Appointment cancelled successfully");
+                              // Refresh appointments list
+                              window.location.reload();
+                            } catch (error) {
+                              alert("Failed to cancel appointment: " + error);
+                            }
                           }
                         }}
                       >
@@ -212,3 +215,5 @@ const AppointmentsPage = () => {
 };
 
 export default AppointmentsPage;
+
+

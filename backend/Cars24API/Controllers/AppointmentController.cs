@@ -71,5 +71,20 @@ namespace Cars24API.Controllers
             }
             return Ok(results);
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> CancelAppointment(string id)
+        {
+            var appointment = await _appointmentService.GetByIdAsynch(id);
+            if (appointment == null)
+                return NotFound("Appointment not found");
+
+            if (appointment.Status == "cancelled")
+                return BadRequest("Appointment is already cancelled");
+
+            appointment.Status = "cancelled";
+            await _appointmentService.UpdateAsync(id, appointment);
+
+            return Ok(new { message = "Appointment cancelled successfully", appointment });
+        }
     }
 }
