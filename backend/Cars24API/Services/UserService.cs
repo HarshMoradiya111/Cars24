@@ -26,6 +26,11 @@ public class UserService
 
     public async Task<User?> GetByIdAsync(string id)
     {
+        // Validate that id is a valid MongoDB ObjectId format (24 hex chars)
+        if (string.IsNullOrEmpty(id) || id.Length != 24 || !id.All(c => "0123456789abcdefABCDEF".Contains(c)))
+        {
+            return null;
+        }
         return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
     }
     public async Task UpdateAsync(string id, User user)
