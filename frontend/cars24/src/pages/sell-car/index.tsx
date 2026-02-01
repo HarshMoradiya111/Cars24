@@ -5,7 +5,7 @@ import Carform from "@/components/sellcar/Carform";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { createCar } from "@/lib/Carapi";
+import { createCar } from "@/services/carService";
 type CarDetails = {
   id: string;
   title: string;

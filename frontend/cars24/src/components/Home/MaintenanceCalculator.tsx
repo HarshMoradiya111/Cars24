@@ -4,7 +4,7 @@ import {
   calculateMaintenanceCost,
   MaintenanceCondition,
   getConditionFromString,
-} from "@/lib/maintenanceCalculator";
+} from "@/utils/maintenanceCalculator";
 import { AlertCircle, TrendingUp, Wrench, Calendar } from "lucide-react";
 
 interface CalculatorState {

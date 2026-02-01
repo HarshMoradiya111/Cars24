@@ -52,16 +52,13 @@ const Footer = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
-              COMPANY
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
+              Company
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                  >
+                  <Link href={link.href} className="text-xs sm:text-sm text-gray-600 hover:text-blue-600">
                     {link.name}
                   </Link>
                 </li>
@@ -70,16 +67,13 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
-              DISCOVER
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
+              Discover
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {discoverLinks.map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                  >
+                  <Link href={link.href} className="text-xs sm:text-sm text-gray-600 hover:text-blue-600">
                     {link.name}
                   </Link>
                 </li>
@@ -88,16 +82,13 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 tracking-wider uppercase mb-3 sm:mb-4">
-              HELP & SUPPORT
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
+              Support
             </h3>
             <ul className="space-y-2 sm:space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors"
-                  >
+                  <Link href={link.href} className="text-xs sm:text-sm text-gray-600 hover:text-blue-600">
                     {link.name}
                   </Link>
                 </li>
@@ -107,24 +98,17 @@ const Footer = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-200 pt-6 sm:pt-8 gap-4 sm:gap-0">
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
-              © 2026 Cars24. All rights reserved.
-            </p>
-          </div>
+          <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+            © 2026 Cars24. All rights reserved.
+          </p>
 
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 sm:items-center w-full sm:w-auto">
-            <span className="text-xs sm:text-sm text-gray-500 text-center sm:text-right sm:mr-4">SOCIAL LINKS</span>
+            <span className="text-xs sm:text-sm text-gray-500 text-center sm:text-right sm:mr-4">Follow Us</span>
             <div className="flex justify-center space-x-4">
-              {socialLinks.map((link, index) => {
+              {socialLinks.map((link, idx) => {
                 const Icon = link.icon;
                 return (
-                  <Link
-                    key={index}
-                    href={link.href}
-                    className="text-gray-400 hover:text-gray-500 transition-colors touch-manipulation"
-                    aria-label={link.icon.name}
-                  >
+                  <Link key={idx} href={link.href} className="text-gray-400 hover:text-gray-500">
                     <Icon className="h-5 w-5" />
                   </Link>
                 );
@@ -134,26 +118,22 @@ const Footer = () => {
         </div>
 
         <div className="mt-6 sm:mt-8 border-t border-gray-200 pt-6 sm:pt-8">
-          <p className="text-xs sm:text-sm text-gray-500 text-center font-medium uppercase">We are global</p>
+          <p className="text-xs sm:text-sm text-gray-500 text-center font-medium uppercase">Global presence</p>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-3 sm:mt-4">
             <div className="flex items-center">
-              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-2 flex-shrink-0">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
-                  alt="India flag"
-                  className="h-full w-full object-cover"
-                />
-              </span>
+              <img
+                src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
+                alt="India"
+                className="h-4 w-6 rounded mr-2"
+              />
               <span className="text-xs text-gray-500">India</span>
             </div>
             <div className="flex items-center">
-              <span className="inline-block h-4 w-6 rounded overflow-hidden mr-2 flex-shrink-0">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg"
-                  alt="UAE flag"
-                  className="h-full w-full object-cover"
-                />
-              </span>
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg"
+                alt="UAE"
+                className="h-4 w-6 rounded mr-2"
+              />
               <span className="text-xs text-gray-500">UAE</span>
             </div>
           </div>

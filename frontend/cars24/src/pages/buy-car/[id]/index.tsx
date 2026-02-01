@@ -1,8 +1,8 @@
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
-import { createBooking } from "@/lib/Bookingapi";
-import { getcarByid } from "@/lib/Carapi";
-import { calculateRecommendedPrice, detectCarType, Region } from "@/lib/pricingEngine";
+import { createBooking } from "@/services/bookingService";
+import { getcarByid } from "@/services/carService";
+import { calculateRecommendedPrice, detectCarType, Region } from "@/utils/pricingEngine";
 import { LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import {
   AlertCircle,
@@ -21,7 +21,7 @@ import SafeImage from "@/components/ui/SafeImage";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useWishlist } from "@/context/WishlistContext";
-import { detectLocationFromIP } from "@/lib/utils";
+import { detectLocationFromIP } from "@/utils/helpers";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
 const fallbackCarDetails = {

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import {
   Wrench,
@@ -133,16 +134,18 @@ const benefits = [
 ];
 
 const ServicesPage = () => {
+  const router = useRouter();
   const handleBookService = (service: typeof services[0]) => {
-    alert(`Service Booking Details:\n\nService: ${service.name}\nPrice: ${service.price}\nDuration: ${service.duration}\n\nWhat's Included:\n${service.includes.map((item, i) => `${i + 1}. ${item}`).join('\n')}\n\nThank you for choosing our service! Our team will contact you shortly to confirm your appointment.`);
+    router.push('/services/book');
   };
 
   const handleCallUs = () => {
-    alert('Calling Customer Service: 1800-123-4567\n\nOur service advisors are available 24/7 to help you!');
+    // Trigger phone call
+    window.location.href = 'tel:1800-123-4567';
   };
 
   const handleFindServiceCenter = () => {
-    alert('Service Centers Near You:\n\n1. Cars24 Service Center - Sector 18, Noida\n2. Cars24 Service Center - Connaught Place, Delhi\n3. Cars24 Service Center - MG Road, Gurgaon\n\nWould you like directions to the nearest center?');
+    router.push('/locations');
   };
 
   return (

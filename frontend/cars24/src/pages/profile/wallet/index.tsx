@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getWallet, redeemWallet, getRedemptions } from "@/lib/userapi";
+import { getWallet, redeemWallet, getRedemptions } from "@/services/userService";
 import { toast } from "sonner";
 import { RefreshCw } from "lucide-react";
 import { useRouter } from "next/router";
@@ -15,7 +15,7 @@ interface Redemption {
 }
 
 const WalletPage = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser, refreshUser } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [redeeming, setRedeeming] = useState<boolean>(false);
@@ -28,14 +28,8 @@ const WalletPage = () => {
     if (!user?.id) return;
     setLoading(true);
     try {
+      await refreshUser(); // Refresh full user data from backend
       const data = await getWallet(user.id);
-      // Update AuthContext with fresh wallet points from API
-      if (data?.points !== undefined) {
-        setUser({
-          ...user,
-          walletPoints: data.points,
-        });
-      }
       if (data?.message) {
         toast.message(data.message);
       }
@@ -122,17 +116,17 @@ const WalletPage = () => {
           <div className="bg-blue-50 border border-blue-100 rounded p-4">
             <p className="text-sm text-blue-700">Wallet Points</p>
             <p className="text-3xl font-bold text-blue-800">{points}</p>
-            <p className="text-xs text-blue-600 mt-1">Earn 100 for referrals, 50 when you sign up with a code</p>
+            <p className="text-xs text-blue-600 mt-1">Earn 1000 points for both you and your referrer when completing a booking or sale</p>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Redeem 100 points</p>
-              <p className="text-sm text-gray-600">Get a discount voucher</p>
+              <p className="font-medium">Redeem 500 points</p>
+              <p className="text-sm text-gray-600">Get a discount voucher (Max 2000/booking)</p>
             </div>
             <button
               onClick={handleRedeem}
-              disabled={redeeming || points < 100}
+              disabled={redeeming || points < 500}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
               {redeeming ? "Redeeming..." : "Redeem"}

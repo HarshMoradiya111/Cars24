@@ -1,20 +1,15 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Firebase imports - optional, will fail gracefully if not installed
-let setupMessageListener: any = () => {};
-let requestNotificationPermission: any = async () => null;
+let setupListener: any = () => {};
+let requestPerm: any = async () => null;
 
 if (typeof window !== "undefined") {
   (async () => {
     try {
-      const module = await import("@/lib/firebase") as any;
-      if (module.setupMessageListener) {
-        setupMessageListener = module.setupMessageListener;
-      }
-      if (module.requestNotificationPermission) {
-        requestNotificationPermission = module.requestNotificationPermission;
-      }
+      const mod = await import("@/lib/firebase") as any;
+      if (mod.setupMessageListener) setupListener = mod.setupMessageListener;
+      if (mod.requestNotificationPermission) requestPerm = mod.requestNotificationPermission;
     } catch (error) {
       console.log("Firebase not available");
     }
@@ -52,11 +47,9 @@ interface NotificationContextType {
   requestPermission: () => Promise<boolean>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-const DEFAULT_PREFERENCES: NotificationPreferences = {
+const DEFAULT_PREFS: NotificationPreferences = {
   appointmentConfirmation: true,
   appointmentReminder: true,
   bidUpdates: true,
@@ -68,130 +61,98 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
   enabled: false,
 };
 
-export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [preferences, setPreferences] = useState<NotificationPreferences>(
-    DEFAULT_PREFERENCES
-  );
-  const [fcmToken, setFcmToken] = useState<string | null>(null);
-  const [isSupported, setIsSupported] = useState(true);
+export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_PREFS);
+  const [token, setToken] = useState<string | null>(null);
+  const [supported, setSupported] = useState(true);
 
-  // Check browser support
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const isNotificationSupported =
-      typeof window !== "undefined" &&
-      "Notification" in window &&
-      "serviceWorker" in navigator;
-    setIsSupported(isNotificationSupported);
+    setSupported("Notification" in window && "serviceWorker" in navigator);
 
-    // Load saved preferences from localStorage
     try {
-      const savedPreferences = localStorage.getItem("notificationPreferences");
-      if (savedPreferences) {
-        setPreferences({
-          ...DEFAULT_PREFERENCES,
-          ...JSON.parse(savedPreferences),
-        });
-      }
-    } catch (error) {
-      console.error("Error loading notification preferences:", error);
+      const saved = localStorage.getItem("notificationPreferences");
+      if (saved) setPrefs({ ...DEFAULT_PREFS, ...JSON.parse(saved) });
+    } catch (e) {
+      console.error("Error loading notification prefs:", e);
     }
 
-    // Load saved FCM token
     try {
       const savedToken = localStorage.getItem("fcmToken");
-      if (savedToken) {
-        setFcmToken(savedToken);
-      }
-    } catch (error) {
-      console.error("Error loading FCM token:", error);
+      if (savedToken) setToken(savedToken);
+    } catch (e) {
+      console.error("Error loading FCM token:", e);
     }
   }, []);
 
-  // Set up message listener for foreground notifications
   useEffect(() => {
-    setupMessageListener((payload: any) => {
-      const notifData = payload.data || {};
-      const type = notifData.type as keyof NotificationPreferences | undefined;
+    setupListener((payload: any) => {
+      const data = payload.data || {};
+      const type = data.type as keyof NotificationPreferences | undefined;
 
-      // Check if this notification type is enabled
-      if (type && !preferences[type]) {
-        return; // Skip if preference is disabled
-      }
+      if (type && !prefs[type]) return;
 
-      // Show foreground notification using Notification API
-      if (preferences.enabled && isSupported) {
-        new Notification(
-          payload.notification?.title || "CARS24 Notification",
-          {
-            body: payload.notification?.body || "You have a new notification",
-            icon: notifData.icon || "/cars24-icon.png",
-            badge: "/cars24-badge.png",
-            tag: notifData.tag || "notification",
-            data: notifData,
-          }
-        );
-      }
-    });
-  }, [preferences, isSupported]);
-
-  const updatePreferences = (prefs: Partial<NotificationPreferences>) => {
-    const updated = { ...preferences, ...prefs };
-    setPreferences(updated);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("notificationPreferences", JSON.stringify(updated));
-      } catch (error) {
-        console.error("Error saving notification preferences:", error);
-      }
-    }
-  };
-
-  const sendNotification = (data: NotificationData) => {
-    // Check if notification type is enabled
-    if (data.type && !preferences[data.type]) {
-      return;
-    }
-
-    if (preferences.enabled && isSupported) {
-      // Show local notification
-      if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(data.title, {
-          body: data.body,
+      if (prefs.enabled && supported) {
+        new Notification(payload.notification?.title || "CARS24", {
+          body: payload.notification?.body || "New notification",
           icon: data.icon || "/cars24-icon.png",
           badge: "/cars24-badge.png",
           tag: data.tag || "notification",
-          data: data.data,
+          data,
         });
+      }
+    });
+  }, [prefs, supported]);
+
+  const updatePrefs = (newPrefs: Partial<NotificationPreferences>) => {
+    const updated = { ...prefs, ...newPrefs };
+    setPrefs(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("notificationPreferences", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Error saving prefs:", e);
       }
     }
   };
 
-  const requestPermission = async (): Promise<boolean> => {
+  const send = (data: NotificationData) => {
+    if (data.type && !prefs[data.type]) return;
+
+    if (prefs.enabled && supported && "Notification" in window && Notification.permission === "granted") {
+      new Notification(data.title, {
+        body: data.body,
+        icon: data.icon || "/cars24-icon.png",
+        badge: "/cars24-badge.png",
+        tag: data.tag || "notification",
+        data: data.data,
+      });
+    }
+  };
+
+  const askPermission = async (): Promise<boolean> => {
     try {
-      if (!requestNotificationPermission) {
+      if (!requestPerm) {
         console.error("Notification service not available");
         return false;
       }
-      const token = await requestNotificationPermission();
-      if (token) {
-        setFcmToken(token);
+      const tok = await requestPerm();
+      if (tok) {
+        setToken(tok);
         if (typeof window !== "undefined") {
           try {
-            localStorage.setItem("fcmToken", token);
-          } catch (error) {
-            console.error("Error saving FCM token:", error);
+            localStorage.setItem("fcmToken", tok);
+          } catch (e) {
+            console.error("Error saving token:", e);
           }
         }
-        updatePreferences({ enabled: true });
+        updatePrefs({ enabled: true });
         return true;
       }
       return false;
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
+    } catch (e) {
+      console.error("Error requesting permission:", e);
       return false;
     }
   };
@@ -199,12 +160,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <NotificationContext.Provider
       value={{
-        preferences,
-        updatePreferences,
-        sendNotification,
-        fcmToken,
-        isSupported,
-        requestPermission,
+        preferences: prefs,
+        updatePreferences: updatePrefs,
+        sendNotification: send,
+        fcmToken: token,
+        isSupported: supported,
+        requestPermission: askPermission,
       }}
     >
       {children}
@@ -213,11 +174,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useNotification = () => {
-  const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error(
-      "useNotification must be used within NotificationProvider"
-    );
-  }
-  return context;
+  const ctx = useContext(NotificationContext);
+  if (!ctx) throw new Error("useNotification must be used within NotificationProvider");
+  return ctx;
 };

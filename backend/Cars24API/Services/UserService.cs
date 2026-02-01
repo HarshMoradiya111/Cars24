@@ -39,6 +39,12 @@ public class UserService
         await _users.UpdateOneAsync(u => u.Id == userId, update);
     }
 
+    public async Task AddBookingIdAsync(string userId, string bookingId)
+    {
+        var update = Builders<User>.Update.Push(u => u.BookingId, bookingId);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
+    }
+
     public async Task<bool> RedeemAsync(string userId, int cost)
     {
         var filter = Builders<User>.Filter.And(
@@ -50,6 +56,12 @@ public class UserService
 
         var result = await _users.UpdateOneAsync(filter, update);
         return result.ModifiedCount > 0;
+    }
+
+    public async Task MarkReferralRewardedAsync(string userId)
+    {
+        var update = Builders<User>.Update.Set(u => u.ReferralRewarded, true);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
     }
 
     public async Task<string> GenerateUniqueReferralCodeAsync()

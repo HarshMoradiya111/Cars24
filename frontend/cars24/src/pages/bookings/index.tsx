@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { getBookingbyuser } from "@/lib/Bookingapi";
+import { getBookingbyuser } from "@/services/bookingService";
 import { BookingListSkeleton, EmptyState, LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import { Button } from "@/components/ui/button";
 import LoadingState from "@/components/ui/LoadingState";
@@ -149,9 +149,9 @@ const PurchasedCarsPage = () => {
         return;
       }
 
-      console.time('API: Load Bookings');
       const response = await getBookingbyuser(user.id);
-      console.timeEnd('API: Load Bookings');
+      
+      console.log('[bookings] API Response:', response, 'Type:', typeof response, 'IsArray:', Array.isArray(response));
       
       // Defensive: Check if response is valid
       if (!response) {
@@ -171,6 +171,8 @@ const PurchasedCarsPage = () => {
           bookingsArray = response.bookings;
         }
       }
+
+      console.log('[bookings] Extracted array length:', bookingsArray.length);
 
       if (bookingsArray.length === 0) {
         console.log('[bookings] No bookings found for user');
@@ -312,7 +314,7 @@ const PurchasedCarsPage = () => {
         <p className="text-gray-600">Thank you for your purchase!</p>
       </div>
       {purchasedCars.map((data: any) => (
-        <div className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl">
+        <div key={data.booking.id} className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl">
           <div className="bg-blue-900 text-white p-6 rounded-t-lg">
             <div className="flex justify-between items-start">
               <div>

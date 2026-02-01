@@ -1,7 +1,7 @@
 import { AlertCircle, CreditCard, DollarSign, Tag, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { getRecommendation } from "@/lib/pricing";
-import { detectLocationFromIP } from "@/lib/utils";
+import { getRecommendation } from "@/utils/pricing";
+import { detectLocationFromIP } from "@/utils/helpers";
 type CarDetails = {
   id: string;
   title: string;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from '@/context/LocationContext';
 import { MapPin, ChevronDown, Loader2, X } from 'lucide-react';
 
@@ -14,40 +14,33 @@ const CitySelector: React.FC = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const filteredCities = availableCities.filter(city =>
+  const filtered = availableCities.filter(city =>
     city.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCitySelect = (city: string) => {
+  const selectCity = (city: string | null) => {
     setSelectedCity(city);
     setIsOpen(false);
     setSearchTerm('');
   };
 
-  const handleDetectClick = () => {
-    detectLocation();
-  };
-
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.city-selector-dropdown')) {
+    const closeOnClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('mousedown', closeOnClickOutside);
+      return () => document.removeEventListener('mousedown', closeOnClickOutside);
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isOpen]);
 
   return (
-    <div className="relative city-selector-dropdown w-full sm:w-auto">
+    <div ref={dropdownRef} className="relative w-full sm:w-auto">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2 px-3 sm:px-4 py-2 bg-white border border-gray-300 rounded-lg hover:border-orange-500 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 touch-manipulation"
@@ -56,37 +49,33 @@ const CitySelector: React.FC = () => {
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0" />
           <span className="text-xs sm:text-sm font-medium text-gray-700 truncate">
-            {isDetecting ? 'Detecting...' : selectedCity === null ? 'All Cities' : selectedCity || 'Select City'}
+            {isDetecting ? 'Detecting...' : selectedCity || 'All Cities'}
           </span>
         </div>
         <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="fixed sm:absolute top-0 sm:top-full left-0 right-0 sm:left-auto sm:right-0 sm:mt-2 w-full sm:w-80 md:w-96 bg-white border-0 sm:border border-gray-200 rounded-none sm:rounded-lg shadow-2xl sm:shadow-xl z-[60] h-full sm:h-auto sm:max-h-96 overflow-hidden">
-          {/* Mobile Header */}
+        <div className="fixed sm:absolute top-0 sm:top-full left-0 right-0 sm:left-auto sm:right-0 sm:mt-2 w-full sm:w-80 bg-white border-0 sm:border border-gray-200 rounded-none sm:rounded-lg shadow-2xl z-50 h-full sm:h-auto sm:max-h-96 overflow-hidden">
+          {/* Mobile header */}
           <div className="sm:hidden sticky top-0 bg-white z-10 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Select City</h3>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors touch-manipulation"
-              aria-label="Close"
-            >
+            <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
-          {/* Detect Location Button */}
-          <div className="p-3 sm:p-3 border-b border-gray-200">
+          {/* Detect location button */}
+          <div className="p-3 border-b border-gray-200">
             <button
-              onClick={handleDetectClick}
+              onClick={detectLocation}
               disabled={isDetecting}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors touch-manipulation active:scale-95"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               {isDetecting ? (
                 <>
                   <Loader2 className="w-5 h-5 sm:w-4 sm:h-4 animate-spin" />
-                  <span className="text-sm font-medium">Detecting Location...</span>
+                  <span className="text-sm font-medium">Detecting...</span>
                 </>
               ) : (
                 <>
@@ -96,36 +85,32 @@ const CitySelector: React.FC = () => {
               )}
             </button>
             {detectionError && (
-              <div className="mt-2 flex items-start gap-2 p-2 bg-red-50 rounded text-xs text-red-600">
+              <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded flex items-start gap-2">
                 <X className="w-3 h-3 mt-0.5 flex-shrink-0" />
                 <span>{detectionError}</span>
               </div>
             )}
           </div>
 
-          {/* Search Input */}
-          <div className="p-3 sm:p-3 border-b border-gray-200">
+          {/* Search */}
+          <div className="p-3 border-b border-gray-200">
             <input
               type="text"
               placeholder="Search city..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm touch-manipulation"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
             />
           </div>
 
-          {/* City List */}
+          {/* Cities list */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
             <ul className="py-1">
-              {/* All Cities Option */}
+              {/* All cities option */}
               <li>
                 <button
-                  onClick={() => {
-                    setSelectedCity(null);
-                    setIsOpen(false);
-                    setSearchTerm('');
-                  }}
-                  className={`w-full text-left px-4 py-3 sm:py-2.5 hover:bg-orange-50 active:bg-orange-100 transition-colors border-b border-gray-200 touch-manipulation ${
+                  onClick={() => selectCity(null)}
+                  className={`w-full text-left px-4 py-3 sm:py-2.5 hover:bg-orange-50 transition-colors border-b border-gray-200 ${
                     selectedCity === null ? 'bg-orange-100 text-orange-700 font-medium' : 'text-gray-700'
                   }`}
                 >
@@ -136,13 +121,13 @@ const CitySelector: React.FC = () => {
                 </button>
               </li>
 
-              {/* Individual Cities */}
-              {filteredCities.length > 0 ? (
-                filteredCities.map((city) => (
+              {/* City list */}
+              {filtered.length > 0 ? (
+                filtered.map((city) => (
                   <li key={city}>
                     <button
-                      onClick={() => handleCitySelect(city)}
-                      className={`w-full text-left px-4 py-3 sm:py-2.5 hover:bg-orange-50 active:bg-orange-100 transition-colors touch-manipulation ${
+                      onClick={() => selectCity(city)}
+                      className={`w-full text-left px-4 py-3 sm:py-2.5 hover:bg-orange-50 transition-colors ${
                         selectedCity === city ? 'bg-orange-100 text-orange-700 font-medium' : 'text-gray-700'
                       }`}
                     >
@@ -155,7 +140,7 @@ const CitySelector: React.FC = () => {
                 ))
               ) : (
                 <li className="p-4 text-center text-sm text-gray-500">
-                  No cities found matching &quot;{searchTerm}&quot;
+                  No cities match "{searchTerm}"
                 </li>
               )}
             </ul>
@@ -164,7 +149,7 @@ const CitySelector: React.FC = () => {
           {/* Footer */}
           <div className="sticky bottom-0 p-3 border-t border-gray-200 bg-gray-50">
             <p className="text-xs text-gray-600 text-center">
-              Select your city to see available cars and service centers
+              Select your city to see cars and service centers
             </p>
           </div>
         </div>

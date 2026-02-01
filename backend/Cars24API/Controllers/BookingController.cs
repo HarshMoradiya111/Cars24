@@ -38,7 +38,18 @@ namespace Cars24API.Controllers
                 user.BookingId = new List<string>();
             }
             user.BookingId.Add(booking.Id);
-            await _userService.UpdateAsync(user.Id, user);
+
+            // Update the user with the new booking ID (atomic operation)
+            await _userService.AddBookingIdAsync(userId, booking.Id);
+
+            // Award referral points if user has a referrer and hasn't been rewarded yet
+            if (!string.IsNullOrEmpty(user.ReferredBy) && !user.ReferralRewarded)
+            {
+                await _userService.AddWalletPointsAsync(userId, 1000); // bonus for buyer
+                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000); // bonus for referrer
+                await _userService.MarkReferralRewardedAsync(userId); // mark as rewarded
+            }
+
             return CreatedAtAction(nameof(GetbookingById), new { id = booking.Id }, booking);
         }
         [HttpGet("{id}")]

@@ -11,7 +11,8 @@ public class UserWalletController : ControllerBase
 {
     private readonly UserService _userService;
     private readonly RedemptionService _redemptionService;
-    private const int RedeemCost = 100;
+    private const int RedeemCost = 500;
+    private const int MaxDiscountPerBooking = 2000;
 
     public UserWalletController(UserService userService, RedemptionService redemptionService)
     {

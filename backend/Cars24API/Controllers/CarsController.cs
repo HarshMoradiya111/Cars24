@@ -11,10 +11,13 @@ namespace Cars24API.Controllers
     {
         private readonly CarService _carservice;
         private readonly PricingService _pricingService;
-        public CarController(CarService carService, PricingService pricingService)
+        private readonly UserService _userService;
+        
+        public CarController(CarService carService, PricingService pricingService, UserService userService)
         {
             _carservice = carService;
             _pricingService = pricingService;
+            _userService = userService;
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id, [FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
@@ -79,6 +82,31 @@ namespace Cars24API.Controllers
                 return BadRequest("Car data is required");
             }
             await _carservice.CreateAsync(car);
+            return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);
+        }
+
+        [HttpPost("sell")]
+        public async Task<IActionResult> SellCar([FromQuery] string userId, [FromBody] Car car)
+        {
+            if (car == null || string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("Car data and userId are required");
+            }
+            
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            await _carservice.CreateAsync(car);
+
+            // Award referral points if user has a referrer and hasn't been rewarded yet
+            if (!string.IsNullOrEmpty(user.ReferredBy) && !user.ReferralRewarded)
+            {
+                await _userService.AddWalletPointsAsync(userId, 1000); // bonus for seller
+                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000); // bonus for referrer
+                await _userService.MarkReferralRewardedAsync(userId); // mark as rewarded
+            }
+            
             return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);
         }
 

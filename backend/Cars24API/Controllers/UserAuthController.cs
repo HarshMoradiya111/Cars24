@@ -52,18 +52,14 @@ public class UserAuthController : ControllerBase
         // Generate unique referral code
         newUser.ReferralCode = await _userService.GenerateUniqueReferralCodeAsync();
 
-        // Apply referral if provided
+        // Save referral code if provided (but don't award points yet)
         if (!string.IsNullOrWhiteSpace(request.ReferralCode))
         {
             var referrer = await _userService.GetByReferralCodeAsync(request.ReferralCode.Trim());
             if (referrer != null)
             {
                 newUser.ReferredBy = referrer.Id;
-                newUser.WalletPoints += 50; // bonus for new user
-                if (!string.IsNullOrEmpty(referrer.Id))
-                {
-                    await _userService.AddWalletPointsAsync(referrer.Id, 100); // bonus for referrer
-                }
+                // Points will be awarded on successful booking or selling
             }
         }
 

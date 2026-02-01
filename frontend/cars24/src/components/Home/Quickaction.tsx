@@ -1,14 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { 
-  Search, 
-  Car, 
-  DollarSign, 
-  ClipboardCheck, 
-  History, 
-  CheckCircle,
-  Wrench
-} from "lucide-react";
+import { Search, Car, DollarSign, ClipboardCheck, CheckCircle, History, Wrench } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MaintenanceCalculator = dynamic(
@@ -17,73 +9,45 @@ const MaintenanceCalculator = dynamic(
 );
 
 const actions = [
-  {
-    name: "Find car",
-    icon: Search,
-    href: "/buy-car",
-    color: "bg-blue-50 text-blue-600",
-  },
-  {
-    name: "Sell car",
-    icon: Car,
-    href: "/sell-car",
-    color: "bg-green-50 text-green-600",
-  },
-  {
-    name: "Car loan",
-    icon: DollarSign,
-    href: "/finance",
-    color: "bg-purple-50 text-purple-600",
-  },
-  {
-    name: "Test drive",
-    icon: ClipboardCheck,
-    href: "/test-drive",
-    color: "bg-yellow-50 text-yellow-600",
-  },
-  {
-    name: "Get car checked",
-    icon: CheckCircle,
-    href: "/car-inspection",
-    color: "bg-red-50 text-red-600",
-  },
-  {
-    name: "Vehicle history",
-    icon: History,
-    href: "/vehicle-history",
-    color: "bg-indigo-50 text-indigo-600",
-  },
+  { name: "Find car", icon: Search, href: "/buy-car", color: "bg-blue-50 text-blue-600" },
+  { name: "Sell car", icon: Car, href: "/sell-car", color: "bg-green-50 text-green-600" },
+  { name: "Car loan", icon: DollarSign, href: "/finance", color: "bg-purple-50 text-purple-600" },
+  { name: "Test drive", icon: ClipboardCheck, href: "/test-drive", color: "bg-yellow-50 text-yellow-600" },
+  { name: "Get checked", icon: CheckCircle, href: "/car-inspection", color: "bg-red-50 text-red-600" },
+  { name: "Vehicle history", icon: History, href: "/vehicle-history", color: "bg-indigo-50 text-indigo-600" },
 ];
 
 export default function QuickActions() {
-  const [showMaintenance, setShowMaintenance] = React.useState(false);
+  const [showMaintenance, setShowMaintenance] = useState(false);
+
+  const actionItem = ({ name, icon: Icon, href, color }: typeof actions[0]) => (
+    <Link href={href} className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center hover:scale-105">
+      <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+        <div className={`${color} p-2.5 sm:p-3 rounded-full`}>
+          <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+        </div>
+        <span className="text-xs sm:text-sm font-medium text-gray-700 line-clamp-2">
+          {name}
+        </span>
+      </div>
+    </Link>
+  );
 
   return (
     <>
       <div className="py-6 sm:py-8 px-0 relative z-20 -mt-10 sm:-mt-12">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 bg-white rounded-lg shadow-md p-3 sm:p-4 mx-auto max-w-6xl">
           {actions.map((action) => (
-            <Link
-              key={action.name}
-              href={action.href}
-              className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center transition-all hover:scale-105 active:scale-95 touch-manipulation"
-            >
-              <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                <div className={`${action.color} p-2.5 sm:p-3 rounded-full flex-shrink-0`}>
-                  <action.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                </div>
-                <span className="text-xs sm:text-sm font-medium text-gray-700 line-clamp-2">
-                  {action.name}
-                </span>
-              </div>
-            </Link>
+            <div key={action.name}>
+              {actionItem(action)}
+            </div>
           ))}
           <button
             onClick={() => setShowMaintenance(true)}
-            className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center transition-all hover:scale-105 active:scale-95 touch-manipulation"
+            className="flex-1 min-w-[calc(50%-0.375rem)] sm:min-w-[calc(33.333%-0.375rem)] lg:flex-none lg:w-[calc(16.666%-0.625rem)] p-2 sm:p-3 text-center hover:scale-105"
           >
             <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-              <div className="bg-orange-50 text-orange-600 p-2.5 sm:p-3 rounded-full flex-shrink-0">
+              <div className="bg-orange-50 text-orange-600 p-2.5 sm:p-3 rounded-full">
                 <Wrench className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <span className="text-xs sm:text-sm font-medium text-gray-700 line-clamp-2">
@@ -94,9 +58,7 @@ export default function QuickActions() {
         </div>
       </div>
 
-      {showMaintenance && (
-        <MaintenanceCalculator />
-      )}
+      {showMaintenance && <MaintenanceCalculator />}
     </>
   );
 }

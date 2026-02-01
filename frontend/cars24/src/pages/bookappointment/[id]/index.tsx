@@ -12,7 +12,7 @@ import {
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { createAppointment } from "@/lib/Appointmentapi";
+import { createAppointment } from "@/services/appointmentService";
 
 const BookAppointmentPage = () => {
   const router = useRouter();

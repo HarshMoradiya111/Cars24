@@ -36,6 +36,8 @@ public class User
 
     public string? ReferredBy { get; set; }
 
+    public bool ReferralRewarded { get; set; } = false;
+
     public int WalletPoints { get; set; } = 0;
 
 }
