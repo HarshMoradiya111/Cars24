@@ -1,12 +1,37 @@
 import { Bell, Calendar, Car, LogOut, Mail, Settings, User, Copy, Share2 } from "lucide-react";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import { getUserById } from "@/lib/userapi";
 
 const index = () => {
-  const { user, signOut } = useAuth();
+  const { user, setUser, signOut } = useAuth();
   const [copying, setCopying] = useState(false);
+  const [loadingWallet, setLoadingWallet] = useState(false);
+  
+  // Fetch fresh wallet points from API
+  useEffect(() => {
+    if (user?.id) {
+      setLoadingWallet(true);
+      getUserById(user.id)
+        .then((userData) => {
+          if (userData?.walletPoints !== undefined) {
+            // Update user in context with fresh wallet points
+            setUser({
+              ...user,
+              walletPoints: userData.walletPoints,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch wallet points:", error);
+        })
+        .finally(() => {
+          setLoadingWallet(false);
+        });
+    }
+  }, [user?.id, setUser]);
   
   // Log user data for debugging
   React.useEffect(() => {

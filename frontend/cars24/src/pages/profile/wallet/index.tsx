@@ -29,7 +29,13 @@ const WalletPage = () => {
     setLoading(true);
     try {
       const data = await getWallet(user.id);
-      // Point will update automatically from AuthContext
+      // Update AuthContext with fresh wallet points from API
+      if (data?.points !== undefined) {
+        setUser({
+          ...user,
+          walletPoints: data.points,
+        });
+      }
       if (data?.message) {
         toast.message(data.message);
       }
