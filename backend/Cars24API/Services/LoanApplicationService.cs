@@ -9,8 +9,8 @@ namespace Cars24API.Services
 
         public LoanApplicationService(IConfiguration configuration)
         {
-            var client = new MongoClient(configuration.GetConnectionString("MongoDb"));
-            var database = client.GetDatabase("Cars24DB");
+            var client = new MongoClient(configuration.GetConnectionString("Cars24DB"));
+            var database = client.GetDatabase(configuration["MongoDB:DatabaseName"]);
             _loanApplications = database.GetCollection<LoanApplication>("LoanApplications");
         }
 
