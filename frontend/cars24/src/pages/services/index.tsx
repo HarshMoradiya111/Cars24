@@ -136,7 +136,7 @@ const benefits = [
 const ServicesPage = () => {
   const router = useRouter();
   const handleBookService = (service: typeof services[0]) => {
-    router.push('/services/book');
+    router.push(`/services/book?serviceId=${service.id}`);
   };
 
   const handleCallUs = () => {

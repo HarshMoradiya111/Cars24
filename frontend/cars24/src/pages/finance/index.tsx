@@ -13,14 +13,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { useAuth } from "@/context/AuthContext";
+import { loanApplicationApi } from "@/lib/loanApplicationApi";
+import { toast } from "sonner";
+import { useRouter } from "next/router";
 
 const FinancePage = () => {
+  const { user } = useAuth();
+  const router = useRouter();
   const [loanAmount, setLoanAmount] = useState(500000);
   const [interestRate, setInterestRate] = useState(9.5);
   const [tenure, setTenure] = useState(5);
 
   const handleApplyLoan = () => {
-    alert(`Loan Application Details:\n\nLoan Amount: ₹${loanAmount.toLocaleString("en-IN")}\nInterest Rate: ${interestRate}% per annum\nTenure: ${tenure} years\nMonthly EMI: ₹${calculateEMI().toLocaleString("en-IN")}\n\nThank you for your interest! Our team will contact you shortly.`);
+    if (!user?.id) {
+      toast.error("Please login to apply for a loan");
+      router.push("/login");
+      return;
+    }
+
+    const emi = calculateEMI();
+    const totalAmount = emi * tenure * 12;
+    const totalInterest = totalAmount - loanAmount;
+
+    // Redirect to apply page with loan details
+    router.push({
+      pathname: "/finance/apply",
+      query: {
+        loanAmount,
+        interestRate,
+        tenure,
+        emi,
+        totalAmount,
+        totalInterest,
+      },
+    });
   };
 
   const calculateEMI = () => {
@@ -38,7 +65,7 @@ const FinancePage = () => {
   const totalInterest = totalAmount - loanAmount;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

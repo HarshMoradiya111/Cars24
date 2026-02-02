@@ -105,8 +105,15 @@ const services: Service[] = [
 
 const ServiceBookingPage = () => {
   const router = useRouter();
+  const { serviceId } = router.query;
   const { user, refreshUser } = useAuth();
-  const [selectedService, setSelectedService] = useState<Service>(services[0]);
+  
+  // Find service by ID from query param, default to first service
+  const initialService = serviceId 
+    ? services.find(s => s.id === Number(serviceId)) || services[0]
+    : services[0];
+  
+  const [selectedService, setSelectedService] = useState<Service>(initialService);
   const [walletPoints, setWalletPoints] = useState(0);
   const [useWallet, setUseWallet] = useState(false);
   const [discount, setDiscount] = useState(0);
@@ -114,6 +121,13 @@ const ServiceBookingPage = () => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    city: "",
+    preferredDate: "",
+  });
+
+  const [errors, setErrors] = useState({
     name: "",
     phone: "",
     city: "",
@@ -148,6 +162,16 @@ const ServiceBookingPage = () => {
     }
   }, [user?.id]);
 
+  // Update selected service when serviceId query param changes
+  useEffect(() => {
+    if (serviceId) {
+      const service = services.find(s => s.id === Number(serviceId));
+      if (service) {
+        setSelectedService(service);
+      }
+    }
+  }, [serviceId]);
+
   // Calculate discount based on wallet usage
   useEffect(() => {
     if (useWallet && walletPoints > 0) {
@@ -169,6 +193,76 @@ const ServiceBookingPage = () => {
       ...prev,
       [name]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors = {
+      name: "",
+      phone: "",
+      city: "",
+      preferredDate: "",
+    };
+
+    // Name validation - at least 2 characters, letters and spaces only
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.name)) {
+      newErrors.name = "Name should contain only letters";
+    }
+
+    // Phone validation - exactly 10 digits
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone.trim())) {
+      newErrors.phone = "Phone number must be exactly 10 digits";
+    }
+
+    // City validation - at least 2 characters, letters and spaces only
+    if (!formData.city.trim()) {
+      newErrors.city = "City is required";
+    } else if (formData.city.trim().length < 2) {
+      newErrors.city = "City name must be at least 2 characters";
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.city)) {
+      newErrors.city = "City name should contain only letters";
+    }
+
+    // Date validation - DD-MM-YYYY format and future date
+    if (!formData.preferredDate.trim()) {
+      newErrors.preferredDate = "Preferred date is required";
+    } else {
+      const datePattern = /^(\d{2})-(\d{2})-(\d{4})$/;
+      const match = formData.preferredDate.match(datePattern);
+      
+      if (!match) {
+        newErrors.preferredDate = "Date must be in DD-MM-YYYY format";
+      } else {
+        const [, day, month, year] = match;
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Check if date is valid
+        if (
+          date.getDate() !== parseInt(day) ||
+          date.getMonth() !== parseInt(month) - 1 ||
+          date.getFullYear() !== parseInt(year)
+        ) {
+          newErrors.preferredDate = "Invalid date";
+        } else if (date < today) {
+          newErrors.preferredDate = "Date must be today or in the future";
+        }
+      }
+    }
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error !== "");
   };
 
   const handleBookService = async (e: React.FormEvent) => {
@@ -180,8 +274,9 @@ const ServiceBookingPage = () => {
       return;
     }
 
-    if (!formData.name || !formData.phone || !formData.city || !formData.preferredDate) {
-      toast.error("Please fill in all fields");
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form");
       return;
     }
 
@@ -324,9 +419,12 @@ const ServiceBookingPage = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="Enter your name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                    )}
                   </div>
 
                   {/* Phone */}
@@ -340,9 +438,12 @@ const ServiceBookingPage = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       placeholder="10-digit number"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                    )}
                   </div>
 
                   {/* City */}
@@ -356,9 +457,12 @@ const ServiceBookingPage = () => {
                       value={formData.city}
                       onChange={handleInputChange}
                       placeholder="Enter your city"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    {errors.city && (
+                      <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+                    )}
                   </div>
 
                   {/* Preferred Date */}
@@ -374,9 +478,12 @@ const ServiceBookingPage = () => {
                       onChange={handleInputChange}
                       placeholder="DD-MM-YYYY"
                       pattern="\d{2}-\d{2}-\d{4}"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
+                    {errors.preferredDate && (
+                      <p className="text-red-500 text-sm mt-1">{errors.preferredDate}</p>
+                    )}
                   </div>
                 </div>
 

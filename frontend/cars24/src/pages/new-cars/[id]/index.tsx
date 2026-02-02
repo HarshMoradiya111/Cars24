@@ -515,12 +515,12 @@ const NewCarDetailPage = () => {
                 </div>
                 <div className="space-y-2 mb-6">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Ex-Showroom</span>
-                    <span className="font-semibold">{car.exShowroomPrice}</span>
+                    <span className="text-gray-900">Ex-Showroom</span>
+                    <span className="font-semibold text-gray-900">{car.exShowroomPrice}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">On-Road (Est.)</span>
-                    <span className="font-semibold">{car.onRoadPrice}</span>
+                    <span className="font-semibold text-gray-900">{car.onRoadPrice}</span>
                   </div>
                 </div>
                 <Link href={`/contact?car=${encodeURIComponent(car.name)}`}>
