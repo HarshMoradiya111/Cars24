@@ -21,7 +21,11 @@ builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationS
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "https://cars24-teal.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:3001"
+            )
             .AllowAnyMethod()
             .AllowAnyHeader()
     )
@@ -51,8 +55,6 @@ app.MapGet("/db-check", async () =>
         return Results.Problem($"Mongodb connection failed: {ex.Message}");
     }
 });
-
-app.UseCors("AllowAll");
 
 app.MapControllers();
 
