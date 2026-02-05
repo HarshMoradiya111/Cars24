@@ -50,8 +50,8 @@ const Footer = () => {
           <p className="text-xs sm:text-sm text-gray-600">better drives, better lives</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12 justify-items-start">
+          <div className="text-left">
             <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
               Company
             </h3>
@@ -66,7 +66,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="text-left">
             <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
               Discover
             </h3>
@@ -81,7 +81,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div>
+          <div className="text-left">
             <h3 className="text-xs sm:text-sm font-semibold text-gray-900 uppercase mb-3 sm:mb-4">
               Support
             </h3>
@@ -127,14 +127,6 @@ const Footer = () => {
                 className="h-4 w-6 rounded mr-2"
               />
               <span className="text-xs text-gray-500">India</span>
-            </div>
-            <div className="flex items-center">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg"
-                alt="UAE"
-                className="h-4 w-6 rounded mr-2"
-              />
-              <span className="text-xs text-gray-500">UAE</span>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 
 const ApplyLoanPage = () => {
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,11 +33,12 @@ const ApplyLoanPage = () => {
   const totalInterest = Number(router.query.totalInterest) || 0;
 
   useEffect(() => {
+    if (!authReady) return;
     if (!user?.id) {
       toast.error("Please login to apply for a loan");
       router.push("/login");
     }
-  }, [user, router]);
+  }, [authReady, user, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

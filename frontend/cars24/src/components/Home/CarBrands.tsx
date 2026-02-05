@@ -2,16 +2,40 @@ import { Car } from "lucide-react";
 
 const brands = [
   {
-    name: "Honda",
-    logo: "https://www.honda.com/-/media/Honda-Homepage/Images/Logos/svg/Honda_Power_Of_Dreams_22.svg",
+    name: "BMW",
+    logo: "https://cdn.simpleicons.org/bmw",
   },
   {
-    name: "BMW",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg",
+    name: "Honda",
+    logo: "https://cdn.simpleicons.org/honda",
+  },
+  {
+    name: "Hyundai",
+    logo: "https://cdn.simpleicons.org/hyundai",
+  },
+  {
+    name: "Maruti Suzuki",
+    logo: "https://cdn.simpleicons.org/suzuki",
   },
   {
     name: "Mercedes-Benz",
     logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg",
+  },
+  {
+    name: "Porsche",
+    logo: "https://cdn.simpleicons.org/porsche",
+  },
+  {
+    name: "Skoda",
+    logo: "https://cdn.simpleicons.org/skoda",
+  },
+  {
+    name: "Tata",
+    logo: "https://cdn.simpleicons.org/tata",
+  },
+  {
+    name: "Volkswagen",
+    logo: "https://cdn.simpleicons.org/volkswagen",
   },
 ];
 
@@ -46,11 +70,6 @@ export default function CarBrands() {
         ))}
       </div>
 
-      <div className="mt-6 sm:mt-8 text-center">
-        <button className="text-orange-500 font-medium hover:text-orange-600 active:text-orange-700 transition-colors text-sm sm:text-base touch-manipulation">
-          View all cars
-        </button>
-      </div>
     </div>
   );
 }

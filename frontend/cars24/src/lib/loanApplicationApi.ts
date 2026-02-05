@@ -42,7 +42,7 @@ export const loanApplicationApi = {
       }
 
       const text = await response.text();
-      return text ? JSON.parse(text) : {};
+      return text ? JSON.parse(text) : data;
     } catch (error: any) {
       console.error("Error creating loan application:", error);
       throw error;
