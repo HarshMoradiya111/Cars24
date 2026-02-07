@@ -62,22 +62,46 @@ export function notifyEvent(event: NotificationEvent): void {
     return;
   }
 
+  const showViaServiceWorker = async () => {
+    if (!("serviceWorker" in navigator)) return false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      if (!reg?.showNotification) return false;
+      await reg.showNotification(event.title, {
+        body: event.message,
+        icon: event.iconUrl || "/favicon.ico",
+        badge: "/favicon.ico",
+        tag: event.type,
+        data: { url: event.url || "/" },
+      });
+      return true;
+    } catch (e) {
+      console.warn("⚠️ Service worker notification failed:", e);
+      return false;
+    }
+  };
+
   // Show notification (icon must be a URL, not emoji)
   console.log(`✅ Showing notification: ${event.type} - ${event.title}`);
-  const notification = new Notification(event.title, {
-    body: event.message,
-    icon: event.iconUrl || "/favicon.ico",
-    badge: "/favicon.ico",
-    tag: event.type,
-  });
+  try {
+    const notification = new Notification(event.title, {
+      body: event.message,
+      icon: event.iconUrl || "/favicon.ico",
+      badge: "/favicon.ico",
+      tag: event.type,
+    });
 
-  // Handle notification click
-  if (event.url) {
-    notification.onclick = () => {
-      window.focus();
-      window.location.href = event.url!;
-      notification.close();
-    };
+    // Handle notification click
+    if (event.url) {
+      notification.onclick = () => {
+        window.focus();
+        window.location.href = event.url!;
+        notification.close();
+      };
+    }
+  } catch (e) {
+    console.warn("⚠️ Notification constructor not available. Using service worker.");
+    void showViaServiceWorker();
   }
 }
 

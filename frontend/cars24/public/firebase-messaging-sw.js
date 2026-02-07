@@ -19,17 +19,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Handle background messages
-messaging.onBackgroundMessage((payload) => {
-  console.log("Background message received:", payload);
-
-  const notificationTitle = payload.notification?.title || "CARS24 Notification";
+const showNotification = (payload) => {
+  const notificationTitle = payload?.notification?.title || "CARS24 Notification";
   const notificationOptions = {
-    body: payload.notification?.body || "You have a new notification",
-    icon: "/cars24-icon.png",
-    badge: "/cars24-badge.png",
-    tag: payload.data?.tag || "notification",
-    data: payload.data || {},
+    body: payload?.notification?.body || "You have a new notification",
+    icon: "/icon.png",
+    tag: payload?.data?.tag || "notification",
+    data: {
+      ...(payload?.data || {}),
+      url: payload?.data?.url || payload?.notification?.click_action || "/",
+    },
     vibrate: [200, 100, 200],
     actions: [
       {
@@ -44,6 +43,25 @@ messaging.onBackgroundMessage((payload) => {
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
+};
+
+// Handle background messages
+messaging.onBackgroundMessage((payload) => {
+  console.log("Background message received:", payload);
+  showNotification(payload);
+});
+
+// Native push fallback for some mobile browsers
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+  let payload = {};
+  try {
+    payload = event.data.json();
+  } catch (e) {
+    payload = { notification: { title: "CARS24 Notification", body: event.data.text() } };
+  }
+
+  event.waitUntil(Promise.resolve(showNotification(payload)));
 });
 
 // Handle notification clicks
@@ -51,7 +69,7 @@ self.addEventListener("notificationclick", (event) => {
   console.log("Notification clicked:", event);
   event.notification.close();
 
-  const urlToOpen = event.notification.data.url || "/";
+  const urlToOpen = event.notification.data?.url || "/";
 
   event.waitUntil(
     clients
@@ -60,14 +78,12 @@ self.addEventListener("notificationclick", (event) => {
         includeUncontrolled: true,
       })
       .then((windowClients) => {
-        // Check if there's already a window/tab open with the target URL
         for (let i = 0; i < windowClients.length; i++) {
           const client = windowClients[i];
           if (client.url === urlToOpen && "focus" in client) {
             return client.focus();
           }
         }
-        // If not, open a new window/tab with the target URL
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen);
         }

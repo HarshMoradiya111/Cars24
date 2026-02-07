@@ -1,6 +1,6 @@
 // notifications.ts - Permission and token handling
-import { getToken, onMessage } from "firebase/messaging";
-import { messaging } from "./firebase";
+import { onMessage, isSupported } from "firebase/messaging";
+import { messaging, requestNotificationPermission } from "./firebase";
 
 // Detect mobile platform
 function getMobilePlatform(): "ios" | "android" | "desktop" {
@@ -17,8 +17,17 @@ function getIOSVersion(): number | null {
 }
 
 export async function enableNotifications(): Promise<string | null> {
-  if (typeof window === "undefined" || !messaging) {
-    console.error("Firebase Messaging not available");
+  if (typeof window === "undefined") {
+    console.error("Notifications can only be enabled in the browser");
+    return null;
+  }
+
+  const supported = await isSupported().catch(() => false);
+  if (!supported) {
+    console.warn("Firebase Messaging not supported in this browser");
+    alert(
+      "Push notifications are not supported on this browser. Please use Chrome on Android or Desktop."
+    );
     return null;
   }
 
@@ -35,6 +44,7 @@ export async function enableNotifications(): Promise<string | null> {
 
   if (!("serviceWorker" in navigator)) {
     console.error("Service Worker not supported");
+    alert("Push notifications require service worker support in your browser.");
     return null;
   }
 
@@ -44,29 +54,18 @@ export async function enableNotifications(): Promise<string | null> {
     return null;
   }
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") {
-    console.log("Notification permission denied");
-    return null;
-  }
-
   try {
-    const registration = await navigator.serviceWorker.register(
-      "/firebase-messaging-sw.js",
-      { scope: "/" }
-    );
-    await navigator.serviceWorker.ready;
-
-    const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-    if (!vapidKey) {
-      console.error("❌ VAPID key not configured");
+    const token = await requestNotificationPermission();
+    if (!token) {
+      if (Notification.permission === "denied") {
+        alert(
+          "Notifications are blocked. Please allow notifications in your browser settings and try again."
+        );
+      } else {
+        alert("Unable to enable notifications. Please try again.");
+      }
       return null;
     }
-
-    const token = await getToken(messaging, {
-      vapidKey,
-      serviceWorkerRegistration: registration,
-    });
 
     console.log("✅ FCM Token obtained:", token.substring(0, 20) + "...");
     console.log(`📱 Platform: ${platform}`);
@@ -89,9 +88,16 @@ export async function enableNotifications(): Promise<string | null> {
 
 export function setupMessageListener(callback: (payload: any) => void) {
   if (!messaging) return;
-  
-  onMessage(messaging, (payload: any) => {
-    console.log("Foreground message received:", payload);
-    callback(payload);
-  });
+
+  isSupported()
+    .then((supported) => {
+      if (!supported) return;
+      onMessage(messaging, (payload: any) => {
+        console.log("Foreground message received:", payload);
+        callback(payload);
+      });
+    })
+    .catch(() => {
+      // Ignore if unsupported
+    });
 }

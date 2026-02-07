@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { isSupported as firebaseIsSupported } from "firebase/messaging";
 
 let setupListener: any = () => {};
 let requestPerm: any = async () => null;
@@ -71,6 +72,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     setSupported("Notification" in window && "serviceWorker" in navigator);
 
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/firebase-messaging-sw.js").catch((e) => {
+        console.error("Service worker registration failed:", e);
+      });
+    }
+
     try {
       const saved = localStorage.getItem("notificationPreferences");
       if (saved) setPrefs({ ...DEFAULT_PREFS, ...JSON.parse(saved) });
@@ -96,14 +103,31 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (prefs.enabled && supported) {
         new Notification(payload.notification?.title || "CARS24", {
           body: payload.notification?.body || "New notification",
-          icon: data.icon || "/cars24-icon.png",
-          badge: "/cars24-badge.png",
+          icon: "/icon.png",
           tag: data.tag || "notification",
           data,
         });
       }
     });
   }, [prefs, supported]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!supported) return;
+
+    const maybeRequestPermission = async () => {
+      const firebaseSupported = await firebaseIsSupported();
+      if (!firebaseSupported) return;
+
+      if (Notification.permission === "default") {
+        askPermission();
+      } else if (Notification.permission === "granted" && !token) {
+        askPermission();
+      }
+    };
+
+    maybeRequestPermission();
+  }, [supported, token]);
 
   const updatePrefs = (newPrefs: Partial<NotificationPreferences>) => {
     const updated = { ...prefs, ...newPrefs };
@@ -123,8 +147,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (prefs.enabled && supported && "Notification" in window && Notification.permission === "granted") {
       new Notification(data.title, {
         body: data.body,
-        icon: data.icon || "/cars24-icon.png",
-        badge: "/cars24-badge.png",
+        icon: data.icon || "/icon.png",
         tag: data.tag || "notification",
         data: data.data,
       });
@@ -133,6 +156,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const askPermission = async (): Promise<boolean> => {
     try {
+      const firebaseSupported = await firebaseIsSupported();
+      if (!firebaseSupported) {
+        alert(
+          "Push notifications are not supported on this browser. Please use Chrome on Android or Desktop."
+        );
+        return false;
+      }
+      if (!supported) return false;
       if (!requestPerm) {
         console.error("Notification service not available");
         return false;
