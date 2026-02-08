@@ -57,6 +57,42 @@ export const login = async (email: string, password: string) => {
   return data?.user ? data : { user: data };
 };
 
+export const forgotPassword = async (email: string) => {
+  const response = await fetch(`${BASE_URL}/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `forgot-password failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+
+  return response.json();
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  const response = await fetch(`${BASE_URL}/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, newPassword }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `reset-password failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+
+  return response.json();
+};
+
 export const getUserById = async (userId: string) => {
   const response = await fetch(`${BASE_URL}/${userId}`);
 

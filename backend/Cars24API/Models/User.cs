@@ -40,4 +40,8 @@ public class User
 
     public int WalletPoints { get; set; } = 0;
 
+    public string? ResetToken { get; set; }
+
+    public DateTime? ResetTokenExpiry { get; set; }
+
 }
