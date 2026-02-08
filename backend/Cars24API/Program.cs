@@ -26,12 +26,7 @@ builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationS
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy
-            .WithOrigins(
-                "https://cars24-teal.vercel.app",
-                "https://cars24-1y9t.onrender.com",
-                "http://localhost:3000",
-                "http://localhost:3001"
-            )
+            .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader()
     )
