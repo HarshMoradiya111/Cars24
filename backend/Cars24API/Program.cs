@@ -24,6 +24,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "https://cars24-teal.vercel.app",
+                "https://cars24-1y9t.onrender.com",
                 "http://localhost:3000",
                 "http://localhost:3001"
             )
