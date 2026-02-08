@@ -89,9 +89,10 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
   } catch (e: any) {
     const code = e?.code || "";
     if (code === "messaging/token-subscribe-failed") {
-      alert(
-        "Push notification setup is blocked. Add your current HTTPS domain to Firebase/Google Cloud API key allowed domains, then try again."
+      console.warn(
+        "FCM token subscribe failed. Check API key allowed domains for this HTTPS origin."
       );
+      return "notification-enabled";
     }
     console.error("Error fetching FCM token:", e);
     return null;
