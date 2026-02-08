@@ -1,56 +1,62 @@
-using System.Net;
-using System.Net.Mail;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace Cars24API.Services;
 
 public class EmailService
 {
-    private readonly IConfiguration _config;
+  private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+  {
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+  };
 
-    public EmailService(IConfiguration config)
+    private readonly IConfiguration _config;
+  private readonly HttpClient _httpClient;
+
+  public EmailService(IConfiguration config, HttpClient httpClient)
     {
         _config = config;
+    _httpClient = httpClient;
     }
 
     public async Task SendPasswordResetEmailAsync(string toEmail, string resetLink)
     {
-        var host = _config["BrevoSmtp:Host"];
-        var portValue = _config["BrevoSmtp:Port"];
-        var username = _config["BrevoSmtp:Username"];
-        var password = _config["BrevoSmtp:Password"];
-        var senderName = _config["BrevoSmtp:SenderName"];
-        var senderEmail = _config["BrevoSmtp:SenderEmail"];
-        var useSslValue = _config["BrevoSmtp:UseSsl"];
+    var apiKey = _config["BrevoApi:ApiKey"];
+    var senderName = _config["BrevoApi:SenderName"];
+    var senderEmail = _config["BrevoApi:SenderEmail"];
 
-        if (string.IsNullOrWhiteSpace(host) ||
-            string.IsNullOrWhiteSpace(portValue) ||
-            string.IsNullOrWhiteSpace(username) ||
-            string.IsNullOrWhiteSpace(password) ||
-            string.IsNullOrWhiteSpace(senderEmail))
-        {
-            throw new InvalidOperationException("Brevo SMTP configuration is missing.");
-        }
+    if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(senderEmail))
+    {
+      throw new InvalidOperationException("Brevo API configuration is missing.");
+    }
 
-        var port = int.TryParse(portValue, out var parsedPort) ? parsedPort : 587;
-        var useSsl = bool.TryParse(useSslValue, out var parsedSsl) ? parsedSsl : true;
+    var payload = new
+    {
+      sender = new
+      {
+        name = string.IsNullOrWhiteSpace(senderName) ? "CARS24" : senderName,
+        email = senderEmail
+      },
+      to = new[] { new { email = toEmail } },
+      subject = "Reset your CARS24 password",
+      htmlContent = BuildResetEmailBody(resetLink)
+    };
 
-        var fromAddress = new MailAddress(senderEmail, string.IsNullOrWhiteSpace(senderName) ? "CARS24" : senderName);
-        var toAddress = new MailAddress(toEmail);
+    using var request = new HttpRequestMessage(HttpMethod.Post, "smtp/email")
+    {
+      Content = new StringContent(JsonSerializer.Serialize(payload, JsonOptions), Encoding.UTF8, "application/json")
+    };
 
-        using var message = new MailMessage(fromAddress, toAddress)
-        {
-            Subject = "Reset your CARS24 password",
-            Body = BuildResetEmailBody(resetLink),
-            IsBodyHtml = true
-        };
+    request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    request.Headers.Add("api-key", apiKey);
 
-        using var client = new SmtpClient(host, port)
-        {
-            EnableSsl = useSsl,
-            Credentials = new NetworkCredential(username, password)
-        };
-
-        await client.SendMailAsync(message);
+    using var response = await _httpClient.SendAsync(request);
+    if (!response.IsSuccessStatusCode)
+    {
+      var responseBody = await response.Content.ReadAsStringAsync();
+      throw new InvalidOperationException($"Brevo API request failed with status {(int)response.StatusCode}: {responseBody}");
+    }
     }
 
     private static string BuildResetEmailBody(string resetLink)

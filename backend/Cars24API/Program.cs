@@ -10,7 +10,11 @@ builder.Services.AddEndpointsApiExplorer();
 string? connectionstring = builder.Configuration.GetConnectionString("Cars24DB");
 
 builder.Services.AddTransient<UserService>(sp => new UserService(builder.Configuration));
-builder.Services.AddTransient<EmailService>(sp => new EmailService(builder.Configuration));
+builder.Services.AddHttpClient<EmailService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.brevo.com/v3/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddTransient<CarService>(sp => new CarService(builder.Configuration));
 builder.Services.AddTransient<BookingService>(sp => new BookingService(builder.Configuration));
 builder.Services.AddTransient<AppointmentService>(sp => new AppointmentService(builder.Configuration));
