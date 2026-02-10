@@ -52,20 +52,18 @@ namespace Cars24API.Controllers
         [HttpGet("summaries")]
         public async Task<IActionResult> GetCarsummaries([FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
-            var cars = await _carservice.GetAllAsync();
+            var cars = await _carservice.GetSummariesOptimizedAsync();
             var result = cars.Select(car => new
             {
                 car.Id,
-                car.Title,
-                km = car.Specs.Km,
-                Fuel = car.Specs.Fuel,
-                Transmission = car.Specs.Transmission,
-                Owner = car.Specs.Owner,
-                car.Emi,
+                car.Brand,
+                car.Model,
                 car.Price,
-                car.Location,
-                image = (car.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
-                RecommendedPrice = _pricingService.Recommend(car.Title, car.Price, car.Location, new Cars24API.Models.PricingContext
+                car.City,
+                car.Year,
+                car.KmDriven,
+                car.MainImageUrl,
+                RecommendedPrice = _pricingService.Recommend($"{car.Brand} {car.Model}", car.Price, car.City, new Cars24API.Models.PricingContext
                 {
                     UserLocation = userLocation,
                     Date = DateTime.UtcNow,

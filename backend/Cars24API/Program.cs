@@ -9,13 +9,18 @@ builder.Services.AddEndpointsApiExplorer();
 
 string? connectionstring = builder.Configuration.GetConnectionString("Cars24DB");
 
+// Register MongoDbContext as Singleton for connection pooling
+builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddSingleton<MongoDbIndexInitializer>();
+
+// Register services with MongoDbContext dependency injection
 builder.Services.AddTransient<UserService>(sp => new UserService(builder.Configuration));
 builder.Services.AddHttpClient<EmailService>(client =>
 {
     client.BaseAddress = new Uri("https://api.brevo.com/v3/");
     client.Timeout = TimeSpan.FromSeconds(10);
 });
-builder.Services.AddTransient<CarService>(sp => new CarService(builder.Configuration));
+builder.Services.AddTransient<CarService>();
 builder.Services.AddTransient<BookingService>(sp => new BookingService(builder.Configuration));
 builder.Services.AddTransient<AppointmentService>(sp => new AppointmentService(builder.Configuration));
 builder.Services.AddTransient<PricingService>(sp => new PricingService(builder.Configuration));
@@ -33,6 +38,13 @@ builder.Services.AddCors(options =>
 );
 
 var app = builder.Build();
+
+// Initialize MongoDB indexes on startup
+using (var scope = app.Services.CreateScope())
+{
+    var indexInitializer = scope.ServiceProvider.GetRequiredService<MongoDbIndexInitializer>();
+    await indexInitializer.InitializeAsync();
+}
 
 // Enable CORS before mapping routes
 app.UseCors("AllowAll");
