@@ -37,7 +37,10 @@ namespace Cars24API.Controllers
                 Date = req.Date ?? DateTime.UtcNow,
                 FuelPriceIndex = req.FuelIndex
             };
-            var rec = _pricingService.Recommend(req.Title, req.BasePrice, req.CarLocation, ctx);
+            
+            // Ensure BasePrice is properly formatted as a string for parsing
+            string basePriceStr = req.BasePrice?.Trim() ?? "";
+            var rec = _pricingService.Recommend(req.Title, basePriceStr, req.CarLocation, ctx);
             return Ok(new
             {
                 RecommendedPrice = rec.RecommendedPrice,

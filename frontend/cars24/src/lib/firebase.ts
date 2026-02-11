@@ -88,13 +88,24 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
     return token || null;
   } catch (e: any) {
     const code = e?.code || "";
+    const errorName = e?.name || "";
+    
+    // Handle common FCM errors silently or with warnings
     if (code === "messaging/token-subscribe-failed") {
       console.warn(
         "FCM token subscribe failed. Check API key allowed domains for this HTTPS origin."
       );
       return "notification-enabled";
     }
-    console.error("Error fetching FCM token:", e);
+    
+    if (errorName === "AbortError" || code === "messaging/registration-failed") {
+      // Silent fail for registration errors - these are common in development
+      console.warn("FCM registration not available. Push notifications will be limited.");
+      return null;
+    }
+    
+    // Only log actual errors that need attention
+    console.warn("FCM token unavailable:", e?.message || e);
     return null;
   }
 };

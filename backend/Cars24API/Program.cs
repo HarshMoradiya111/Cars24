@@ -49,6 +49,9 @@ using (var scope = app.Services.CreateScope())
 // Enable CORS before mapping routes
 app.UseCors("AllowAll");
 
+// Ensure CORS middleware is applied before any other middleware
+app.UseRouting();
+
 app.MapGet("/", () => "Welcome to Cars24 API");
 
 app.MapGet("/db-check", async () =>

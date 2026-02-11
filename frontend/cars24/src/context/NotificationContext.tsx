@@ -111,23 +111,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   }, [prefs, supported]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!supported) return;
-
-    const maybeRequestPermission = async () => {
-      const firebaseSupported = await firebaseIsSupported();
-      if (!firebaseSupported) return;
-
-      if (Notification.permission === "default") {
-        askPermission();
-      } else if (Notification.permission === "granted" && !token) {
-        askPermission();
-      }
-    };
-
-    maybeRequestPermission();
-  }, [supported, token]);
+  // Removed automatic permission request - only request when user explicitly enables notifications
+  // This prevents console errors on every page load
 
   const updatePrefs = (newPrefs: Partial<NotificationPreferences>) => {
     const updated = { ...prefs, ...newPrefs };

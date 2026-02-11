@@ -22,7 +22,7 @@ namespace Cars24API.Services
         {
             var stopwatch = Stopwatch.StartNew();
 
-            // Project only essential fields for lightweight response
+            // Use only inclusion projection - include only the fields we need
             var projection = Builders<Car>.Projection
                 .Include(c => c.Id)
                 .Include(c => c.Title)
@@ -30,14 +30,7 @@ namespace Cars24API.Services
                 .Include(c => c.Location)
                 .Include(c => c.Specs.Year)
                 .Include(c => c.Specs.Km)
-                .Include(c => c.Images)
-                .Exclude(c => c.Emi)
-                .Exclude(c => c.Features)
-                .Exclude(c => c.Highlights)
-                .Exclude("Specs.Fuel")
-                .Exclude("Specs.Transmission")
-                .Exclude("Specs.Owner")
-                .Exclude("Specs.Insurance");
+                .Include(c => c.Images);
 
             // Limit to 12 cars for reduced response size
             var cars = await _cars.Find(_ => true)

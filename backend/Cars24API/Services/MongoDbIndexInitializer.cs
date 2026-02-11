@@ -26,13 +26,18 @@ namespace Cars24API.Services
                     // Single field indexes for common filters
                     Builders<Car>.IndexKeys.Ascending(c => c.Location),  // City filter
                     Builders<Car>.IndexKeys.Ascending(c => c.Price),      // Price filter
-                    Builders<Car>.IndexKeys.Ascending(c => c.Title),      // Search by brand
-                    Builders<Car>.IndexKeys.Descending("_id")             // CreatedAt (ObjectId contains timestamp)
+                    Builders<Car>.IndexKeys.Ascending(c => c.Title)       // Search by brand
+                    // Note: _id index is automatically created by MongoDB, so no need to explicitly create it
                 };
 
-                var indexModels = indexKeysDefinitions.Select(key => 
-                    new CreateIndexModel<Car>(key, new CreateIndexOptions { Background = true })
-                ).ToList();
+                var indexModels = new List<CreateIndexModel<Car>>();
+
+                foreach (var key in indexKeysDefinitions)
+                {
+                    // Apply options for indexes (MongoDB allows background for non-_id indexes)
+                    var options = new CreateIndexOptions { Background = true };
+                    indexModels.Add(new CreateIndexModel<Car>(key, options));
+                }
 
                 // Create compound indexes for efficient multi-field queries
                 var compoundIndexes = new[]
@@ -47,12 +52,13 @@ namespace Cars24API.Services
 
                 foreach (var compoundIndex in compoundIndexes)
                 {
-                    indexModels.Add(new CreateIndexModel<Car>(compoundIndex, new CreateIndexOptions { Background = true }));
+                    // Don't apply background option to compound indexes as some may contain _id
+                    indexModels.Add(new CreateIndexModel<Car>(compoundIndex));
                 }
 
                 await carsCollection.Indexes.CreateManyAsync(indexModels);
 
-                _logger.LogInformation("MongoDB indexes created successfully for Cars collection: Location, Price, Title, _id (CreatedAt), and compound indexes");
+                _logger.LogInformation("MongoDB indexes created successfully for Cars collection: Location, Price, Title, and compound indexes");
             }
             catch (Exception ex)
             {

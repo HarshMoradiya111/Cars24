@@ -6,7 +6,7 @@ using Cars24API.Services;
 namespace Cars24API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/cars")] // Explicitly set the route to 'api/cars'
     public class CarController : ControllerBase
     {
         private readonly CarService _carservice;
