@@ -24,23 +24,28 @@ namespace Cars24API.Services
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var result = await _cars
+            // Fetch documents first without projection
+            var documents = await _cars
                 .Find(_ => true)
                 .SortByDescending(c => c.Price)
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize)
-                .Project(c => new CarListDto
-                {
-                    Id = c.Id ?? string.Empty,
-                    Brand = string.IsNullOrWhiteSpace(c.Title) ? "" : c.Title.Split(' ')[0],
-                    Model = string.IsNullOrWhiteSpace(c.Title) ? "" : string.Join(" ", c.Title.Split(' ').Skip(1)),
-                    Price = c.Price,
-                    City = c.Location,
-                    Year = c.Specs.Year,
-                    KmDriven = c.Specs.Km,
-                    MainImageUrl = c.Images.FirstOrDefault() ?? ""
-                })
                 .ToListAsync();
+
+            // Map to DTO on client side to avoid MongoDB LINQ translation issues
+            var result = documents.Select(c => new CarListDto
+            {
+                Id = c.Id ?? string.Empty,
+                Brand = !string.IsNullOrWhiteSpace(c.Title) ? c.Title.Split(' ')[0] : "",
+                Model = !string.IsNullOrWhiteSpace(c.Title) && c.Title.Split(' ').Length > 1 
+                    ? string.Join(" ", c.Title.Split(' ').Skip(1)) 
+                    : "",
+                Price = c.Price,
+                City = c.Location,
+                Year = c.Specs.Year,
+                KmDriven = c.Specs.Km,
+                MainImageUrl = c.Images.Count > 0 ? c.Images[0] : ""
+            }).ToList();
 
             stopwatch.Stop();
             _logger.LogInformation("Car list fetched in {Time} ms", stopwatch.ElapsedMilliseconds);

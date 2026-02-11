@@ -29,11 +29,16 @@ builder.Services.AddTransient<ServiceBookingService>(sp => new ServiceBookingSer
 builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationService(builder.Configuration));
 
 builder.Services.AddCors(options =>
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
         policy
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader()
+            .WithOrigins(
+                "http://localhost:3000",           // Local development
+                "https://cars24-teal.vercel.app"   // Production Vercel
+            )
+            .AllowAnyMethod()                       // Allow GET, POST, PUT, DELETE, etc.
+            .AllowAnyHeader()                       // Allow any headers
+            .WithExposedHeaders("Content-Type")    // Expose headers if needed
+            .SetPreflightMaxAge(TimeSpan.FromMinutes(10)) // Cache preflight for 10 minutes
     )
 );
 
@@ -46,10 +51,9 @@ using (var scope = app.Services.CreateScope())
     await indexInitializer.InitializeAsync();
 }
 
-// Enable CORS before mapping routes
-app.UseCors("AllowAll");
+// CORS middleware MUST come before routing and authorization
+app.UseCors("AllowFrontend");
 
-// Ensure CORS middleware is applied before any other middleware
 app.UseRouting();
 
 app.MapGet("/", () => "Welcome to Cars24 API");
