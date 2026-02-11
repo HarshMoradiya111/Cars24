@@ -1,76 +1,60 @@
 using Cars24API.Models;
 using MongoDB.Driver;
-using System.Diagnostics;
 
 namespace Cars24API.Services
 {
     public class CarService
     {
         private readonly IMongoCollection<Car> _cars;
-        private readonly ILogger<CarService> _logger;
-
-        public CarService(MongoDbContext context, ILogger<CarService> logger)
+        public CarService(IConfiguration config)
         {
-            _cars = context.GetCollection<Car>("Cars");
-            _logger = logger;
+            var client = new MongoClient(config.GetConnectionString("Cars24DB"));
+
+            var database = client.GetDatabase(config["MongoDB:DatabaseName"]);
+            _cars = database.GetCollection<Car>("Cars");
         }
-
-        public async Task<List<CarListDto>> GetSummariesOptimizedAsync()
-        {
-            return await GetPagedAsync(1, 12);
-        }
-
-        public async Task<List<CarListDto>> GetPagedAsync(int page, int pageSize)
-        {
-            var stopwatch = Stopwatch.StartNew();
-
-            // Fetch documents first without projection
-            var documents = await _cars
-                .Find(_ => true)
-                .SortByDescending(c => c.Price)
-                .Skip((page - 1) * pageSize)
-                .Limit(pageSize)
-                .ToListAsync();
-
-            // Map to DTO on client side to avoid MongoDB LINQ translation issues
-            var result = documents.Select(c => new CarListDto
-            {
-                Id = c.Id ?? string.Empty,
-                Brand = !string.IsNullOrWhiteSpace(c.Title) ? c.Title.Split(' ')[0] : "",
-                Model = !string.IsNullOrWhiteSpace(c.Title) && c.Title.Split(' ').Length > 1 
-                    ? string.Join(" ", c.Title.Split(' ').Skip(1)) 
-                    : "",
-                Price = c.Price,
-                City = c.Location,
-                Year = c.Specs.Year,
-                KmDriven = c.Specs.Km,
-                MainImageUrl = c.Images.Count > 0 ? c.Images[0] : ""
-            }).ToList();
-
-            stopwatch.Stop();
-            _logger.LogInformation("Car list fetched in {Time} ms", stopwatch.ElapsedMilliseconds);
-
-            return result;
-        }
-
+        public async Task<List<Car>> GetAllAsync() =>
+            await _cars.Find(_ => true).ToListAsync();
         public async Task<Car?> GetByIdAsync(string id)
         {
-            return await _cars.Find(c => c.Id == id).FirstOrDefaultAsync();
+            return await _cars.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
-
-        public async Task CreateAsync(Car car)
-        {
+        public async Task CreateAsync(Car car) =>
             await _cars.InsertOneAsync(car);
-        }
-
         public async Task DeleteAsync(string id)
         {
-            await _cars.DeleteOneAsync(c => c.Id == id);
+            var result = await _cars.DeleteOneAsync(c => c.Id == id);
+            if (result.DeletedCount == 0)
+            {
+                throw new Exception("Car not found");
+            }
         }
 
-        public async Task<long> CountAsync()
+        public async Task<int> RemoveDuplicatesAsync()
         {
-            return await _cars.CountDocumentsAsync(_ => true);
+            var allCars = await GetAllAsync();
+            var seenTitles = new HashSet<string>();
+            var carsToDelete = new List<string>();
+
+            foreach (var car in allCars)
+            {
+                if (seenTitles.Contains(car.Title))
+                {
+                    carsToDelete.Add(car.Id);
+                }
+                else
+                {
+                    seenTitles.Add(car.Title);
+                }
+            }
+
+            if (carsToDelete.Count > 0)
+            {
+                var result = await _cars.DeleteManyAsync(c => carsToDelete.Contains(c.Id));
+                return (int)result.DeletedCount;
+            }
+
+            return 0;
         }
     }
 }

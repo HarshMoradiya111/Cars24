@@ -37,14 +37,7 @@ namespace Cars24API.Controllers
                 Date = req.Date ?? DateTime.UtcNow,
                 FuelPriceIndex = req.FuelIndex
             };
-            
-            // Parse BasePrice string to decimal
-            if (!decimal.TryParse(req.BasePrice, out var basePriceDecimal) || basePriceDecimal <= 0)
-            {
-                basePriceDecimal = 0m;
-            }
-            
-            var rec = _pricingService.Recommend(req.Title, basePriceDecimal, req.CarLocation, ctx);
+            var rec = _pricingService.Recommend(req.Title, req.BasePrice, req.CarLocation, ctx);
             return Ok(new
             {
                 RecommendedPrice = rec.RecommendedPrice,

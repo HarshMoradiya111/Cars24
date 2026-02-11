@@ -9,18 +9,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 string? connectionstring = builder.Configuration.GetConnectionString("Cars24DB");
 
-// Register MongoDbContext as Singleton for connection pooling
-builder.Services.AddSingleton<MongoDbContext>();
-builder.Services.AddSingleton<MongoDbIndexInitializer>();
-
-// Register services with MongoDbContext dependency injection
 builder.Services.AddTransient<UserService>(sp => new UserService(builder.Configuration));
-builder.Services.AddHttpClient<EmailService>(client =>
-{
-    client.BaseAddress = new Uri("https://api.brevo.com/v3/");
-    client.Timeout = TimeSpan.FromSeconds(10);
-});
-builder.Services.AddTransient<CarService>();
+builder.Services.AddTransient<CarService>(sp => new CarService(builder.Configuration));
 builder.Services.AddTransient<BookingService>(sp => new BookingService(builder.Configuration));
 builder.Services.AddTransient<AppointmentService>(sp => new AppointmentService(builder.Configuration));
 builder.Services.AddTransient<PricingService>(sp => new PricingService(builder.Configuration));
@@ -29,32 +19,22 @@ builder.Services.AddTransient<ServiceBookingService>(sp => new ServiceBookingSer
 builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationService(builder.Configuration));
 
 builder.Services.AddCors(options =>
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("AllowAll", policy =>
         policy
             .WithOrigins(
-                "http://localhost:3000",           // Local development
-                "https://cars24-teal.vercel.app"   // Production Vercel
+                "https://cars24-teal.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:3001"
             )
-            .AllowAnyMethod()                       // Allow GET, POST, PUT, DELETE, etc.
-            .AllowAnyHeader()                       // Allow any headers
-            .WithExposedHeaders("Content-Type")    // Expose headers if needed
-            .SetPreflightMaxAge(TimeSpan.FromMinutes(10)) // Cache preflight for 10 minutes
+            .AllowAnyMethod()
+            .AllowAnyHeader()
     )
 );
 
 var app = builder.Build();
 
-// Initialize MongoDB indexes on startup
-using (var scope = app.Services.CreateScope())
-{
-    var indexInitializer = scope.ServiceProvider.GetRequiredService<MongoDbIndexInitializer>();
-    await indexInitializer.InitializeAsync();
-}
-
-// CORS middleware MUST come before routing and authorization
-app.UseCors("AllowFrontend");
-
-app.UseRouting();
+// Enable CORS before mapping routes
+app.UseCors("AllowAll");
 
 app.MapGet("/", () => "Welcome to Cars24 API");
 
