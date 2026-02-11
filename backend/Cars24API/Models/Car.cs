@@ -21,8 +21,10 @@ public class Car
 
     public List<string> Images { get; set; } = new();
     public string Title { get; set; } = string.Empty;
+
     public decimal Price { get; set; }
     public decimal Emi { get; set; }
+
     public string Location { get; set; } = string.Empty;
     public Specs Specs { get; set; } = new();
     public List<string> Features { get; set; } = new();
