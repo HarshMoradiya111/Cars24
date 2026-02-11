@@ -32,23 +32,18 @@ namespace Cars24API.Services
                 .Project(car => new CarListDto
                 {
                     Id = car.Id ?? string.Empty,
-                    Brand = string.IsNullOrWhiteSpace(car.Title)
-                        ? string.Empty
-                        : car.Title.Split(' ')[0],
-                    Model = string.IsNullOrWhiteSpace(car.Title)
-                        ? string.Empty
-                        : string.Join(" ", car.Title.Split(' ').Skip(1)),
+                    Brand = string.IsNullOrWhiteSpace(car.Title) ? string.Empty : car.Title.Split(' ')[0],
+                    Model = string.IsNullOrWhiteSpace(car.Title) ? string.Empty : string.Join(" ", car.Title.Split(' ').Skip(1)),
                     Price = car.Price,
                     City = car.Location ?? string.Empty,
-                    Year = car.Specs != null ? car.Specs.Year : 0,
-                    KmDriven = car.Specs != null ? car.Specs.Km ?? "0" : "0",
-                    MainImageUrl = car.Images != null && car.Images.Any()
-                        ? car.Images.First()
-                        : string.Empty
+                    Year = car.Specs.Year,
+                    KmDriven = car.Specs.Km,
+                    MainImageUrl = car.Images.FirstOrDefault() ?? string.Empty
                 })
                 .ToListAsync();
 
             stopwatch.Stop();
+
             _logger.LogInformation("GetPagedAsync executed in {ElapsedMs}ms, returned {Count} cars",
                 stopwatch.ElapsedMilliseconds, result.Count);
 
@@ -70,10 +65,7 @@ namespace Cars24API.Services
 
         public async Task DeleteAsync(string id)
         {
-            var result = await _cars.DeleteOneAsync(c => c.Id == id);
-
-            if (result.DeletedCount == 0)
-                throw new Exception("Car not found");
+            await _cars.DeleteOneAsync(c => c.Id == id);
         }
 
         public async Task<long> CountAsync()
