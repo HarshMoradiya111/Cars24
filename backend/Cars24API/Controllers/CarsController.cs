@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Cars24API.Models;
 using Cars24API.Services;
 
-
 namespace Cars24API.Controllers
 {
     [ApiController]
@@ -12,28 +11,30 @@ namespace Cars24API.Controllers
         private readonly CarService _carservice;
         private readonly PricingService _pricingService;
         private readonly UserService _userService;
-        
+
         public CarController(CarService carService, PricingService pricingService, UserService userService)
         {
             _carservice = carService;
             _pricingService = pricingService;
             _userService = userService;
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id, [FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
             var car = await _carservice.GetByIdAsync(id);
             if (car == null)
-            {
                 return NotFound();
-            }
-            var ctx = new Cars24API.Models.PricingContext
+
+            var ctx = new PricingContext
             {
                 UserLocation = userLocation,
                 Date = DateTime.UtcNow,
                 FuelPriceIndex = fuelIndex
             };
+
             var rec = _pricingService.Recommend(car.Title, car.Price, car.Location, ctx);
+
             return Ok(new
             {
                 car.Id,
@@ -49,10 +50,12 @@ namespace Cars24API.Controllers
                 PricingNotes = rec.Notes
             });
         }
+
         [HttpGet("summaries")]
         public async Task<IActionResult> GetCarsummaries([FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
             var cars = await _carservice.GetSummariesOptimizedAsync();
+
             var result = cars.Select(car => new
             {
                 car.Id,
@@ -63,22 +66,23 @@ namespace Cars24API.Controllers
                 car.Year,
                 car.KmDriven,
                 car.MainImageUrl,
-                RecommendedPrice = _pricingService.Recommend($"{car.Brand} {car.Model}", car.Price, car.City, new Cars24API.Models.PricingContext
+                RecommendedPrice = _pricingService.Recommend($"{car.Brand} {car.Model}", car.Price, car.City, new PricingContext
                 {
                     UserLocation = userLocation,
                     Date = DateTime.UtcNow,
                     FuelPriceIndex = fuelIndex
                 }).RecommendedPrice
             });
+
             return Ok(result);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Car car)
         {
             if (car == null)
-            {
-                return BadRequest("Car data is required");
-            }
+                return BadRequest();
+
             await _carservice.CreateAsync(car);
             return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);
         }
@@ -87,24 +91,21 @@ namespace Cars24API.Controllers
         public async Task<IActionResult> SellCar([FromQuery] string userId, [FromBody] Car car)
         {
             if (car == null || string.IsNullOrEmpty(userId))
-            {
-                return BadRequest("Car data and userId are required");
-            }
-            
+                return BadRequest();
+
             var user = await _userService.GetByIdAsync(userId);
             if (user == null)
-                return NotFound("User not found");
+                return NotFound();
 
             await _carservice.CreateAsync(car);
 
-            // Award referral points if user has a referrer and hasn't been rewarded yet
             if (!string.IsNullOrEmpty(user.ReferredBy) && !user.ReferralRewarded)
             {
-                await _userService.AddWalletPointsAsync(userId, 1000); // bonus for seller
-                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000); // bonus for referrer
-                await _userService.MarkReferralRewardedAsync(userId); // mark as rewarded
+                await _userService.AddWalletPointsAsync(userId, 1000);
+                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000);
+                await _userService.MarkReferralRewardedAsync(userId);
             }
-            
+
             return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);
         }
 
@@ -113,18 +114,17 @@ namespace Cars24API.Controllers
         {
             var car = await _carservice.GetByIdAsync(id);
             if (car == null)
-            {
-                return NotFound("Car not found");
-            }
+                return NotFound();
+
             await _carservice.DeleteAsync(id);
-            return Ok(new { message = "Car deleted successfully" });
+            return Ok();
         }
 
         [HttpPost("remove-duplicates")]
         public async Task<IActionResult> RemoveDuplicates()
         {
             var deletedCount = await _carservice.RemoveDuplicatesAsync();
-            return Ok(new { message = $"Removed {deletedCount} duplicate cars" });
+            return Ok(new { deletedCount });
         }
     }
 }
