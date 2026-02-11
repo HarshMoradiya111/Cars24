@@ -25,36 +25,31 @@ namespace Cars24API.Services
             var stopwatch = Stopwatch.StartNew();
 
             var result = await _cars
-                .Find(Builders<Car>.Filter.Empty)
+                .Find(_ => true)
                 .SortByDescending(c => c.Price)
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize)
                 .Project(c => new CarListDto
                 {
                     Id = c.Id ?? string.Empty,
-                    Brand = string.IsNullOrWhiteSpace(c.Title) ? string.Empty : c.Title.Split(' ')[0],
-                    Model = string.IsNullOrWhiteSpace(c.Title) ? string.Empty : string.Join(" ", c.Title.Split(' ').Skip(1)),
+                    Brand = string.IsNullOrWhiteSpace(c.Title) ? "" : c.Title.Split(' ')[0],
+                    Model = string.IsNullOrWhiteSpace(c.Title) ? "" : string.Join(" ", c.Title.Split(' ').Skip(1)),
                     Price = c.Price,
-                    City = c.Location ?? string.Empty,
-                    Year = c.Specs != null ? c.Specs.Year : 0,
-                    KmDriven = c.Specs != null ? c.Specs.Km : "0",
-                    MainImageUrl = c.Images != null && c.Images.Any() ? c.Images.First() : string.Empty
+                    City = c.Location,
+                    Year = c.Specs.Year,
+                    KmDriven = c.Specs.Km,
+                    MainImageUrl = c.Images.FirstOrDefault() ?? ""
                 })
                 .ToListAsync();
 
             stopwatch.Stop();
-
-            _logger.LogInformation("Car summaries loaded in {ElapsedMs}ms, Count: {Count}",
-                stopwatch.ElapsedMilliseconds, result.Count);
+            _logger.LogInformation("Car list fetched in {Time} ms", stopwatch.ElapsedMilliseconds);
 
             return result;
         }
 
         public async Task<Car?> GetByIdAsync(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return null;
-
             return await _cars.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
@@ -71,25 +66,6 @@ namespace Cars24API.Services
         public async Task<long> CountAsync()
         {
             return await _cars.CountDocumentsAsync(_ => true);
-        }
-
-        public async Task<int> RemoveDuplicatesAsync()
-        {
-            var allCars = await _cars.Find(_ => true).ToListAsync();
-
-            var duplicates = allCars
-                .GroupBy(c => c.Title)
-                .Where(g => g.Count() > 1)
-                .SelectMany(g => g.Skip(1))
-                .Select(c => c.Id)
-                .Where(id => id != null)
-                .ToList();
-
-            if (!duplicates.Any())
-                return 0;
-
-            var result = await _cars.DeleteManyAsync(c => duplicates.Contains(c.Id));
-            return (int)result.DeletedCount;
         }
     }
 }
