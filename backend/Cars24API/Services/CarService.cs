@@ -15,6 +15,11 @@ namespace Cars24API.Services
             _logger = logger;
         }
 
+        public async Task<List<CarListDto>> GetSummariesOptimizedAsync()
+        {
+            return await GetPagedAsync(1, 12);
+        }
+
         public async Task<List<CarListDto>> GetPagedAsync(int page, int pageSize)
         {
             var stopwatch = Stopwatch.StartNew();
@@ -26,15 +31,20 @@ namespace Cars24API.Services
                 .Limit(pageSize)
                 .Project(car => new CarListDto
                 {
-                    Id = car.Id,
-                    Brand = string.IsNullOrEmpty(car.Title) ? string.Empty : car.Title.Split(' ')[0],
-                    Model = string.IsNullOrEmpty(car.Title) ? string.Empty :
-                            string.Join(" ", car.Title.Split(' ').Skip(1)),
+                    Id = car.Id ?? string.Empty,
+                    Brand = string.IsNullOrWhiteSpace(car.Title)
+                        ? string.Empty
+                        : car.Title.Split(' ')[0],
+                    Model = string.IsNullOrWhiteSpace(car.Title)
+                        ? string.Empty
+                        : string.Join(" ", car.Title.Split(' ').Skip(1)),
                     Price = car.Price,
-                    City = car.Location,
+                    City = car.Location ?? string.Empty,
                     Year = car.Specs != null ? car.Specs.Year : 0,
-                    KmDriven = car.Specs != null ? car.Specs.Km : "0",
-                    MainImageUrl = car.Images != null ? car.Images.FirstOrDefault() : string.Empty
+                    KmDriven = car.Specs != null ? car.Specs.Km ?? "0" : "0",
+                    MainImageUrl = car.Images != null && car.Images.Any()
+                        ? car.Images.First()
+                        : string.Empty
                 })
                 .ToListAsync();
 
@@ -45,20 +55,49 @@ namespace Cars24API.Services
             return result;
         }
 
-        public async Task<Car?> GetByIdAsync(string id) =>
-            await _cars.Find(c => c.Id == id).FirstOrDefaultAsync();
+        public async Task<Car?> GetByIdAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
 
-        public async Task CreateAsync(Car car) =>
+            return await _cars.Find(c => c.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task CreateAsync(Car car)
+        {
             await _cars.InsertOneAsync(car);
+        }
 
         public async Task DeleteAsync(string id)
         {
             var result = await _cars.DeleteOneAsync(c => c.Id == id);
+
             if (result.DeletedCount == 0)
                 throw new Exception("Car not found");
         }
 
-        public async Task<long> CountAsync() =>
-            await _cars.CountDocumentsAsync(_ => true);
+        public async Task<long> CountAsync()
+        {
+            return await _cars.CountDocumentsAsync(_ => true);
+        }
+
+        public async Task<int> RemoveDuplicatesAsync()
+        {
+            var allCars = await _cars.Find(_ => true).ToListAsync();
+
+            var duplicates = allCars
+                .GroupBy(c => c.Title)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .Select(c => c.Id)
+                .Where(id => !string.IsNullOrEmpty(id))
+                .ToList();
+
+            if (!duplicates.Any())
+                return 0;
+
+            var result = await _cars.DeleteManyAsync(c => duplicates.Contains(c.Id));
+            return (int)result.DeletedCount;
+        }
     }
 }
