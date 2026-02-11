@@ -8,13 +8,13 @@ namespace Cars24API.Controllers
     [Route("api/[controller]")]
     public class CarController : ControllerBase
     {
-        private readonly CarService _carService;
+        private readonly CarService _carservice;
         private readonly PricingService _pricingService;
         private readonly UserService _userService;
 
         public CarController(CarService carService, PricingService pricingService, UserService userService)
         {
-            _carService = carService;
+            _carservice = carService;
             _pricingService = pricingService;
             _userService = userService;
         }
@@ -22,9 +22,8 @@ namespace Cars24API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id, [FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
-            var car = await _carService.GetByIdAsync(id);
-            if (car == null)
-                return NotFound();
+            var car = await _carservice.GetByIdAsync(id);
+            if (car == null) return NotFound();
 
             var ctx = new PricingContext
             {
@@ -54,7 +53,7 @@ namespace Cars24API.Controllers
         [HttpGet("summaries")]
         public async Task<IActionResult> GetCarsummaries([FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
-            var cars = await _carService.GetSummariesOptimizedAsync();
+            var cars = await _carservice.GetSummariesOptimizedAsync();
 
             var result = cars.Select(car =>
             {
@@ -84,23 +83,6 @@ namespace Cars24API.Controllers
             });
 
             return Ok(result);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Car car)
-        {
-            if (car == null)
-                return BadRequest();
-
-            await _carService.CreateAsync(car);
-            return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            await _carService.DeleteAsync(id);
-            return Ok();
         }
     }
 }
