@@ -25,26 +25,26 @@ namespace Cars24API.Services
             var stopwatch = Stopwatch.StartNew();
 
             var result = await _cars
-                .Find(_ => true)
+                .Find(Builders<Car>.Filter.Empty)
                 .SortByDescending(c => c.Price)
                 .Skip((page - 1) * pageSize)
                 .Limit(pageSize)
-                .Project(car => new CarListDto
+                .Project(c => new CarListDto
                 {
-                    Id = car.Id ?? string.Empty,
-                    Brand = string.IsNullOrWhiteSpace(car.Title) ? string.Empty : car.Title.Split(' ')[0],
-                    Model = string.IsNullOrWhiteSpace(car.Title) ? string.Empty : string.Join(" ", car.Title.Split(' ').Skip(1)),
-                    Price = car.Price,
-                    City = car.Location ?? string.Empty,
-                    Year = car.Specs.Year,
-                    KmDriven = car.Specs.Km,
-                    MainImageUrl = car.Images.FirstOrDefault() ?? string.Empty
+                    Id = c.Id ?? string.Empty,
+                    Brand = string.IsNullOrWhiteSpace(c.Title) ? string.Empty : c.Title.Split(' ')[0],
+                    Model = string.IsNullOrWhiteSpace(c.Title) ? string.Empty : string.Join(" ", c.Title.Split(' ').Skip(1)),
+                    Price = c.Price,
+                    City = c.Location ?? string.Empty,
+                    Year = c.Specs != null ? c.Specs.Year : 0,
+                    KmDriven = c.Specs != null ? c.Specs.Km : "0",
+                    MainImageUrl = c.Images != null && c.Images.Any() ? c.Images.First() : string.Empty
                 })
                 .ToListAsync();
 
             stopwatch.Stop();
 
-            _logger.LogInformation("GetPagedAsync executed in {ElapsedMs}ms, returned {Count} cars",
+            _logger.LogInformation("Car summaries loaded in {ElapsedMs}ms, Count: {Count}",
                 stopwatch.ElapsedMilliseconds, result.Count);
 
             return result;
@@ -82,7 +82,7 @@ namespace Cars24API.Services
                 .Where(g => g.Count() > 1)
                 .SelectMany(g => g.Skip(1))
                 .Select(c => c.Id)
-                .Where(id => !string.IsNullOrEmpty(id))
+                .Where(id => id != null)
                 .ToList();
 
             if (!duplicates.Any())
