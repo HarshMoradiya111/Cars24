@@ -20,8 +20,8 @@ const Hero = () => {
     <div className="relative w-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg"
-          alt="Happy woman driving car"
+          src="https://images.pexels.com/photos/17377918/pexels-photo-17377918.jpeg"
+          alt="Sports car"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />

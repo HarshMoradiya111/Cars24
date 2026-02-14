@@ -1,0 +1,70 @@
+using MongoDB.Driver;
+using Cars24API.Models;
+
+namespace Cars24API.Services
+{
+    public class MongoDbIndexInitializer
+    {
+        private readonly MongoDbContext _context;
+        private readonly ILogger<MongoDbIndexInitializer> _logger;
+
+        public MongoDbIndexInitializer(MongoDbContext context, ILogger<MongoDbIndexInitializer> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
+
+        public async Task InitializeAsync()
+        {
+            try
+            {
+                var carsCollection = _context.GetCollection<Car>("Cars");
+
+                // Create indexes for optimized queries
+                var indexKeysDefinitions = new[]
+                {
+                    // Single field indexes for common filters
+                    Builders<Car>.IndexKeys.Ascending(c => c.Location),  // City filter
+                    Builders<Car>.IndexKeys.Ascending(c => c.Price),      // Price filter
+                    Builders<Car>.IndexKeys.Ascending(c => c.Title)       // Search by brand
+                    // Note: _id index is automatically created by MongoDB, so no need to explicitly create it
+                };
+
+                var indexModels = new List<CreateIndexModel<Car>>();
+
+                foreach (var key in indexKeysDefinitions)
+                {
+                    // Apply options for indexes (MongoDB allows background for non-_id indexes)
+                    var options = new CreateIndexOptions { Background = true };
+                    indexModels.Add(new CreateIndexModel<Car>(key, options));
+                }
+
+                // Create compound indexes for efficient multi-field queries
+                var compoundIndexes = new[]
+                {
+                    Builders<Car>.IndexKeys
+                        .Ascending(c => c.Location)
+                        .Ascending(c => c.Price),
+                    Builders<Car>.IndexKeys
+                        .Ascending(c => c.Location)
+                        .Descending("_id")                          // City + newest first
+                };
+
+                foreach (var compoundIndex in compoundIndexes)
+                {
+                    // Don't apply background option to compound indexes as some may contain _id
+                    indexModels.Add(new CreateIndexModel<Car>(compoundIndex));
+                }
+
+                await carsCollection.Indexes.CreateManyAsync(indexModels);
+
+                _logger.LogInformation("MongoDB indexes created successfully for Cars collection: Location, Price, Title, and compound indexes");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create MongoDB indexes");
+                // Don't throw - indexes are performance optimization, not critical for startup
+            }
+        }
+    }
+}

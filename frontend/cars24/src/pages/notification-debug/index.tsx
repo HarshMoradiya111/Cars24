@@ -7,7 +7,7 @@ export default function NotificationDebugPage() {
 
   useEffect(() => {
     const addLog = (msg: string) => {
-      console.log(msg);
+      console.log(msg); 
       setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
     };
 

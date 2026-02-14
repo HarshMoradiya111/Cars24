@@ -22,7 +22,7 @@ export default function AppPromotion() {
         
         <div className="absolute right-0 bottom-0 opacity-85 hidden sm:block">
           <img 
-            src="https://images.pexels.com/photos/8127035/pexels-photo-8127035.jpeg" 
+            src="https://images.pexels.com/photos/35782939/pexels-photo-35782939.jpeg" 
             alt="People with mobile phones" 
             className="h-32 sm:h-48 md:h-60 w-auto object-cover rounded-tl-lg"
             loading="lazy"

@@ -1,4 +1,9 @@
-const BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || "https://cars-24-clone-net-nextjs.onrender.com/api"}/Pricing`;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_API_URL is not configured");
+}
+
+const BASE_URL = `${API_BASE}/api/Pricing`;
 
 export type PricingRequest = {
   title: string;

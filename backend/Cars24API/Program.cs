@@ -33,8 +33,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Enable CORS before mapping routes
+// Middleware order: CORS must come before routing
 app.UseCors("AllowAll");
+app.UseRouting();
 
 app.MapGet("/", () => "Welcome to Cars24 API");
 

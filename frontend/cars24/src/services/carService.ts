@@ -5,7 +5,7 @@ if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");
 }
 
-const BASE_URL = `${API_BASE}/api/Car`;
+const BASE_URL = `${API_BASE}/api/car`;
 
 type CarDetails = {
   title: string;
