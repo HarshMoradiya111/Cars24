@@ -571,7 +571,7 @@ const index = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
           {/* filter */}
           <div className={`md:col-span-1 space-y-4 sm:space-y-6 ${showFilters ? 'block' : 'hidden'} md:block`}>
-            <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <h3 className="text-sm sm:text-base font-semibold">Filters</h3>
                 <button

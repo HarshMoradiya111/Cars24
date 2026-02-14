@@ -16,6 +16,7 @@ type User = {
 type AuthContextType = {
   user: User | null;
   loading: boolean;
+  authReady: boolean;
   setUser: (user: User | null) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>;
@@ -30,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [authReady, setAuthReady] = useState<boolean>(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Fetch fresh data from backend when component mounts
       refreshUserData(parsedUser.id);
     }
+    setAuthReady(true);
   }, []);
 
   const refreshUserData = async (userId: string) => {
@@ -133,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, signIn, signUp, signOut, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, authReady, setUser, signIn, signUp, signOut, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

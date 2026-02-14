@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cars24API.Models;
 
+[BsonIgnoreExtraElements]
 public class User
 {
     [BsonId]
@@ -39,5 +40,9 @@ public class User
     public bool ReferralRewarded { get; set; } = false;
 
     public int WalletPoints { get; set; } = 0;
+
+    public string? ResetToken { get; set; }
+
+    public DateTime? ResetTokenExpiresUtc { get; set; }
 
 }

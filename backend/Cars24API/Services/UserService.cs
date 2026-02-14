@@ -38,6 +38,31 @@ public class UserService
         await _users.ReplaceOneAsync(u => u.Id == id, user);
     }
 
+    public async Task<User?> GetByResetTokenAsync(string token) =>
+        await _users.Find(u => u.ResetToken == token).FirstOrDefaultAsync();
+
+    public async Task SetResetTokenAsync(string userId, string token, DateTime expiresUtc)
+    {
+        var update = Builders<User>.Update
+            .Set(u => u.ResetToken, token)
+            .Set(u => u.ResetTokenExpiresUtc, expiresUtc);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
+    }
+
+    public async Task ClearResetTokenAsync(string userId)
+    {
+        var update = Builders<User>.Update
+            .Set(u => u.ResetToken, null)
+            .Set(u => u.ResetTokenExpiresUtc, null);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
+    }
+
+    public async Task UpdatePasswordAsync(string userId, string passwordHash)
+    {
+        var update = Builders<User>.Update.Set(u => u.Password, passwordHash);
+        await _users.UpdateOneAsync(u => u.Id == userId, update);
+    }
+
     public async Task AddWalletPointsAsync(string userId, int points)
     {
         var update = Builders<User>.Update.Inc(u => u.WalletPoints, points);

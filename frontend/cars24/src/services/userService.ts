@@ -68,6 +68,42 @@ export const getUserById = async (userId: string) => {
   return data?.user ? data : { user: data };
 };
 
+export const requestPasswordReset = async (email: string, clientUrl?: string) => {
+  const response = await fetch(`${BASE_URL}/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, clientUrl }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `forgot-password failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+
+  return response.json();
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await fetch(`${BASE_URL}/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token, password }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    const message = err?.message || `reset-password failed with HTTP ${response.status}`;
+    throw new Error(message);
+  }
+
+  return response.json();
+};
+
 export const getWallet = async (userId: string) => {
   const response = await fetch(`${API_BASE}/api/user/${userId}/wallet`);
   if (response.status === 404) {
