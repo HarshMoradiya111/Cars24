@@ -11,13 +11,13 @@ namespace Cars24API.Services
             _config = config;
         }
 
-        public PriceRecommendation Recommend(string title, string basePriceRaw, string? carLocation, PricingContext ctx)
+        public PriceRecommendationDto Recommend(string title, string basePriceRaw, string? carLocation, PricingRules ctx)
         {
             var notes = new List<string>();
             var basePrice = ParsePrice(basePriceRaw);
             if (basePrice <= 0)
             {
-                return new PriceRecommendation
+                return new PriceRecommendationDto
                 {
                     RecommendedPrice = Math.Max(basePrice, 0),
                     Notes = new List<string> { "Unable to parse base price; showing original." }
@@ -32,7 +32,6 @@ namespace Cars24API.Services
             var spikeThreshold = _config.GetSection("PricingRules").GetValue<double?>("FuelSpikeThreshold") ?? 1.1;
 
             decimal multiplier = 1.0m;
-            // Monsoon or Hilly regions favor SUVs/offroad
             if (season == "Monsoon" || region == "Hilly")
             {
                 if (bodyType == "SUV" || bodyType == "Offroad")
@@ -47,7 +46,6 @@ namespace Cars24API.Services
                 }
             }
 
-            // Fuel price spike negatively impacts hatchbacks in metro
             if (region == "Metro" && fuelIndex >= spikeThreshold)
             {
                 if (bodyType == "Hatchback")
@@ -57,7 +55,6 @@ namespace Cars24API.Services
                 }
             }
 
-            // Small positive bump for rugged vehicles in rural
             if (region == "Rural" && (bodyType == "SUV" || bodyType == "Offroad"))
             {
                 multiplier *= 1.02m;
@@ -66,9 +63,8 @@ namespace Cars24API.Services
 
             var recommended = Decimal.Round(basePrice * multiplier, 0);
 
-            // Add info notes
             notes.Add($"Region: {region}. Season: {season}. Body type: {bodyType}.");
-            return new PriceRecommendation
+            return new PriceRecommendationDto
             {
                 RecommendedPrice = recommended,
                 Notes = notes
@@ -78,7 +74,6 @@ namespace Cars24API.Services
         private static decimal ParsePrice(string? raw)
         {
             if (string.IsNullOrWhiteSpace(raw)) return 0m;
-            // Accept formats like "₹7.80 lakh" or plain rupees with symbols
             var lower = raw.ToLowerInvariant();
             if (lower.Contains("lakh"))
             {
@@ -113,22 +108,17 @@ namespace Cars24API.Services
         {
             var l = (location ?? string.Empty).ToLowerInvariant();
             if (string.IsNullOrWhiteSpace(l)) return "Default";
-            // Metro cities
             string[] metro = new[] { "delhi", "new delhi", "mumbai", "bangalore", "bengaluru", "chennai", "hyderabad", "pune", "kolkata" };
             if (metro.Any(c => l.Contains(c))) return "Metro";
-            // Hilly regions examples
             string[] hilly = new[] { "shimla", "manali", "dehradun", "nainital", "mussoorie", "darjeeling", "munnar", "ooty" };
             if (hilly.Any(c => l.Contains(c))) return "Hilly";
-            // Coastal
             string[] coastal = new[] { "goa", "kochi", "mangalore", "visakhapatnam", "puducherry", "pondicherry" };
             if (coastal.Any(c => l.Contains(c))) return "Coastal";
-            // Rural fallback
             return "Rural";
         }
 
         private static string GetSeason(DateTime date, string region)
         {
-            // Basic Indian seasons
             int m = date.Month;
             if (m >= 6 && m <= 9) return "Monsoon";
             if (m == 10 || m == 11) return "Post-Monsoon";

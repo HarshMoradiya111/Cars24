@@ -1,4 +1,4 @@
-import { fetchWithRetry } from '../utils/fetchWithRetry';
+import { fetchWithRetry } from "@/utils/apiClient";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 if (!API_BASE) {

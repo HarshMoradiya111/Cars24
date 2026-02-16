@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { CarGridSkeleton, EmptyState } from "@/components/ui/SkeletonLoaders";
-// API fetch disabled to show only user-added cars
 import { ChevronDown, Heart, Search, Sliders, ShoppingCart, MapPin, AlertCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import SafeImage from "@/components/ui/SafeImage";
@@ -16,105 +15,8 @@ import Fuse from "fuse.js";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
 import { useRouter } from "next/router";
+import { formatCurrency, normalizeOwnerText, parseAmount, parseKmValue } from "@/utils/formatters";
 
-// const cars = [
-//   {
-//     id: "fronx-2023",
-//     title: "2023 Maruti FRONX DELTA PLUS 1.2L AGS",
-//     km: "10,048",
-//     fuel: "Petrol",
-//     transmission: "Auto",
-//     owner: "1st owner",
-//     emi: "₹15,245/m",
-//     price: "₹7.80 lakh",
-//     location: "Metro Walk, Rohini, New Delhi",
-//     image: "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
-//   },
-//   {
-//     id: "swift-2017",
-//     title: "2017 Maruti Swift VXI (O)",
-//     km: "60,056",
-//     fuel: "Petrol",
-//     transmission: "Manual",
-//     owner: "1st owner",
-//     emi: "₹7,214/m",
-//     price: "₹3.69 lakh",
-//     location: "Metro Walk, Rohini, New Delhi",
-//     image: "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
-//   },
-//   {
-//     id: "creta-2021",
-//     title: "2021 Hyundai Creta SX IVT",
-//     km: "20,500",
-//     fuel: "Petrol",
-//     transmission: "Auto",
-//     owner: "1st owner",
-//     emi: "₹18,999/m",
-//     price: "₹11.20 lakh",
-//     location: "Sector 29, Gurugram",
-//     image: "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
-//   },
-//   {
-//     id: "baleno-2020",
-//     title: "2020 Maruti Baleno ZETA",
-//     km: "30,000",
-//     fuel: "Petrol",
-//     transmission: "Manual",
-//     owner: "2nd owner",
-//     emi: "₹10,600/m",
-//     price: "₹6.45 lakh",
-//     location: "Karol Bagh, New Delhi",
-//     image: "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg",
-//   },
-//   {
-//     id: "eco-2018",
-//     title: "2018 Maruti Eeco 5 STR WITH A/C+HTR",
-//     km: "45,000",
-//     fuel: "Petrol",
-//     transmission: "Manual",
-//     owner: "1st owner",
-//     emi: "₹5,300/m",
-//     price: "₹3.10 lakh",
-//     location: "Lajpat Nagar, New Delhi",
-//     image: "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
-//   },
-//   {
-//     id: "city-2019",
-//     title: "2019 Honda City ZX CVT",
-//     km: "25,000",
-//     fuel: "Petrol",
-//     transmission: "Auto",
-//     owner: "1st owner",
-//     emi: "₹16,500/m",
-//     price: "₹9.95 lakh",
-//     location: "South Ex, New Delhi",
-//     image: "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
-//   },
-//   {
-//     id: "venue-2022",
-//     title: "2022 Hyundai Venue SX Turbo",
-//     km: "12,000",
-//     fuel: "Petrol",
-//     transmission: "Auto",
-//     owner: "1st owner",
-//     emi: "₹14,875/m",
-//     price: "₹9.40 lakh",
-//     location: "Noida Sector 63, Uttar Pradesh",
-//     image: "https://images.pexels.com/photos/244206/pexels-photo-244206.jpeg",
-//   },
-//   {
-//     id: "altroz-2021",
-//     title: "2021 Tata Altroz XT Petrol",
-//     km: "18,000",
-//     fuel: "Petrol",
-//     transmission: "Manual",
-//     owner: "1st owner",
-//     emi: "₹9,350/m",
-//     price: "₹6.75 lakh",
-//     location: "Dwarka, New Delhi",
-//     image: "https://images.pexels.com/photos/1280560/pexels-photo-1280560.jpeg",
-//   },
-// ];
 interface Car {
   id: string;
   title: string;
@@ -131,49 +33,6 @@ interface Car {
   recommendedPrice?: number;
   pricingExplanation?: string;
 }
-const parseAmount = (raw: string) => {
-  if (!raw) return null;
-  
-  // If price is in lakh format (e.g., "₹ 6.80 lakh")
-  if (/lakh/i.test(raw)) {
-    const match = raw.match(/(\d+\.?\d*)\s*lakh/i);
-    if (match) {
-      const lakhValue = parseFloat(match[1]);
-      return Math.round(lakhValue * 100000); // Convert lakh to rupees
-    }
-  }
-  
-  // Otherwise, extract all digits
-  const digits = raw.toString().replace(/[^0-9.]/g, "");
-  return digits ? Math.round(parseFloat(digits)) : null;
-};
-
-const formatCurrency = (value: string, fallback = "N/A") => {
-  if (!value) return fallback;
-  
-  // If value already has lakh format like "₹6.80 lakh", just ensure rupee symbol
-  if (/lakh/i.test(value)) {
-    // Extract the numeric part with decimal
-    const match = value.match(/(\d+\.?\d*)\s*lakh/i);
-    if (match) {
-      return `₹ ${match[1]} lakh`;
-    }
-    return value; // Return as-is if we can't parse
-  }
-  
-  // Otherwise parse as number and convert to lakh
-  const amount = parseAmount(value);
-  if (amount === null) return fallback;
-  
-  const lakhValue = amount / 100000;
-  return `₹ ${lakhValue.toFixed(2)} lakh`;
-};
-
-const parseKmValue = (raw: string) => {
-  if (!raw) return null;
-  const digits = raw.replace(/[^0-9]/g, "");
-  return digits ? parseInt(digits, 10) : null;
-};
 
 const extractYear = (raw: string) => {
   const match = raw.match(/(19|20)\d{2}/);
@@ -248,7 +107,6 @@ const index = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading cars...");
 
-  // Get search query from URL on mount
   useEffect(() => {
     if (router.query.search && typeof router.query.search === 'string') {
       setSearchQuery(router.query.search);
@@ -292,12 +150,10 @@ const index = () => {
       const summaries = await getcarSummaries({ userLocation: selectedCity || "Delhi" });
       console.timeEnd("API: Load Cars");
 
-      // Defensive: Check if response is valid
       if (!summaries) {
         throw new Error("API returned null or undefined response");
       }
 
-      // Safe array extraction
       let carsArray: any[] = [];
       if (Array.isArray(summaries)) {
         carsArray = summaries;
@@ -314,7 +170,6 @@ const index = () => {
       }
 
       const carsWithPricing = carsArray.map((c: any) => {
-        // Defensive null checks on every property
         const basePrice = parseAmount(c?.price) || 0;
         const title = c?.title || c?.name || "Unknown Car";
         const carType = detectCarType(title);
@@ -327,7 +182,7 @@ const index = () => {
           km: c?.specs?.km || c?.km || "N/A",
           fuel: c?.specs?.fuel || c?.fuel || "N/A",
           transmission: c?.specs?.transmission || c?.transmission || "N/A",
-          owner: c?.specs?.owner || c?.owner || "N/A",
+          owner: normalizeOwnerText(c?.specs?.owner || c?.owner || "N/A"),
           emi: c?.emi || "N/A",
           price: c?.price || "N/A",
           location: c?.location || "N/A",
@@ -452,8 +307,7 @@ const index = () => {
             (car?.title && car.title.toLowerCase().includes(brandLower))
           );
         });
-      
-      // City-based filtering - match if location contains selected city
+
       const matchesCity = !selectedCity || 
         (car?.location && car.location.toLowerCase().includes(selectedCity.toLowerCase()));
       
@@ -569,7 +423,6 @@ const index = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
-          {/* filter */}
           <div className={`md:col-span-1 space-y-4 sm:space-y-6 ${showFilters ? 'block' : 'hidden'} md:block`}>
             <div className="bg-white p-3 sm:p-4 rounded-lg shadow max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -937,7 +790,7 @@ const index = () => {
                           <span>•</span>
                           <span>{car?.transmission || "N/A"}</span>
                           <span>•</span>
-                          <span>{car?.owner || "N/A"}</span>
+                          <span>{normalizeOwnerText(car?.owner || "N/A")}</span>
                         </div>
 
                         {/* Pricing Section */}

@@ -71,7 +71,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
     updateCarDetails({ highlights: updatedHighlights });
   };
 
-  // Common suggested features and highlights
   const suggestedFeatures = [
     "Air Conditioning",
     "Power Steering",

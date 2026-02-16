@@ -1,6 +1,3 @@
-// Image Upload Utility for Cloudinary
-// Make sure to set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET in .env.local
-
 export const uploadImageToCloudinary = async (file: File): Promise<string> => {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -49,7 +46,6 @@ export const uploadMultipleImages = async (
   }
 };
 
-// Helper function to validate image files
 export const validateImageFile = (file: File): boolean => {
   const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
   const maxSize = 5 * 1024 * 1024; // 5MB
@@ -65,7 +61,6 @@ export const validateImageFile = (file: File): boolean => {
   return true;
 };
 
-// Alternative: Using a simple base64 conversion (not recommended for production)
 export const convertToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

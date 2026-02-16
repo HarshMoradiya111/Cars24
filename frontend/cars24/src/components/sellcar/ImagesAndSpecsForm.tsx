@@ -59,7 +59,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
     setIsValid(!!specsFilled && hasImages);
   }, [carDetails]);
 
-  // Handle actual file uploads
   const handleImageUpload = () => {
     fileInputRef.current?.click();
   };
@@ -72,14 +71,12 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
     
     for (let i = 0; i < files.length && newImages.length < 10; i++) {
       const file = files[i];
-      
-      // Validate file type
+
       if (!file.type.startsWith('image/')) {
         alert('Please upload only image files');
         continue;
       }
-      
-      // Validate file size (max 5MB)
+
       if (file.size > 5 * 1024 * 1024) {
         alert('File size must be less than 5MB');
         continue;
@@ -95,7 +92,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
       reader.readAsDataURL(file);
     }
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

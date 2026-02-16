@@ -31,8 +31,7 @@ const NotificationSettings = () => {
   useEffect(() => {
     const prefs = getPreferences();
     setPreferences(prefs);
-    
-    // Check if Notification API is available
+
     if (typeof window !== "undefined" && "Notification" in window) {
       setPermissionGranted(Notification.permission === "granted");
       setNotificationSupported(true);

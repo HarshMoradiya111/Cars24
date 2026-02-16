@@ -27,7 +27,7 @@ namespace Cars24API.Controllers
             {
                 return NotFound();
             }
-            var ctx = new Cars24API.Models.PricingContext
+            var ctx = new Cars24API.Models.PricingRules
             {
                 UserLocation = userLocation,
                 Date = DateTime.UtcNow,
@@ -42,7 +42,15 @@ namespace Cars24API.Controllers
                 car.Price,
                 car.Emi,
                 car.Location,
-                Specs = car.Specs,
+                Specs = new Specs
+                {
+                    Year = car.Specs.Year,
+                    Km = car.Specs.Km,
+                    Fuel = car.Specs.Fuel,
+                    Transmission = car.Specs.Transmission,
+                    Owner = NormalizeOwnerText(car.Specs.Owner),
+                    Insurance = car.Specs.Insurance
+                },
                 Features = car.Features,
                 Highlights = car.Highlights,
                 RecommendedPrice = rec.RecommendedPrice,
@@ -60,12 +68,12 @@ namespace Cars24API.Controllers
                 km = car.Specs.Km,
                 Fuel = car.Specs.Fuel,
                 Transmission = car.Specs.Transmission,
-                Owner = car.Specs.Owner,
+                Owner = NormalizeOwnerText(car.Specs.Owner),
                 car.Emi,
                 car.Price,
                 car.Location,
                 image = (car.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
-                RecommendedPrice = _pricingService.Recommend(car.Title, car.Price, car.Location, new Cars24API.Models.PricingContext
+                RecommendedPrice = _pricingService.Recommend(car.Title, car.Price, car.Location, new Cars24API.Models.PricingRules
                 {
                     UserLocation = userLocation,
                     Date = DateTime.UtcNow,
@@ -73,6 +81,18 @@ namespace Cars24API.Controllers
                 }).RecommendedPrice
             });
             return Ok(result);
+        }
+
+        private static string NormalizeOwnerText(string? owner)
+        {
+            if (string.IsNullOrWhiteSpace(owner)) return string.Empty;
+            var trimmed = owner.Trim();
+            if (trimmed.Equals("1st owner", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.Equals("lst owner", StringComparison.OrdinalIgnoreCase))
+            {
+                return "1st Owner";
+            }
+            return trimmed;
         }
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Car car)
@@ -99,12 +119,11 @@ namespace Cars24API.Controllers
 
             await _carservice.CreateAsync(car);
 
-            // Award referral points if user has a referrer and hasn't been rewarded yet
             if (!string.IsNullOrEmpty(user.ReferredBy) && !user.ReferralRewarded)
             {
-                await _userService.AddWalletPointsAsync(userId, 1000); // bonus for seller
-                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000); // bonus for referrer
-                await _userService.MarkReferralRewardedAsync(userId); // mark as rewarded
+                await _userService.AddWalletPointsAsync(userId, 1000);
+                await _userService.AddWalletPointsAsync(user.ReferredBy, 1000);
+                await _userService.MarkReferralRewardedAsync(userId);
             }
             
             return CreatedAtAction(nameof(GetById), new { id = car.Id }, car);

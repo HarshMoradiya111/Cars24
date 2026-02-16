@@ -1,13 +1,3 @@
-/**
- * Frontend API Client: User Authentication Service
- * 
- * This file contains HTTP client functions that communicate with the ASP.NET Core backend API.
- * It provides methods for user signup, login, and profile management via the backend.
- * 
- * Backend Endpoint: /api/UserAuth
- * Framework: ASP.NET Core Web API
- */
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");
@@ -142,20 +132,19 @@ export const redeemWallet = async (userId: string) => {
     throw new Error(err?.message || `redeem failed with HTTP ${response.status}`);
   }
   const result = await response.json();
-  
-  // Fetch updated user data to sync with AuthContext
+
   try {
     const userData = await getUserById(userId);
     return { ...result, user: userData?.user || userData };
   } catch (err) {
-    return result; // Return redemption result if user fetch fails
+    return result;
   }
 };
 
 export const getRedemptions = async (userId: string) => {
   const response = await fetch(`${API_BASE}/api/user/${userId}/redemptions`);
   if (response.status === 404) {
-    return []; // Return empty array if endpoint not found or no history
+    return [];
   }
   if (!response.ok) {
     throw new Error(`getRedemptions failed with HTTP ${response.status}`);

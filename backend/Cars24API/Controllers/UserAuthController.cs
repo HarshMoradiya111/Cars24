@@ -42,7 +42,6 @@ public class UserAuthController : ControllerBase
         if (existingUser != null)
             return BadRequest(new { message = "User already exists." });
 
-        // Prepare new user
         var newUser = new User
         {
             FullName = request.FullName,
@@ -52,17 +51,14 @@ public class UserAuthController : ControllerBase
             WalletPoints = 0
         };
 
-        // Generate unique referral code
         newUser.ReferralCode = await _userService.GenerateUniqueReferralCodeAsync();
 
-        // Save referral code if provided (but don't award points yet)
         if (!string.IsNullOrWhiteSpace(request.ReferralCode))
         {
             var referrer = await _userService.GetByReferralCodeAsync(request.ReferralCode.Trim());
             if (referrer != null)
             {
                 newUser.ReferredBy = referrer.Id;
-                // Points will be awarded on successful booking or selling
             }
         }
 
@@ -73,7 +69,7 @@ public class UserAuthController : ControllerBase
             message = "Signup successful",
             user = new
             {
-                id = newUser.Id, // MongoDB-generated ObjectId
+                id = newUser.Id,
                 fullName = newUser.FullName,
                 email = newUser.Email,
                 phone = newUser.Phone,

@@ -97,40 +97,33 @@ const NewCarsPage = () => {
     sortBy: "popularity",
   });
 
-  // Filter cars based on search, brand, and filters
   const filteredCars = newCars.filter((car) => {
     const matchesSearch = car.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesBrand =
       selectedBrand === "All" || car.name.includes(selectedBrand);
-    
-    // Price filter - consider both base price and top price
+
     let matchesPrice = true;
     if (filters.priceRange !== "All") {
       const prices = car.price.split("-").map(p => parseFloat(p.replace(/[^0-9.]/g, "")));
       const minPrice = prices[0];
       const maxPrice = prices.length > 1 ? prices[1] : prices[0];
-      
+
       if (filters.priceRange === "under10") {
-        // Show if any variant is under 10 lakh
         matchesPrice = minPrice < 10;
       } else if (filters.priceRange === "10to15") {
-        // Show if price range overlaps with 10-15 lakh
         matchesPrice = (minPrice >= 10 && minPrice < 15) || (maxPrice >= 10 && maxPrice < 15) || (minPrice < 10 && maxPrice >= 15);
       } else if (filters.priceRange === "15to20") {
-        // Show if price range overlaps with 15-20 lakh
         matchesPrice = (minPrice >= 15 && minPrice < 20) || (maxPrice >= 15 && maxPrice < 20) || (minPrice < 15 && maxPrice >= 20);
       } else if (filters.priceRange === "above20") {
-        // Show if any variant is above 20 lakh
         matchesPrice = maxPrice >= 20;
       }
     }
-    
+
     return matchesSearch && matchesBrand && matchesPrice;
   });
 
-  // Sort cars
   const sortedCars = [...filteredCars].sort((a, b) => {
     if (filters.sortBy === "priceLowToHigh") {
       const priceA = parseFloat(a.price.split("-")[0].replace(/[^0-9.]/g, ""));
@@ -287,6 +280,7 @@ const NewCarsPage = () => {
                     src={car.image}
                     alt={car.name}
                     fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-2 right-2 bg-orange-600 text-white px-2 py-1 rounded text-xs font-semibold">

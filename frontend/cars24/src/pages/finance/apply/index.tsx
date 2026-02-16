@@ -24,7 +24,6 @@ const ApplyLoanPage = () => {
     email: "",
   });
 
-  // Get loan details from query params
   const loanAmount = Number(router.query.loanAmount) || 0;
   const interestRate = Number(router.query.interestRate) || 0;
   const tenure = Number(router.query.tenure) || 0;
@@ -44,7 +43,6 @@ const ApplyLoanPage = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -53,7 +51,6 @@ const ApplyLoanPage = () => {
   const validateForm = (): boolean => {
     const newErrors = { name: "", phone: "", email: "" };
 
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
@@ -62,14 +59,12 @@ const ApplyLoanPage = () => {
       newErrors.name = "Name should contain only letters";
     }
 
-    // Phone validation
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
     } else if (!/^\d{10}$/.test(formData.phone.trim())) {
       newErrors.phone = "Phone number must be exactly 10 digits";
     }
 
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {

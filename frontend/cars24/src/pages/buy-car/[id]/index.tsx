@@ -21,7 +21,7 @@ import SafeImage from "@/components/ui/SafeImage";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useWishlist } from "@/context/WishlistContext";
-import { detectLocationFromIP } from "@/utils/helpers";
+import { detectLocationFromIP, formatCurrency, normalizeOwnerText, parseAmount } from "@/utils/formatters";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
 const fallbackCarDetails = {
@@ -40,7 +40,7 @@ const fallbackCarDetails = {
     km: "10,048",
     fuel: "Petrol",
     transmission: "Automatic",
-    owner: "1st owner",
+    owner: "1st Owner",
     insurance: "Valid till 2024",
   },
   features: [
@@ -57,43 +57,6 @@ const fallbackCarDetails = {
     "Non-accidental",
     "Fully maintained",
   ],
-};
-const parseAmount = (raw: string) => {
-  if (!raw) return null;
-  
-  // If price is in lakh format (e.g., "₹ 6.80 lakh")
-  if (/lakh/i.test(raw)) {
-    const match = raw.match(/(\d+\.?\d*)\s*lakh/i);
-    if (match) {
-      const lakhValue = parseFloat(match[1]);
-      return Math.round(lakhValue * 100000); // Convert lakh to rupees
-    }
-  }
-  
-  // Otherwise, extract all digits
-  const digits = raw.toString().replace(/[^0-9.]/g, "");
-  return digits ? Math.round(parseFloat(digits)) : null;
-};
-
-const formatCurrency = (value: string, fallback = "N/A") => {
-  if (!value) return fallback;
-  
-  // If value already has lakh format like "₹6.80 lakh", just ensure rupee symbol
-  if (/lakh/i.test(value)) {
-    // Extract the numeric part with decimal
-    const match = value.match(/(\d+\.?\d*)\s*lakh/i);
-    if (match) {
-      return `₹ ${match[1]} lakh`;
-    }
-    return value; // Return as-is if we can't parse
-  }
-  
-  // Otherwise parse as number and convert to lakh
-  const amount = parseAmount(value);
-  if (amount === null) return fallback;
-  
-  const lakhValue = amount / 100000;
-  return `₹ ${lakhValue.toFixed(2)} lakh`;
 };
 const index = () => {
   const { toggle, isSaved } = useWishlist();
@@ -121,7 +84,6 @@ const index = () => {
   const [recommendedPrice, setRecommendedPrice] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Mock cars data (same as buy-car page)
   const mockCars: any[] = [
     {
       id: "1",
@@ -129,7 +91,7 @@ const index = () => {
       km: "15,000",
       fuel: "Petrol",
       transmission: "Manual",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹8,245/m",
       price: "₹6.80 lakh",
       location: "Rohini, New Delhi",
@@ -143,7 +105,7 @@ const index = () => {
         km: "15,000",
         fuel: "Petrol",
         transmission: "Manual",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Power Steering", "Air Conditioning", "ABS", "Power Windows"],
@@ -155,7 +117,7 @@ const index = () => {
       km: "25,000",
       fuel: "Diesel",
       transmission: "Auto",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹18,999/m",
       price: "₹14.50 lakh",
       location: "Gurgaon, Haryana",
@@ -169,7 +131,7 @@ const index = () => {
         km: "25,000",
         fuel: "Diesel",
         transmission: "Auto",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Power Steering", "ABS", "Airbags", "Alloy Wheels"],
@@ -181,7 +143,7 @@ const index = () => {
       km: "12,000",
       fuel: "Petrol",
       transmission: "Auto",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹12,500/m",
       price: "₹9.75 lakh",
       location: "Noida, UP",
@@ -195,7 +157,7 @@ const index = () => {
         km: "12,000",
         fuel: "Petrol",
         transmission: "Auto",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Touchscreen", "ABS", "Airbags", "Power Windows"],
@@ -207,7 +169,7 @@ const index = () => {
       km: "35,000",
       fuel: "Petrol",
       transmission: "Manual",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹10,500/m",
       price: "₹10.20 lakh",
       location: "Dwarka, New Delhi",
@@ -221,7 +183,7 @@ const index = () => {
         km: "35,000",
         fuel: "Petrol",
         transmission: "Manual",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Power Steering", "Air Conditioning", "Rear Parking Sensor"],
@@ -233,7 +195,7 @@ const index = () => {
       km: "8,000",
       fuel: "Petrol",
       transmission: "Auto",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹9,200/m",
       price: "₹7.80 lakh",
       location: "Faridabad, Haryana",
@@ -247,7 +209,7 @@ const index = () => {
         km: "8,000",
         fuel: "Petrol",
         transmission: "Auto",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Power Steering", "Air Conditioning", "ABS", "Alloy Wheels"],
@@ -259,7 +221,7 @@ const index = () => {
       km: "22,000",
       fuel: "Petrol",
       transmission: "Manual",
-      owner: "1st owner",
+      owner: "1st Owner",
       emi: "₹11,800/m",
       price: "₹9.50 lakh",
       location: "Ghaziabad, UP",
@@ -273,7 +235,7 @@ const index = () => {
         km: "22,000",
         fuel: "Petrol",
         transmission: "Manual",
-        owner: "1st owner",
+        owner: "1st Owner",
         insurance: "Comprehensive",
       },
       features: ["Power Steering", "Air Conditioning", "ABS"],
@@ -711,7 +673,7 @@ const index = () => {
                 </div>
                 <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
                   <p className="text-xs sm:text-sm text-gray-600">Owner</p>
-                  <p className="text-sm sm:text-base font-medium">{carDetails.specs.owner}</p>
+                  <p className="text-sm sm:text-base font-medium">{normalizeOwnerText(carDetails.specs.owner)}</p>
                 </div>
                 <div className="bg-gray-50 p-2 sm:p-3 rounded-lg col-span-2 sm:col-span-1">
                   <p className="text-xs sm:text-sm text-gray-600">Insurance</p>

@@ -21,7 +21,6 @@ const WalletPage = () => {
   const [redeeming, setRedeeming] = useState<boolean>(false);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
 
-  // Use user.walletPoints from AuthContext instead of local state
   const points = user?.walletPoints ?? 0;
 
   const loadWallet = async () => {
@@ -54,7 +53,6 @@ const WalletPage = () => {
   useEffect(() => {
     loadWallet();
     loadRedemptions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleRedeem = async () => {
@@ -62,7 +60,6 @@ const WalletPage = () => {
     setRedeeming(true);
     try {
       const res = await redeemWallet(user.id);
-      // Update user in AuthContext with new wallet points
       if (res?.user) {
         setUser({
           ...user,

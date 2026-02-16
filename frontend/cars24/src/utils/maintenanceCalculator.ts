@@ -1,4 +1,3 @@
-// Average annual service cost by brand (in INR)
 const brandServiceCosts: { [key: string]: number } = {
   "maruti": 8000,
   "hyundai": 9500,
@@ -15,22 +14,20 @@ const brandServiceCosts: { [key: string]: number } = {
   "default": 9000,
 };
 
-// Service intervals (in km)
 const serviceIntervals = {
   minor: 5000,
   major: 40000,
   tireReplacement: 50000,
-  batteryReplacement: 48000, // 3-4 years
+  batteryReplacement: 48000,
   brakeFluidChange: 40000,
   coolantChange: 50000,
 };
 
-// Cost multipliers based on maintenance condition
 export enum MaintenanceCondition {
-  EXCELLENT = 0.7, // Well maintained, lower costs
+  EXCELLENT = 0.7,
   GOOD = 0.9,
   AVERAGE = 1.0,
-  POOR = 1.3, // Poor maintenance, higher costs
+  POOR = 1.3,
 }
 
 interface MaintenanceEstimate {
@@ -52,31 +49,26 @@ export const calculateMaintenanceCost = (
   brand: string,
   condition: MaintenanceCondition = MaintenanceCondition.AVERAGE
 ): MaintenanceEstimate => {
-  // Get base service cost
   const baseCost = brandServiceCosts[brand.toLowerCase()] || brandServiceCosts["default"];
   
-  // Age multiplier: older cars typically need more maintenance
   let ageMultiplier = 1.0;
   if (carAge <= 2) ageMultiplier = 0.8;
   else if (carAge <= 5) ageMultiplier = 1.0;
   else if (carAge <= 8) ageMultiplier = 1.3;
   else ageMultiplier = 1.6;
 
-  // KM multiplier: cars with high mileage need more maintenance
   let kmMultiplier = 1.0;
   if (kmDriven <= 40000) kmMultiplier = 0.9;
   else if (kmDriven <= 80000) kmMultiplier = 1.0;
   else if (kmDriven <= 120000) kmMultiplier = 1.2;
   else kmMultiplier = 1.4;
 
-  // Calculate estimated annual maintenance cost
   const estimatedAnnualCost = Math.round(
     baseCost * ageMultiplier * kmMultiplier * condition
   );
 
   const monthlyEstimate = Math.round(estimatedAnnualCost / 12);
 
-  // Determine maintenance status
   let status: "Good" | "Average" | "High Maintenance Expected" = "Average";
   let statusColor = "bg-yellow-100 text-yellow-800";
 
@@ -88,10 +80,8 @@ export const calculateMaintenanceCost = (
     statusColor = "bg-green-100 text-green-800";
   }
 
-  // Calculate next due services
   const nextServices: MaintenanceEstimate["nextServices"] = [];
   
-  // Estimate km for next minor service (every 5000-10000 km)
   const nextMinorServiceKm = Math.ceil(kmDriven / 5000) * 5000 + 5000;
   const minorKmRemaining = nextMinorServiceKm - kmDriven;
   if (minorKmRemaining > 0) {
@@ -101,7 +91,6 @@ export const calculateMaintenanceCost = (
     });
   }
 
-  // Estimate km for next major service (every 40000 km)
   const nextMajorServiceKm = Math.ceil(kmDriven / 40000) * 40000 + 40000;
   const majorKmRemaining = nextMajorServiceKm - kmDriven;
   if (majorKmRemaining > 0) {
@@ -111,7 +100,6 @@ export const calculateMaintenanceCost = (
     });
   }
 
-  // Estimate tire replacement
   const nextTireReplacementKm = Math.ceil(kmDriven / 50000) * 50000 + 50000;
   const tireKmRemaining = nextTireReplacementKm - kmDriven;
   if (tireKmRemaining > 0 && tireKmRemaining < 10000) {
@@ -121,7 +109,6 @@ export const calculateMaintenanceCost = (
     });
   }
 
-  // Estimate battery replacement (usually after 3-4 years or 48000 km)
   if (carAge >= 3 || kmDriven >= 48000) {
     nextServices.push({
       service: "Battery Replacement May Be Due",
@@ -129,7 +116,6 @@ export const calculateMaintenanceCost = (
     });
   }
 
-  // Build insights
   const insights: string[] = [];
 
   if (carAge > 7) {

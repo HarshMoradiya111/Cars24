@@ -21,13 +21,23 @@ const LoginPage = () => {
       await signIn(email, password);
       toast.success("Signed in successfully!");
       router.push("/");
-    } catch (err) {
-      const msg = "Failed to sign in. Please check your credentials.";
-      setError(msg);
-      toast.error(msg);
+    } catch (err: any) {
+      const errorMessage = err?.message || "Failed to sign in. Please check your credentials.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError("");
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError("");
   };
 
   return (
@@ -76,7 +86,7 @@ const LoginPage = () => {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="you@example.com"
                 />
@@ -95,7 +105,7 @@ const LoginPage = () => {
                   type="password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Enter your password"
                 />

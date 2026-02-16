@@ -29,6 +29,7 @@ const SignupPage = () => {
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+    if (error) setError("");
   };
 
   const onSubmit = async (e: React.FormEvent) => {

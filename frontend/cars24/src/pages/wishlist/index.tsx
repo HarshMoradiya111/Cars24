@@ -3,22 +3,7 @@
 import Link from "next/link";
 import { useWishlist } from "@/context/WishlistContext";
 import { Heart, Trash2 } from "lucide-react";
-
-const parseAmount = (raw: string) => {
-  const digits = (raw || "").toString().replace(/[^0-9]/g, "");
-  return digits ? parseInt(digits, 10) : null;
-};
-
-const formatCurrency = (value: string | undefined, fallback = "—") => {
-  if (!value) return fallback;
-  if (/lakh/i.test(value)) {
-    return value.replace(/\$/g, "₹");
-  }
-  const amount = parseAmount(value);
-  if (amount === null) return fallback;
-  const lakhValue = amount / 100000;
-  return `₹ ${lakhValue.toFixed(2)} lakh`;
-};
+import { formatCurrencyLoose, parseAmount } from "@/utils/formatters";
 
 const WishlistPage = () => {
   const { items, toggle, clear } = useWishlist();
@@ -78,7 +63,7 @@ const WishlistPage = () => {
                 <div className="flex items-center justify-between text-sm">
                   <div>
                     <p className="text-gray-500">Price</p>
-                    <p className="font-semibold">{formatCurrency(car.price)}</p>
+                    <p className="font-semibold">{formatCurrencyLoose(car.price)}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-gray-500">EMI from</p>

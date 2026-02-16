@@ -11,7 +11,6 @@ export const NotificationPrompt = () => {
 
   useEffect(() => {
     const checkAndShow = () => {
-      // Force show via URL param
       const forceShow =
         typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).has("forceNotificationPrompt");
@@ -46,7 +45,6 @@ export const NotificationPrompt = () => {
         return false;
       }
 
-      // Check if dismissed in last 24 hours
       try {
         const lastDismissed = localStorage.getItem("notificationPromptDismissed");
         if (lastDismissed) {
@@ -78,7 +76,6 @@ export const NotificationPrompt = () => {
     try {
       localStorage.setItem("notificationPromptDismissed", Date.now().toString());
     } catch (error) {
-      // storage error, ignore
     }
   };
 

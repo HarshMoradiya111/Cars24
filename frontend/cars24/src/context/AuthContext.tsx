@@ -38,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (stored) {
       const parsedUser = JSON.parse(stored);
       setUser(parsedUser);
-      // Fetch fresh data from backend when component mounts
       refreshUserData(parsedUser.id);
     }
     setAuthReady(true);
@@ -78,8 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       };
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
       throw error;
     } finally {
       setLoading(false);

@@ -1,15 +1,5 @@
-/**
- * Skeleton Loading Components
- * 
- * Reusable skeleton UI components for loading states across the application.
- * These provide visual feedback while data is being fetched.
- */
-
 import React from 'react';
 
-/**
- * Skeleton loader for individual car cards
- */
 export function CarCardSkeleton() {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
@@ -18,16 +8,13 @@ export function CarCardSkeleton() {
       
       {/* Content skeleton */}
       <div className="p-4 space-y-3">
-        {/* Title */}
         <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-        
-        {/* Specs */}
+
         <div className="space-y-2">
           <div className="h-4 bg-gray-200 rounded w-full"></div>
           <div className="h-4 bg-gray-200 rounded w-5/6"></div>
         </div>
-        
-        {/* Price and location */}
+
         <div className="flex justify-between items-center pt-2">
           <div className="h-6 bg-gray-200 rounded w-1/3"></div>
           <div className="h-4 bg-gray-200 rounded w-1/4"></div>
@@ -37,9 +24,6 @@ export function CarCardSkeleton() {
   );
 }
 
-/**
- * Grid of skeleton car cards
- */
 export function CarGridSkeleton({ count = 6 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -50,13 +34,9 @@ export function CarGridSkeleton({ count = 6 }: { count?: number }) {
   );
 }
 
-/**
- * Skeleton loader for booking cards
- */
 export function BookingCardSkeleton() {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden animate-pulse">
-      {/* Header */}
       <div className="bg-gray-300 p-6">
         <div className="h-6 bg-gray-400 rounded w-1/2 mb-3"></div>
         <div className="h-4 bg-gray-400 rounded w-1/3 mb-4"></div>
@@ -65,14 +45,11 @@ export function BookingCardSkeleton() {
           <div className="h-4 bg-gray-400 rounded w-24"></div>
         </div>
       </div>
-      
-      {/* Body */}
+
       <div className="p-6">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Image */}
           <div className="md:w-2/5 h-64 bg-gray-200 rounded-lg"></div>
-          
-          {/* Details */}
+
           <div className="md:w-3/5 space-y-3">
             <div className="h-6 bg-gray-200 rounded w-3/4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -88,9 +65,6 @@ export function BookingCardSkeleton() {
   );
 }
 
-/**
- * List of skeleton booking cards
- */
 export function BookingListSkeleton({ count = 2 }: { count?: number }) {
   return (
     <div className="space-y-6">
@@ -113,9 +87,6 @@ export function LoadingSpinner({ message = "Loading..." }: { message?: string })
   );
 }
 
-/**
- * Empty state component for when no data is returned
- */
 export function EmptyState({ 
   title = "No Results Found",
   description = "We couldn't find any items to display.",
@@ -141,16 +112,11 @@ export function EmptyState({
   );
 }
 
-/**
- * Skeleton for featured articles/cards (Home page)
- */
 export function ArticleCardSkeleton() {
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md animate-pulse">
-      {/* Image */}
       <div className="h-48 bg-gray-200"></div>
-      
-      {/* Content */}
+
       <div className="p-4 space-y-3">
         <div className="h-5 bg-gray-200 rounded w-full"></div>
         <div className="h-4 bg-gray-200 rounded w-5/6"></div>

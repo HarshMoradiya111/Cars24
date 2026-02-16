@@ -21,7 +21,6 @@ namespace Cars24API.Services
 
         public async Task<LoanApplication?> GetByIdAsync(string id)
         {
-            // Validate ObjectId format
             if (string.IsNullOrEmpty(id) || id.Length != 24 || !id.All(c => "0123456789abcdefABCDEF".Contains(c)))
             {
                 return null;
@@ -31,7 +30,6 @@ namespace Cars24API.Services
 
         public async Task<List<LoanApplication>> GetByUserIdAsync(string userId)
         {
-            // Validate ObjectId format
             if (string.IsNullOrEmpty(userId) || userId.Length != 24 || !userId.All(c => "0123456789abcdefABCDEF".Contains(c)))
             {
                 return new List<LoanApplication>();

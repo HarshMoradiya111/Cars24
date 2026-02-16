@@ -1,14 +1,4 @@
-/**
- * Frontend API Client: Car Service
- * 
- * This file contains HTTP client functions that communicate with the ASP.NET Core backend API.
- * It provides methods to fetch and manage car-related data from the backend.
- * 
- * Backend Endpoint: /api/Car
- * Framework: ASP.NET Core Web API
- */
-
-import { fetchWithRetry } from './fetchWithRetry';
+import { fetchWithRetry } from "@/utils/apiClient";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 if (!API_BASE) {

@@ -30,10 +30,8 @@ namespace Cars24API.Controllers
             booking.UserId = userId;
             await _serviceBookingService.CreateAsync(booking);
 
-            // If wallet was used, deduct the discount points from wallet
             if (booking.UseWallet && booking.DiscountUsed > 0)
             {
-                // Deduct points from user's wallet
                 var deductPoints = booking.DiscountUsed;
                 var hadSuccess = await _userService.RedeemAsync(userId, deductPoints);
                 

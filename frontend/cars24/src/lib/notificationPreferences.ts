@@ -1,4 +1,3 @@
-// notificationPreferences.ts - User notification preferences management
 export type NotificationPrefs = {
   appointment: boolean;
   priceDrop: boolean;
@@ -10,13 +9,13 @@ export type NotificationPrefs = {
 };
 
 const DEFAULT_PREFS: NotificationPrefs = {
-  appointment: true,  // Enabled by default
-  priceDrop: true,    // Enabled by default
-  bidUpdate: true,    // Enabled by default
-  message: true,      // Enabled by default
-  inspection: true,   // Enabled by default
-  booking: true,      // Enabled by default
-  newsOffers: false,  // Disabled by default (less critical)
+  appointment: true,
+  priceDrop: true,
+  bidUpdate: true,
+  message: true,
+  inspection: true,
+  booking: true,
+  newsOffers: false,
 };
 
 const STORAGE_KEY = "notificationPrefs";

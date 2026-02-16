@@ -33,7 +33,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Middleware order: CORS must come before routing
 app.UseCors("AllowAll");
 app.UseRouting();
 

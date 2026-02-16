@@ -39,7 +39,6 @@ const ContactPage = () => {
       return;
     }
 
-    // Simulate form submission
     toast.success("Thank you! Our team will contact you soon to schedule your test drive.");
     setFormData({
       name: "",

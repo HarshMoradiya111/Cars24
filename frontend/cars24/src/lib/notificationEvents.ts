@@ -1,21 +1,4 @@
-// notificationEvents.ts - Event-based notification triggers
 import { getPreferences } from "./notificationPreferences";
-
-/**
- * NOTIFICATION EVENTS & DEMO TRIGGERS
- * 
- * This module handles event-based notification creation and simulated real-time triggers.
- * Aligned with Task 2 requirements for real-time push notifications on key events:
- * - Appointment confirmations
- * - Price drops
- * - Bid updates
- * - New messages
- * - Inspection results
- * - Booking confirmations
- * - Special offers
- * 
- * Contains demo/test functions for evaluating notification preferences and system behavior.
- */
 
 export type NotificationEventType =
   | "appointment"
@@ -36,27 +19,23 @@ export interface NotificationEvent {
 
 export function notifyEvent(event: NotificationEvent): void {
   const prefs = getPreferences();
-  
-  // Log current enabled notification types
+
   const enabledTypes = Object.entries(prefs)
     .filter(([_, enabled]) => enabled)
     .map(([type]) => type);
   console.log("📋 Enabled notification types:", enabledTypes);
-  
-  // Check if this notification type is enabled
+
   if (!prefs[event.type]) {
     console.warn(`🚫 Notification blocked: "${event.type}" is disabled by user preferences`);
     console.log(`💡 Enable "${event.type}" in notification settings to receive these alerts`);
     return;
   }
 
-  // Check if browser supports notifications
   if (typeof window === "undefined" || !("Notification" in window)) {
     console.warn("⚠️ Notifications not supported in this browser");
     return;
   }
 
-  // Check permission
   if (Notification.permission !== "granted") {
     console.warn("⚠️ Notification permission not granted. Please enable notifications first.");
     return;
@@ -81,7 +60,6 @@ export function notifyEvent(event: NotificationEvent): void {
     }
   };
 
-  // Show notification (icon must be a URL, not emoji)
   console.log(`✅ Showing notification: ${event.type} - ${event.title}`);
   try {
     const notification = new Notification(event.title, {
@@ -91,7 +69,6 @@ export function notifyEvent(event: NotificationEvent): void {
       tag: event.type,
     });
 
-    // Handle notification click
     if (event.url) {
       notification.onclick = () => {
         window.focus();
@@ -105,19 +82,16 @@ export function notifyEvent(event: NotificationEvent): void {
   }
 }
 
-// Demo/Test function for triggering price drop notification (always enabled by default)
 export function testPriceDropNotification(): void {
   console.log("🧪 Testing price drop notification...");
   NotificationFactories.priceDropped("Honda City 2020", "₹8.5 lakh", "₹8.2 lakh");
 }
 
-// Demo/Test function for appointment confirmation
 export function testAppointmentNotification(): void {
   console.log("🧪 Testing appointment notification...");
   NotificationFactories.appointmentConfirmed("Tomorrow", "10:00 AM");
 }
 
-// Predefined notification factories for common events
 export const NotificationFactories = {
   appointmentConfirmed: (date: string, time: string) =>
     notifyEvent({
@@ -183,8 +157,6 @@ export const NotificationFactories = {
     }),
 };
 
-// Simulate real-time events (for testing/demo purposes)
-// Only includes notification types that are typically enabled by default
 export function simulateNotificationEvents() {
   const simulations = [
     () => NotificationFactories.appointmentConfirmed("Tomorrow", "10:00 AM"),
@@ -193,10 +165,8 @@ export function simulateNotificationEvents() {
     () => NotificationFactories.newMessage("Car Dealer", "Your car is ready for inspection"),
     () => NotificationFactories.inspectionComplete("Honda City 2020", "87"),
     () => NotificationFactories.bookingConfirmed("Hyundai Creta 2021", "BK123456"),
-    // Note: specialOffer (newsOffers) excluded from demo as it's disabled by default
   ];
 
-  // Trigger random notifications every 10-30 seconds
   const randomDelay = () => Math.random() * 20000 + 10000;
 
   const scheduleNext = () => {

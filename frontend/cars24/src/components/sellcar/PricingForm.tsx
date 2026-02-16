@@ -1,7 +1,7 @@
 import { AlertCircle, CreditCard, DollarSign, Tag, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getRecommendation } from "@/utils/pricing";
-import { detectLocationFromIP } from "@/utils/helpers";
+import { detectLocationFromIP } from "@/utils/formatters";
 type CarDetails = {
   id: string;
   title: string;
@@ -43,7 +43,6 @@ const PricingForm: React.FC<PricingFormprop> = ({
   }, [carDetails.price]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Format with commas and allow only numbers
     const value = e.target.value.replace(/[^\d]/g, "");
     const formattedValue = value ? parseInt(value, 10).toLocaleString() : "";
     updateCarDetails({ price: formattedValue });
@@ -54,7 +53,6 @@ const PricingForm: React.FC<PricingFormprop> = ({
   };
 
   useEffect(() => {
-    // Debounced recommendation when title, price, and location present
     const t = setTimeout(async () => {
       const { title, price, location } = carDetails;
       if (!title || !price) {

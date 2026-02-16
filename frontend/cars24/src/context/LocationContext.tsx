@@ -349,24 +349,20 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
   const availableCities = Object.keys(CITIES_DATA);
 
   useEffect(() => {
-    // Try to load saved city from localStorage
     const savedCity = localStorage.getItem('selectedCity');
     if (savedCity === '') {
-      // "All Cities" was saved
       setSelectedCityState(null);
       setCityData(null);
     } else if (savedCity && CITIES_DATA[savedCity]) {
       setSelectedCityState(savedCity);
       setCityData(CITIES_DATA[savedCity]);
     } else {
-      // Auto-detect on first load
       detectLocation();
     }
   }, []);
 
   const setSelectedCity = (city: string | null) => {
     if (city === null) {
-      // "All Cities" selected
       setSelectedCityState(null);
       setCityData(null);
       localStorage.setItem('selectedCity', '');
@@ -381,7 +377,6 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const reverseGeocode = async (lat: number, lng: number): Promise<string | null> => {
     try {
-      // Using OpenStreetMap Nominatim for reverse geocoding (free, no API key needed)
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
         {
@@ -396,8 +391,7 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       const data = await response.json();
-      
-      // Extract city name from the response
+
       const cityName = data.address?.city || 
                       data.address?.town || 
                       data.address?.village || 
@@ -405,7 +399,6 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
                       null;
 
       if (cityName) {
-        // Try to match with our available cities (case-insensitive)
         const matchedCity = availableCities.find(
           city => city.toLowerCase() === cityName.toLowerCase() ||
                   cityName.toLowerCase().includes(city.toLowerCase())
@@ -435,14 +428,12 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
       async (position) => {
         const { latitude, longitude } = position.coords;
 
-        // Try reverse geocoding
         const detectedCity = await reverseGeocode(latitude, longitude);
 
         if (detectedCity) {
           setSelectedCity(detectedCity);
           setIsDetecting(false);
         } else {
-          // Fallback: Find nearest city based on coordinates
           let nearestCity: string | null = null;
           let minDistance = Infinity;
 

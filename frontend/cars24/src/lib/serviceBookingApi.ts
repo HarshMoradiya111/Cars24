@@ -1,10 +1,3 @@
-/**
- * Service Booking API Client
- * 
- * This file contains HTTP client functions for car service bookings.
- * It communicates with the backend ServiceBooking API.
- */
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 
 if (!API_BASE) {

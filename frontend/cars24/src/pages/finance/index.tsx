@@ -36,7 +36,6 @@ const FinancePage = () => {
     const totalAmount = emi * tenure * 12;
     const totalInterest = totalAmount - loanAmount;
 
-    // Redirect to apply page with loan details
     router.push({
       pathname: "/finance/apply",
       query: {

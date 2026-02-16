@@ -79,7 +79,6 @@ export const db = {
   appointments: [] as AppointmentRecord[],
 };
 
-// seed demo cars
 const demoCars: CarSummary[] = [
   {
     id: "1",
@@ -87,7 +86,7 @@ const demoCars: CarSummary[] = [
     km: "15,000",
     fuel: "Petrol",
     transmission: "Manual",
-    owner: "1st owner",
+    owner: "1st Owner",
     emi: "₹8,245/m",
     price: "₹6.80 lakh",
     location: "Rohini, New Delhi",
@@ -99,7 +98,7 @@ const demoCars: CarSummary[] = [
     km: "25,000",
     fuel: "Diesel",
     transmission: "Auto",
-    owner: "1st owner",
+    owner: "1st Owner",
     emi: "₹18,999/m",
     price: "₹14.50 lakh",
     location: "Gurgaon, Haryana",

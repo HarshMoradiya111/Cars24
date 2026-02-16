@@ -1,18 +1,3 @@
-/**
- * LEGACY NOTIFICATION SERVICE
- * 
- * ⚠️ This file is DEPRECATED for new code.
- * 
- * The active notification logic has been refactored into:
- * - notificationEvents.ts     → Event triggers and demo functions
- * - notificationPreferences.ts → User preference management
- * - notifications.ts          → Firebase token & permission handling
- * 
- * This file is kept for backward compatibility only.
- * New notification features should use the files above.
- */
-
-// notificationService.ts
 export enum NotificationType {
   APPOINTMENT_CONFIRMATION = "appointmentConfirmation",
   APPOINTMENT_REMINDER = "appointmentReminder",
@@ -34,9 +19,6 @@ export interface NotificationPayload {
   tag?: string;
 }
 
-/**
- * Create appointment confirmation notification
- */
 export const createAppointmentNotification = (
   appointmentDetails: {
     carModel: string;
@@ -55,9 +37,6 @@ export const createAppointmentNotification = (
   data: appointmentDetails,
 });
 
-/**
- * Create appointment reminder notification
- */
 export const createAppointmentReminderNotification = (
   appointmentDetails: {
     carModel: string;
@@ -76,9 +55,6 @@ export const createAppointmentReminderNotification = (
   data: appointmentDetails,
 });
 
-/**
- * Create bid update notification
- */
 export const createBidUpdateNotification = (
   bidDetails: {
     carModel: string;
@@ -96,9 +72,6 @@ export const createBidUpdateNotification = (
   data: bidDetails,
 });
 
-/**
- * Create price drop notification
- */
 export const createPriceDropNotification = (
   priceDetails: {
     carModel: string;
@@ -117,9 +90,6 @@ export const createPriceDropNotification = (
   data: priceDetails,
 });
 
-/**
- * Create new message notification
- */
 export const createMessageNotification = (
   messageDetails: {
     senderName: string;
@@ -137,9 +107,6 @@ export const createMessageNotification = (
   data: messageDetails,
 });
 
-/**
- * Create booking update notification
- */
 export const createBookingUpdateNotification = (
   bookingDetails: {
     carModel: string;
@@ -157,9 +124,6 @@ export const createBookingUpdateNotification = (
   data: bookingDetails,
 });
 
-/**
- * Create inspection result notification
- */
 export const createInspectionResultNotification = (
   inspectionDetails: {
     carModel: string;
@@ -177,9 +141,6 @@ export const createInspectionResultNotification = (
   data: inspectionDetails,
 });
 
-/**
- * Create news/offer notification
- */
 export const createNewsOfferNotification = (
   offerDetails: {
     title: string;
@@ -197,27 +158,11 @@ export const createNewsOfferNotification = (
   data: offerDetails,
 });
 
-/**
- * Send notification to user (in production, this would call backend API)
- */
 export const sendNotificationToUser = async (
   payload: NotificationPayload,
   userId?: string
 ): Promise<boolean> => {
   try {
-    // In production, send to your backend API which will handle FCM token management
-    // const response = await fetch("/api/notifications/send", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     userId,
-    //     ...payload,
-    //   }),
-    // });
-    // return response.ok;
-
     console.log("Notification prepared:", payload);
     return true;
   } catch (error) {
@@ -226,9 +171,6 @@ export const sendNotificationToUser = async (
   }
 };
 
-/**
- * Schedule notification for later
- */
 export const scheduleNotification = (
   payload: NotificationPayload,
   delayMs: number

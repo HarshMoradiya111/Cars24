@@ -31,7 +31,7 @@ namespace Cars24API.Controllers
             {
                 return BadRequest("Title and BasePrice are required");
             }
-            var ctx = new PricingContext
+            var ctx = new PricingRules
             {
                 UserLocation = req.UserLocation,
                 Date = req.Date ?? DateTime.UtcNow,

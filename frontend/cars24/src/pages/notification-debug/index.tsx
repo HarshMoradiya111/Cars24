@@ -11,37 +11,30 @@ export default function NotificationDebugPage() {
       setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
     };
 
-    // Run all checks
     const runChecks = () => {
       const results: any = {};
 
       addLog("🔍 Starting system checks...");
 
-      // Check 1: Browser environment
       results.browserCheck = typeof window !== "undefined";
       addLog(`Browser check: ${results.browserCheck ? "✅ PASS" : "❌ FAIL"}`);
 
-      // Check 2: Notification API
       results.notificationApi = "Notification" in window;
       addLog(`Notification API: ${results.notificationApi ? "✅ PASS" : "❌ FAIL"}`);
 
-      // Check 3: Permission status
       if (results.notificationApi) {
         results.permission = Notification.permission;
         addLog(`Permission status: ${Notification.permission}`);
       }
 
-      // Check 4: Service Worker support
       results.serviceWorker = "serviceWorker" in navigator;
       addLog(`Service Worker support: ${results.serviceWorker ? "✅ PASS" : "❌ FAIL"}`);
 
-      // Check 5: Firebase env vars
       results.firebaseApiKey = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
       results.firebaseVapid = !!process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
       addLog(`Firebase API Key: ${results.firebaseApiKey ? "✅ FOUND" : "❌ MISSING"}`);
       addLog(`Firebase VAPID Key: ${results.firebaseVapid ? "✅ FOUND" : "❌ MISSING"}`);
 
-      // Check 6: LocalStorage
       try {
         const dismissed = localStorage.getItem("notificationPromptDismissed");
         results.dismissedTime = dismissed;
@@ -56,11 +49,9 @@ export default function NotificationDebugPage() {
         addLog(`LocalStorage: ❌ ERROR - ${e}`);
       }
 
-      // Check 7: User Agent
       results.userAgent = navigator.userAgent;
       addLog(`User Agent: ${navigator.userAgent}`);
 
-      // Detect mobile platform
       const ua = navigator.userAgent.toLowerCase();
       if (/iphone|ipad|ipod/.test(ua)) {
         results.platform = "iOS";
@@ -81,7 +72,6 @@ export default function NotificationDebugPage() {
         addLog(`🖥️ Platform: Desktop - Full notification support`);
       }
 
-      // Check 8: React Router
       try {
         const router = require("next/router").useRouter();
         addLog(`✅ Next.js Router available`);

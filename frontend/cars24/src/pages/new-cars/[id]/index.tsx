@@ -368,6 +368,7 @@ const NewCarDetailPage = () => {
                   src={car.images[currentImageIndex]}
                   alt={car.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                   className="object-cover"
                 />
                 {car.images.length > 1 && (
@@ -403,6 +404,7 @@ const NewCarDetailPage = () => {
                       src={img}
                       alt={`${car.name} ${idx + 1}`}
                       fill
+                      sizes="80px"
                       className="object-cover"
                     />
                   </button>

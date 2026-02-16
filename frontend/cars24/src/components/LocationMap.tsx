@@ -27,7 +27,6 @@ const LocationMap: React.FC<LocationMapProps> = ({
     (center) => selectedType === "all" || center.type === selectedType
   );
 
-  // Proper Google Maps embed
   const generateMapUrl = () => {
     const center = `${cityData.lat},${cityData.lng}`;
     return `https://maps.google.com/maps?q=${center}&z=12&output=embed`;

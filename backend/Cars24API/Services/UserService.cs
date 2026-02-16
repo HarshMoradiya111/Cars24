@@ -26,7 +26,6 @@ public class UserService
 
     public async Task<User?> GetByIdAsync(string id)
     {
-        // Validate that id is a valid MongoDB ObjectId format (24 hex chars)
         if (string.IsNullOrEmpty(id) || id.Length != 24 || !id.All(c => "0123456789abcdefABCDEF".Contains(c)))
         {
             return null;
@@ -96,7 +95,6 @@ public class UserService
 
     public async Task<string> GenerateUniqueReferralCodeAsync()
     {
-        // Keep it short but unique enough for this app
         string code;
         do
         {

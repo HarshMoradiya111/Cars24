@@ -47,7 +47,6 @@ public class UserWalletController : ControllerBase
             return BadRequest(new { message = "Insufficient wallet points" });
         }
 
-        // Log redemption
         var redemption = new Redemption
         {
             UserId = id,

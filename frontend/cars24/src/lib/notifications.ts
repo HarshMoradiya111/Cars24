@@ -1,8 +1,6 @@
-// notifications.ts - Permission and token handling
 import { onMessage, isSupported } from "firebase/messaging";
 import { messaging, requestNotificationPermission } from "./firebase";
 
-// Detect mobile platform
 function getMobilePlatform(): "ios" | "android" | "desktop" {
   const ua = navigator.userAgent.toLowerCase();
   if (/iphone|ipad|ipod/.test(ua)) return "ios";
@@ -10,7 +8,6 @@ function getMobilePlatform(): "ios" | "android" | "desktop" {
   return "desktop";
 }
 
-// Check iOS version
 function getIOSVersion(): number | null {
   const match = navigator.userAgent.match(/OS (\d+)_(\d+)_?(\d+)?/);
   return match ? parseInt(match[1], 10) : null;
@@ -31,7 +28,6 @@ export async function enableNotifications(): Promise<string | null> {
     return null;
   }
 
-  // Check mobile compatibility
   const platform = getMobilePlatform();
   if (platform === "ios") {
     const version = getIOSVersion();
@@ -72,15 +68,12 @@ export async function enableNotifications(): Promise<string | null> {
     return token;
   } catch (error) {
     console.error("❌ Failed to get FCM token:", error);
-    
-    // Provide user-friendly error messages
+
     if (platform === "ios") {
       console.warn("ℹ️ Push notifications have limited support on iOS. Using basic notification fallback.");
-      // Return a placeholder token so notifications still work
       return "ios-notification-enabled";
     } else {
       console.warn("ℹ️ Push notifications configuration issue. Using basic notification fallback.");
-      // Return a placeholder token so notifications still work
       return "notification-enabled";
     }
   }
@@ -98,6 +91,5 @@ export function setupMessageListener(callback: (payload: any) => void) {
       });
     })
     .catch(() => {
-      // Ignore if unsupported
     });
 }

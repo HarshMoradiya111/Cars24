@@ -108,7 +108,6 @@ const ServiceBookingPage = () => {
   const { serviceId } = router.query;
   const { user, refreshUser } = useAuth();
   
-  // Find service by ID from query param, default to first service
   const initialService = serviceId 
     ? services.find(s => s.id === Number(serviceId)) || services[0]
     : services[0];
@@ -142,7 +141,6 @@ const ServiceBookingPage = () => {
 
   const servicePrice = getServicePrice(selectedService.price);
 
-  // Fetch wallet points
   useEffect(() => {
     if (user?.id) {
       const fetchWallet = async () => {
@@ -162,7 +160,6 @@ const ServiceBookingPage = () => {
     }
   }, [user?.id]);
 
-  // Update selected service when serviceId query param changes
   useEffect(() => {
     if (serviceId) {
       const service = services.find(s => s.id === Number(serviceId));
@@ -172,10 +169,8 @@ const ServiceBookingPage = () => {
     }
   }, [serviceId]);
 
-  // Calculate discount based on wallet usage
   useEffect(() => {
     if (useWallet && walletPoints > 0) {
-      // 1 point = 1 rupee, but max discount is 2000
       const calculatedDiscount = Math.min(walletPoints, 2000, servicePrice);
       setDiscount(calculatedDiscount);
       setFinalPrice(Math.max(0, servicePrice - calculatedDiscount));
@@ -194,7 +189,6 @@ const ServiceBookingPage = () => {
       [name]: value,
     }));
     
-    // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -208,7 +202,6 @@ const ServiceBookingPage = () => {
       preferredDate: "",
     };
 
-    // Name validation - at least 2 characters, letters and spaces only
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     } else if (formData.name.trim().length < 2) {
@@ -217,14 +210,12 @@ const ServiceBookingPage = () => {
       newErrors.name = "Name should contain only letters";
     }
 
-    // Phone validation - exactly 10 digits
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required";
     } else if (!/^\d{10}$/.test(formData.phone.trim())) {
       newErrors.phone = "Phone number must be exactly 10 digits";
     }
 
-    // City validation - at least 2 characters, letters and spaces only
     if (!formData.city.trim()) {
       newErrors.city = "City is required";
     } else if (formData.city.trim().length < 2) {
@@ -233,7 +224,6 @@ const ServiceBookingPage = () => {
       newErrors.city = "City name should contain only letters";
     }
 
-    // Date validation - DD-MM-YYYY format and future date
     if (!formData.preferredDate.trim()) {
       newErrors.preferredDate = "Preferred date is required";
     } else {
@@ -248,7 +238,6 @@ const ServiceBookingPage = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Check if date is valid
         if (
           date.getDate() !== parseInt(day) ||
           date.getMonth() !== parseInt(month) - 1 ||
@@ -274,7 +263,6 @@ const ServiceBookingPage = () => {
       return;
     }
 
-    // Validate form before submission
     if (!validateForm()) {
       toast.error("Please fix the errors in the form");
       return;
@@ -297,12 +285,10 @@ const ServiceBookingPage = () => {
       const data = await createServiceBooking(user.id, bookingData);
       toast.success("Service booked successfully!");
 
-      // Refresh user data if wallet was used
       if (useWallet) {
         await refreshUser();
       }
 
-      // Reset form and redirect
       setFormData({
         name: "",
         phone: "",
@@ -311,9 +297,8 @@ const ServiceBookingPage = () => {
       });
       setUseWallet(false);
 
-      // Redirect to bookings page after 2 seconds
       setTimeout(() => {
-        router.push("/profile/bookings");
+        router.push("/bookings");
       }, 2000);
     } catch (error: any) {
       console.error("Service booking failed:", error);
@@ -325,7 +310,6 @@ const ServiceBookingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-blue-600 text-white">
         <div className="container mx-auto px-4 py-6">
           <button
@@ -340,10 +324,8 @@ const ServiceBookingPage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Service Selection */}
           <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Services</h2>
@@ -366,10 +348,8 @@ const ServiceBookingPage = () => {
             </div>
           </div>
 
-          {/* Booking Form */}
           <div className="md:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-8">
-              {/* Service Details */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold text-gray-900">
@@ -385,7 +365,6 @@ const ServiceBookingPage = () => {
                   </div>
                 </div>
 
-                {/* Included Services */}
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
                   <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -405,10 +384,8 @@ const ServiceBookingPage = () => {
                 </div>
               </div>
 
-              {/* Booking Form */}
               <form onSubmit={handleBookService} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Full Name
@@ -427,7 +404,6 @@ const ServiceBookingPage = () => {
                     )}
                   </div>
 
-                  {/* Phone */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Phone Number
@@ -446,7 +422,6 @@ const ServiceBookingPage = () => {
                     )}
                   </div>
 
-                  {/* City */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       City
@@ -465,7 +440,6 @@ const ServiceBookingPage = () => {
                     )}
                   </div>
 
-                  {/* Preferred Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Preferred Date
@@ -487,7 +461,6 @@ const ServiceBookingPage = () => {
                   </div>
                 </div>
 
-                {/* Wallet Section */}
                 {walletPoints > 0 && (
                   <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                     <div className="flex items-start justify-between mb-4">
@@ -531,7 +504,6 @@ const ServiceBookingPage = () => {
                   </div>
                 )}
 
-                {/* Price Summary */}
                 {!useWallet && (
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="flex justify-between font-bold text-lg">
@@ -541,7 +513,6 @@ const ServiceBookingPage = () => {
                   </div>
                 )}
 
-                {/* Confirm Button */}
                 <button
                   type="submit"
                   disabled={loading}

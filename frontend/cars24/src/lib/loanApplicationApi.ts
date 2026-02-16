@@ -18,7 +18,6 @@ export interface LoanApplicationData {
 }
 
 export const loanApplicationApi = {
-  // Create a new loan application
   createLoanApplication: async (data: LoanApplicationData): Promise<LoanApplicationData> => {
     try {
       const response = await fetch(`${API_BASE_URL}/LoanApplication`, {
@@ -35,7 +34,6 @@ export const loanApplicationApi = {
           const error = await response.json();
           errorMessage = error.message || errorMessage;
         } catch (e) {
-          // If response body is empty or not JSON, use default message
           errorMessage = `Server error: ${response.status} ${response.statusText}`;
         }
         throw new Error(errorMessage);
@@ -49,7 +47,6 @@ export const loanApplicationApi = {
     }
   },
 
-  // Get all loan applications
   getAllLoanApplications: async (): Promise<LoanApplicationData[]> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication`);
 
@@ -60,7 +57,6 @@ export const loanApplicationApi = {
     return response.json();
   },
 
-  // Get loan application by ID
   getLoanApplicationById: async (id: string): Promise<LoanApplicationData> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`);
 
@@ -71,7 +67,6 @@ export const loanApplicationApi = {
     return response.json();
   },
 
-  // Get loan applications by user ID
   getLoanApplicationsByUserId: async (userId: string): Promise<LoanApplicationData[]> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication/user/${userId}`);
 
@@ -82,7 +77,6 @@ export const loanApplicationApi = {
     return response.json();
   },
 
-  // Get loan applications by status
   getLoanApplicationsByStatus: async (status: string): Promise<LoanApplicationData[]> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication/status/${status}`);
 
@@ -93,7 +87,6 @@ export const loanApplicationApi = {
     return response.json();
   },
 
-  // Update loan application
   updateLoanApplication: async (id: string, data: LoanApplicationData): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`, {
       method: "PUT",
@@ -108,7 +101,6 @@ export const loanApplicationApi = {
     }
   },
 
-  // Delete loan application
   deleteLoanApplication: async (id: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`, {
       method: "DELETE",

@@ -1,13 +1,3 @@
-/**
- * Frontend API Client: Appointment Service
- * 
- * This file contains HTTP client functions that communicate with the ASP.NET Core backend API.
- * It provides methods to schedule and manage car appointments via the backend.
- * 
- * Backend Endpoint: /api/Appointment
- * Framework: ASP.NET Core Web API
- */
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
 if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");

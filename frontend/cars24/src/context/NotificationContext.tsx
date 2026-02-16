@@ -111,9 +111,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   }, [prefs, supported]);
 
-  // Removed automatic permission request - only request when user explicitly enables notifications
-  // This prevents console errors on every page load
-
   const updatePrefs = (newPrefs: Partial<NotificationPreferences>) => {
     const updated = { ...prefs, ...newPrefs };
     setPrefs(updated);

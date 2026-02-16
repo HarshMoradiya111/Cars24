@@ -1,9 +1,3 @@
-/**
- * Rule-Based Dynamic Pricing Engine
- * Simple percentage multipliers based on car type, season, and region
- * Formula: basePrice × carTypeMultiplier × seasonMultiplier × regionMultiplier
- */
-
 export type CarType = "SUV" | "Sedan" | "Hatchback" | "MUV" | "Coupe" | "Wagon";
 export type Region = "Metro" | "Hilly" | "Rural";
 export type Season = "Monsoon" | "Winter" | "Summer";
@@ -15,12 +9,6 @@ interface PricingResult {
   explanation: string;
 }
 
-/**
- * Detect season from current date
- * Monsoon: June–September (6-9)
- * Winter: November–February (11, 12, 1, 2)
- * Summer: March–May (3-5)
- */
 export const detectSeason = (date: Date = new Date()): Season => {
   const month = date.getMonth() + 1;
 
@@ -29,33 +17,20 @@ export const detectSeason = (date: Date = new Date()): Season => {
   return "Summer";
 };
 
-/**
- * Get car type multiplier
- * SUV/off-road: +5% (1.05)
- * Sedan: +2% (1.02)
- * Hatchback: +1% (1.01)
- * Default: 1.0
- */
 const getCarTypeMultiplier = (carType: CarType): number => {
   switch (carType) {
     case "SUV":
     case "MUV":
-      return 1.05; // SUV/off-road +5%
+      return 1.05;
     case "Sedan":
-      return 1.02; // Sedan +2%
+      return 1.02;
     case "Hatchback":
-      return 1.01; // Hatchback +1%
+      return 1.01;
     default:
       return 1.0;
   }
 };
 
-/**
- * Get season multiplier
- * Monsoon (Jun–Sep): 1.03
- * Winter (Nov–Feb): 1.02
- * Summer (Mar–May): 0.99
- */
 const getSeasonMultiplier = (season: Season): number => {
   switch (season) {
     case "Monsoon":
@@ -69,12 +44,6 @@ const getSeasonMultiplier = (season: Season): number => {
   }
 };
 
-/**
- * Get region multiplier
- * Hilly: 1.04
- * Metro: 0.98
- * Rural: 1.00
- */
 const getRegionMultiplier = (region: Region): number => {
   switch (region) {
     case "Hilly":
@@ -88,9 +57,6 @@ const getRegionMultiplier = (region: Region): number => {
   }
 };
 
-/**
- * Generate explanation string describing multipliers applied
- */
 const generateExplanation = (
   carType: CarType,
   season: Season,
@@ -101,7 +67,6 @@ const generateExplanation = (
 ): string => {
   const explanations: string[] = [];
 
-  // Car type explanation
   if (carType === "SUV" || carType === "MUV") {
     explanations.push("SUV demand increases during monsoon in hilly regions");
   } else if (carType === "Sedan") {
@@ -110,7 +75,6 @@ const generateExplanation = (
     explanations.push("Hatchback is practical for city commutes");
   }
 
-  // Region explanation
   if (region === "Hilly") {
     explanations.push("Higher demand in hilly regions for better traction");
   } else if (region === "Metro") {
@@ -119,7 +83,6 @@ const generateExplanation = (
     explanations.push("Rural market stability maintains standard pricing");
   }
 
-  // Season explanation
   if (season === "Monsoon") {
     explanations.push("Monsoon season increases demand for reliable vehicles");
   } else if (season === "Winter") {
@@ -131,10 +94,6 @@ const generateExplanation = (
   return explanations.join(". ");
 };
 
-/**
- * Calculate recommended price using rule-based multipliers
- * Formula: basePrice × carTypeMultiplier × seasonMultiplier × regionMultiplier
- */
 export const calculateRecommendedPrice = (
   basePrice: number,
   carType: CarType,
@@ -147,7 +106,6 @@ export const calculateRecommendedPrice = (
   const seasonMultiplier = getSeasonMultiplier(season);
   const regionMultiplier = getRegionMultiplier(region);
 
-  // Apply all multipliers
   const totalMultiplier = carTypeMultiplier * seasonMultiplier * regionMultiplier;
   const recommendedPrice = Math.round(basePrice * totalMultiplier);
 
@@ -163,14 +121,11 @@ export const calculateRecommendedPrice = (
   return {
     basePrice,
     recommendedPrice,
-    multiplier: Math.round(totalMultiplier * 10000) / 10000, // Keep 4 decimals
+    multiplier: Math.round(totalMultiplier * 10000) / 10000,
     explanation,
   };
 };
 
-/**
- * Extract car type from car title
- */
 export const detectCarType = (carTitle: string): CarType => {
   const title = carTitle.toLowerCase();
 
@@ -181,6 +136,5 @@ export const detectCarType = (carTitle: string): CarType => {
     return "Hatchback";
   if (title.includes("muv") || title.includes("ertiga")) return "MUV";
 
-  // Default to Sedan
   return "Sedan";
 };

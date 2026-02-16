@@ -150,17 +150,15 @@ const PurchasedCarsPage = () => {
       }
 
       const response = await getBookingbyuser(user.id);
-      
+
       console.log('[bookings] API Response:', response, 'Type:', typeof response, 'IsArray:', Array.isArray(response));
-      
-      // Defensive: Check if response is valid
+
       if (!response) {
         console.warn('[bookings] API returned null/undefined, using fallback');
         setpurchasedCars(fallbackPurchasedCars);
         return;
       }
 
-      // Safe array extraction
       let bookingsArray: any[] = [];
       if (Array.isArray(response)) {
         bookingsArray = response;
@@ -178,7 +176,6 @@ const PurchasedCarsPage = () => {
         console.log('[bookings] No bookings found for user');
         setpurchasedCars([]);
       } else {
-        // Add defensive null checks on each booking
         const safeBookings = bookingsArray.map((item: any) => ({
           booking: {
             id: item?.booking?.id || item?.id || `booking-${Date.now()}`,

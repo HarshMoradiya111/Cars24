@@ -20,26 +20,21 @@ namespace Cars24API.Services
             {
                 var carsCollection = _context.GetCollection<Car>("Cars");
 
-                // Create indexes for optimized queries
                 var indexKeysDefinitions = new[]
                 {
-                    // Single field indexes for common filters
-                    Builders<Car>.IndexKeys.Ascending(c => c.Location),  // City filter
-                    Builders<Car>.IndexKeys.Ascending(c => c.Price),      // Price filter
-                    Builders<Car>.IndexKeys.Ascending(c => c.Title)       // Search by brand
-                    // Note: _id index is automatically created by MongoDB, so no need to explicitly create it
+                    Builders<Car>.IndexKeys.Ascending(c => c.Location),
+                    Builders<Car>.IndexKeys.Ascending(c => c.Price),
+                    Builders<Car>.IndexKeys.Ascending(c => c.Title)
                 };
 
                 var indexModels = new List<CreateIndexModel<Car>>();
 
                 foreach (var key in indexKeysDefinitions)
                 {
-                    // Apply options for indexes (MongoDB allows background for non-_id indexes)
                     var options = new CreateIndexOptions { Background = true };
                     indexModels.Add(new CreateIndexModel<Car>(key, options));
                 }
 
-                // Create compound indexes for efficient multi-field queries
                 var compoundIndexes = new[]
                 {
                     Builders<Car>.IndexKeys
@@ -47,12 +42,11 @@ namespace Cars24API.Services
                         .Ascending(c => c.Price),
                     Builders<Car>.IndexKeys
                         .Ascending(c => c.Location)
-                        .Descending("_id")                          // City + newest first
+                        .Descending("_id")
                 };
 
                 foreach (var compoundIndex in compoundIndexes)
                 {
-                    // Don't apply background option to compound indexes as some may contain _id
                     indexModels.Add(new CreateIndexModel<Car>(compoundIndex));
                 }
 
@@ -63,7 +57,6 @@ namespace Cars24API.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to create MongoDB indexes");
-                // Don't throw - indexes are performance optimization, not critical for startup
             }
         }
     }

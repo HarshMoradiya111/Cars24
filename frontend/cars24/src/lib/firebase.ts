@@ -1,4 +1,3 @@
-// firebase.ts - Core Firebase initialization
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
@@ -11,7 +10,6 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-// Initialize only in browser
 const isBrowser = typeof window !== "undefined";
 export const firebaseApp = isBrowser ? initializeApp(firebaseConfig) : null;
 
@@ -89,22 +87,19 @@ export const requestNotificationPermission = async (): Promise<string | null> =>
   } catch (e: any) {
     const code = e?.code || "";
     const errorName = e?.name || "";
-    
-    // Handle common FCM errors silently or with warnings
+
     if (code === "messaging/token-subscribe-failed") {
       console.warn(
         "FCM token subscribe failed. Check API key allowed domains for this HTTPS origin."
       );
       return "notification-enabled";
     }
-    
+
     if (errorName === "AbortError" || code === "messaging/registration-failed") {
-      // Silent fail for registration errors - these are common in development
       console.warn("FCM registration not available. Push notifications will be limited.");
       return null;
     }
-    
-    // Only log actual errors that need attention
+
     console.warn("FCM token unavailable:", e?.message || e);
     return null;
   }

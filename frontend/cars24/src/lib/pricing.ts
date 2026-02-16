@@ -27,7 +27,6 @@ export async function getRecommendation(req: PricingRequest): Promise<PricingRes
       body: JSON.stringify(req),
     });
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    // normalize casing from backend anonymous object
     const data = await resp.json();
     return {
       recommendedPrice: data?.recommendedPrice ?? data?.RecommendedPrice,
