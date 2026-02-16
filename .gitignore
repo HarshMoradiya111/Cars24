@@ -18,6 +18,7 @@ Thumbs.db
 # Dotnet
 **/Cars24API/bin/
 **/Cars24API/obj/
+**/Cars24API/appsettings.json
 **/Cars24API/appsettings.Development.json
 **/Cars24API/appsettings.*.json
 **/Cars24API/*.user

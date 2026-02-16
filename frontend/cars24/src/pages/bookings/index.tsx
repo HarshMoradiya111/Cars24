@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getBookingbyuser } from "@/services/bookingService";
+import { getServiceBookingsByUserId } from "@/lib/serviceBookingApi";
 import { BookingListSkeleton, EmptyState, LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import { Button } from "@/components/ui/button";
 import LoadingState from "@/components/ui/LoadingState";
@@ -133,6 +134,7 @@ const PurchasedCarsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [purchasedCars, setpurchasedCars] = useState<any[]>([]);
+  const [serviceBookings, setServiceBookings] = useState<any[]>([]);
   
   const fetchBookings = async (isRetry = false) => {
     try {
@@ -146,6 +148,7 @@ const PurchasedCarsPage = () => {
       if (!user) {
         console.log('[bookings] No user, using fallback data');
         setpurchasedCars(fallbackPurchasedCars);
+        setServiceBookings([]);
         return;
       }
 
@@ -206,12 +209,29 @@ const PurchasedCarsPage = () => {
         console.log(`[bookings] ✓ Loaded ${safeBookings.length} bookings`);
         setpurchasedCars(safeBookings);
       }
+
+      try {
+        const serviceResponse = await getServiceBookingsByUserId(user.id);
+        console.log('[service-bookings] API Response:', serviceResponse);
+        
+        if (serviceResponse && Array.isArray(serviceResponse)) {
+          console.log(`[service-bookings] ✓ Loaded ${serviceResponse.length} service bookings`);
+          setServiceBookings(serviceResponse);
+        } else {
+          setServiceBookings([]);
+        }
+      } catch (serviceErr) {
+        console.warn('[service-bookings] Failed to load service bookings:', serviceErr);
+        setServiceBookings([]);
+      }
+
       setError(null);
     } catch (err: any) {
       const errorMsg = err?.message || "Failed to load bookings";
       console.error('[bookings] ✗ Error:', errorMsg, err);
       setError(errorMsg);
-      setpurchasedCars(fallbackPurchasedCars); // Use fallback on error
+      setpurchasedCars(fallbackPurchasedCars);
+      setServiceBookings([]);
     } finally {
       setLoading(false);
       setIsRetrying(false);
@@ -266,14 +286,14 @@ const PurchasedCarsPage = () => {
     );
   }
   
-  if (purchasedCars.length === 0 && !loading && !isRetrying) {
+  if (purchasedCars.length === 0 && serviceBookings.length === 0 && !loading && !isRetrying) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-5xl mx-auto">
           <EmptyStateComponent
             type="no-results"
             title="No bookings found"
-            message="You haven't made any car bookings yet. Start browsing our collection!"
+            message="You haven't made any bookings yet. Start browsing our collection or book a service!"
             actionText="Browse Cars"
             actionHref="/buy-car"
           />
@@ -304,12 +324,14 @@ const PurchasedCarsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 print:py-0 print:px-0 text-black">
-      <div className="mb-8 text-center print:hidden">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Car Booking Confirmation
-        </h1>
-        <p className="text-gray-600">Thank you for your purchase!</p>
-      </div>
+      {purchasedCars.length > 0 && (
+        <div className="mb-8 text-center print:hidden">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Car Booking Confirmation
+          </h1>
+          <p className="text-gray-600">Thank you for your purchase!</p>
+        </div>
+      )}
       {purchasedCars.map((data: any) => (
         <div key={data.booking.id} className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl">
           <div className="bg-blue-900 text-white p-6 rounded-t-lg">
@@ -572,6 +594,162 @@ const PurchasedCarsPage = () => {
           </div>
         </div>
       ))}
+
+      {serviceBookings.length > 0 && (
+        <>
+          <div className="mb-8 text-center mt-12">
+            <h1 className="text-3xl font-bold text-gray-800">
+              Service Bookings
+            </h1>
+            <p className="text-gray-600">Your scheduled services</p>
+          </div>
+          
+          {serviceBookings.map((booking: any) => (
+            <div key={booking.id} className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl mb-8">
+              <div className="bg-gradient-to-r from-orange-600 to-orange-800 text-white p-6 rounded-t-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center mb-2">
+                      <Check className="w-6 h-6 mr-2 text-green-400" />
+                      <h2 className="text-2xl font-bold">Service Booking Confirmed</h2>
+                    </div>
+                    <p className="text-orange-200 mb-4">
+                      Booking ID: {booking.id?.slice(-8).toUpperCase() || 'N/A'}
+                    </p>
+
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-5 h-5 mr-2 text-orange-300" />
+                        <span>{booking.preferredDate || 'N/A'}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Tool className="w-5 h-5 mr-2 text-orange-300" />
+                        <span className="capitalize">{booking.status || 'Confirmed'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center">
+                    <Tool className="w-12 h-12 text-orange-300" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                      <Tool className="w-5 h-5 mr-2 text-orange-600" />
+                      Service Details
+                    </h3>
+
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Service Name</p>
+                        <p className="text-lg font-bold text-gray-800">
+                          {booking.serviceName || 'N/A'}
+                        </p>
+                      </div>
+
+                      <div className="border-t pt-3">
+                        <p className="text-sm text-gray-500">Service Price</p>
+                        <p className="text-gray-800 font-medium">
+                          ₹ {booking.servicePrice?.toLocaleString('en-IN') || '0'}
+                        </p>
+                      </div>
+
+                      {booking.discountUsed > 0 && (
+                        <div>
+                          <p className="text-sm text-gray-500">Discount Applied</p>
+                          <p className="text-green-600 font-medium">
+                            - ₹ {booking.discountUsed?.toLocaleString('en-IN') || '0'}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="bg-orange-50 p-3 rounded-lg border-t-2 border-orange-600">
+                        <p className="text-sm text-gray-500">Final Price</p>
+                        <p className="text-2xl font-bold text-orange-900">
+                          ₹ {booking.finalPrice?.toLocaleString('en-IN') || '0'}
+                        </p>
+                      </div>
+
+                      {booking.useWallet && (
+                        <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                          <ShoppingBag className="w-4 h-4 mr-2" />
+                          <span>Wallet points used</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                      <User className="w-5 h-5 mr-2 text-orange-600" />
+                      Customer Details
+                    </h3>
+
+                    <div className="space-y-3">
+                      <div className="flex items-start">
+                        <div className="w-8 flex-shrink-0 text-gray-500">
+                          <User className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Name</p>
+                          <p className="text-gray-800 font-medium">
+                            {booking.name || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        <div className="w-8 flex-shrink-0 text-gray-500">
+                          <Phone className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Phone</p>
+                          <p className="text-gray-800 font-medium">
+                            {booking.phone || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        <div className="w-8 flex-shrink-0 text-gray-500">
+                          <MapPin className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">City</p>
+                          <p className="text-gray-800 font-medium">
+                            {booking.city || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start">
+                        <div className="w-8 flex-shrink-0 text-gray-500">
+                          <Calendar className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Preferred Date</p>
+                          <p className="text-gray-800 font-medium">
+                            {booking.preferredDate || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-100 p-4 text-center text-gray-500 text-sm mt-6 rounded">
+                  <p>
+                    Thank you for booking our service! We'll contact you soon to confirm the appointment.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
 
       <div className="mt-8 text-center text-gray-500 text-sm print:hidden">
         <p>© 2025 Premium Auto Sales. All rights reserved.</p>

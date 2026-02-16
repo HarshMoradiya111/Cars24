@@ -10,11 +10,13 @@ namespace Cars24API.Controllers
     {
         private readonly ServiceBookingService _serviceBookingService;
         private readonly UserService _userService;
+        private readonly RedemptionService _redemptionService;
 
-        public ServiceBookingController(ServiceBookingService serviceBookingService, UserService userService)
+        public ServiceBookingController(ServiceBookingService serviceBookingService, UserService userService, RedemptionService redemptionService)
         {
             _serviceBookingService = serviceBookingService;
             _userService = userService;
+            _redemptionService = redemptionService;
         }
 
         [HttpPost]
@@ -39,6 +41,16 @@ namespace Cars24API.Controllers
                 {
                     return BadRequest("Failed to apply wallet discount. Insufficient points.");
                 }
+
+                var redemption = new Redemption
+                {
+                    UserId = userId,
+                    PointsRedeemed = deductPoints,
+                    RewardType = $"Service Booking - {booking.ServiceName}",
+                    RedeemedAt = DateTime.UtcNow,
+                    Status = "Completed"
+                };
+                await _redemptionService.CreateAsync(redemption);
             }
 
             return CreatedAtAction(nameof(GetServiceBookingById), new { id = booking.Id }, booking);
