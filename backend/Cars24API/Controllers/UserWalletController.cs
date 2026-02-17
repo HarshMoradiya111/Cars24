@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Cars24API.Controllers;
 
 [ApiController]
-[Route("api/user")]
+[Route("api/wallet")]
 public class UserWalletController : ControllerBase
 {
     private readonly UserService _userService;

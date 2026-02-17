@@ -7,7 +7,7 @@ using BCrypt.Net;
 namespace Cars24API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UserAuthController : ControllerBase
 {
     private readonly UserService _userService;

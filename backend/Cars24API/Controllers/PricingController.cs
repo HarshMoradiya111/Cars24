@@ -5,7 +5,7 @@ using Cars24API.Models;
 namespace Cars24API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/pricing")]
     public class PricingController : ControllerBase
     {
         private readonly PricingService _pricingService;

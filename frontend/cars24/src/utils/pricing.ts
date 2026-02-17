@@ -3,7 +3,7 @@ if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");
 }
 
-const BASE_URL = `${API_BASE}/api/Pricing`;
+const BASE_URL = `${API_BASE}/api/pricing`;
 
 export type PricingRequest = {
   title: string;

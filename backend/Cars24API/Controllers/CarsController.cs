@@ -6,14 +6,14 @@ using Cars24API.Services;
 namespace Cars24API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class CarController : ControllerBase
+    [Route("api/cars")]
+    public class CarsController : ControllerBase
     {
         private readonly CarService _carservice;
         private readonly PricingService _pricingService;
         private readonly UserService _userService;
         
-        public CarController(CarService carService, PricingService pricingService, UserService userService)
+        public CarsController(CarService carService, PricingService pricingService, UserService userService)
         {
             _carservice = carService;
             _pricingService = pricingService;

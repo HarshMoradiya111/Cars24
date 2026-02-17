@@ -5,7 +5,7 @@ if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");
 }
 
-const BASE_URL = `${API_BASE}/api/Booking`;
+const BASE_URL = `${API_BASE}/api/bookings`;
 
 export const createBooking = async (userid: string, Booking: any) => {
   const response = await fetchWithRetry(`${BASE_URL}?userId=${userid}`, {

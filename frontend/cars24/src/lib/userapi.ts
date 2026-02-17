@@ -3,7 +3,7 @@ if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_API_URL is not configured");
 }
 
-const BASE_URL = `${API_BASE}/api/UserAuth`;
+const BASE_URL = `${API_BASE}/api/users`;
 
 export const signup = async (
   email: string,
@@ -59,7 +59,7 @@ export const getUserById = async (userId: string) => {
 };
 
 export const getWallet = async (userId: string) => {
-  const response = await fetch(`${API_BASE}/api/user/${userId}/wallet`);
+  const response = await fetch(`${API_BASE}/api/wallet/${userId}`);
   if (response.status === 404) {
     return { points: 0, message: "Wallet not found" };
   }
@@ -70,7 +70,7 @@ export const getWallet = async (userId: string) => {
 };
 
 export const redeemWallet = async (userId: string) => {
-  const response = await fetch(`${API_BASE}/api/user/${userId}/redeem`, {
+  const response = await fetch(`${API_BASE}/api/wallet/${userId}/redeem`, {
     method: "POST",
   });
   if (!response.ok) {
@@ -88,7 +88,7 @@ export const redeemWallet = async (userId: string) => {
 };
 
 export const getRedemptions = async (userId: string) => {
-  const response = await fetch(`${API_BASE}/api/user/${userId}/redemptions`);
+  const response = await fetch(`${API_BASE}/api/wallet/${userId}/redemptions`);
   if (response.status === 404) {
     return [];
   }

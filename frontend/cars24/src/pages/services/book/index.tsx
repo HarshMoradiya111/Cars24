@@ -146,7 +146,7 @@ const ServiceBookingPage = () => {
       const fetchWallet = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user/${user.id}/wallet`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${user.id}`
           );
           if (response.ok) {
             const data = await response.json();

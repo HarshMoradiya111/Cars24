@@ -21,9 +21,15 @@ builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationS
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "https://cars24-teal.vercel.app",
+                "http://localhost:3000",
+                "https://cars24-teal-*.vercel.app" // Allow Vercel preview URLs
+            )
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
             .AllowAnyMethod()
             .AllowAnyHeader()
+            .AllowCredentials()
     )
 );
 

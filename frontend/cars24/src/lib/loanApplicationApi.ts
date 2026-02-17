@@ -20,7 +20,7 @@ export interface LoanApplicationData {
 export const loanApplicationApi = {
   createLoanApplication: async (data: LoanApplicationData): Promise<LoanApplicationData> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/LoanApplication`, {
+      const response = await fetch(`${API_BASE_URL}/loanapplications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export const loanApplicationApi = {
   },
 
   getAllLoanApplications: async (): Promise<LoanApplicationData[]> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication`);
+    const response = await fetch(`${API_BASE_URL}/loanapplications`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch loan applications");
@@ -58,7 +58,7 @@ export const loanApplicationApi = {
   },
 
   getLoanApplicationById: async (id: string): Promise<LoanApplicationData> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`);
+    const response = await fetch(`${API_BASE_URL}/loanapplications/${id}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch loan application");
@@ -68,7 +68,7 @@ export const loanApplicationApi = {
   },
 
   getLoanApplicationsByUserId: async (userId: string): Promise<LoanApplicationData[]> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication/user/${userId}`);
+    const response = await fetch(`${API_BASE_URL}/loanapplications/user/${userId}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch user loan applications");
@@ -78,7 +78,7 @@ export const loanApplicationApi = {
   },
 
   getLoanApplicationsByStatus: async (status: string): Promise<LoanApplicationData[]> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication/status/${status}`);
+    const response = await fetch(`${API_BASE_URL}/loanapplications/status/${status}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch loan applications by status");
@@ -88,7 +88,7 @@ export const loanApplicationApi = {
   },
 
   updateLoanApplication: async (id: string, data: LoanApplicationData): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/loanapplications/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export const loanApplicationApi = {
   },
 
   deleteLoanApplication: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/LoanApplication/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/loanapplications/${id}`, {
       method: "DELETE",
     });
 

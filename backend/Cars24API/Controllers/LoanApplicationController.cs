@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Cars24API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/loanapplications")]
     public class LoanApplicationController : ControllerBase
     {
         private readonly LoanApplicationService _loanApplicationService;
