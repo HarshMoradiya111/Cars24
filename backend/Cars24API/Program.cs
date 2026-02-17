@@ -38,6 +38,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Custom global exception handling middleware
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next.Invoke();
+    }
+    catch (Exception ex)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        
+        var response = new { message = "Internal server error", error = ex.Message };
+        await context.Response.WriteAsJsonAsync(response);
+    }
+});
+
 // Middleware order is critical for CORS to work properly
 app.UseHttpsRedirection();
 app.UseRouting();

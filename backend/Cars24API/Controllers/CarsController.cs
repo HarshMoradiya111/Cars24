@@ -65,29 +65,56 @@ namespace Cars24API.Controllers
             try
             {
                 var cars = await _carservice.GetAllAsync();
-                var result = cars.Select(car => new
+                
+                if (cars == null || cars.Count == 0)
+                    return Ok(new List<object>());
+                
+                var result = new List<object>();
+                foreach (var car in cars)
                 {
-                    car.Id,
-                    Title = car.Title ?? string.Empty,
-                    km = car.Specs?.Km ?? string.Empty,
-                    Fuel = car.Specs?.Fuel ?? string.Empty,
-                    Transmission = car.Specs?.Transmission ?? string.Empty,
-                    Owner = NormalizeOwnerText(car.Specs?.Owner),
-                    car.Emi,
-                    Price = car.Price ?? string.Empty,
-                    car.Location,
-                    image = (car.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
-                    RecommendedPrice = _pricingService.Recommend(
-                        car.Title ?? string.Empty,
-                        car.Price ?? string.Empty,
-                        car.Location ?? string.Empty,
-                        new Cars24API.Models.PricingRules
+                    try
+                    {
+                        decimal recommendedPrice = 0;
+                        try
                         {
-                            UserLocation = userLocation,
-                            Date = DateTime.UtcNow,
-                            FuelPriceIndex = fuelIndex
-                        }).RecommendedPrice
-                });
+                            recommendedPrice = _pricingService.Recommend(
+                                car?.Title ?? string.Empty,
+                                car?.Price ?? string.Empty,
+                                car?.Location ?? string.Empty,
+                                new Cars24API.Models.PricingRules
+                                {
+                                    UserLocation = userLocation,
+                                    Date = DateTime.UtcNow,
+                                    FuelPriceIndex = fuelIndex
+                                }).RecommendedPrice;
+                        }
+                        catch
+                        {
+                            recommendedPrice = 0;
+                        }
+
+                        result.Add(new
+                        {
+                            car?.Id,
+                            Title = car?.Title ?? string.Empty,
+                            km = car?.Specs?.Km ?? string.Empty,
+                            Fuel = car?.Specs?.Fuel ?? string.Empty,
+                            Transmission = car?.Specs?.Transmission ?? string.Empty,
+                            Owner = NormalizeOwnerText(car?.Specs?.Owner),
+                            car?.Emi,
+                            Price = car?.Price ?? string.Empty,
+                            car?.Location,
+                            image = (car?.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
+                            RecommendedPrice = recommendedPrice
+                        });
+                    }
+                    catch
+                    {
+                        // Skip problematic cars
+                        continue;
+                    }
+                }
+                
                 return Ok(result);
             }
             catch (Exception ex)
