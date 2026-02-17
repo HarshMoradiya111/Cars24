@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 using Cars24API.Services;
 using Cars24API.Models;
 
 namespace Cars24API.Controllers
 {
     [ApiController]
+    [EnableCors("CorsPolicy")]
     [Route("api/pricing")]
     public class PricingController : ControllerBase
     {

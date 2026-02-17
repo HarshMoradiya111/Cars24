@@ -3,7 +3,6 @@ using Cars24API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -18,25 +17,31 @@ builder.Services.AddTransient<RedemptionService>(sp => new RedemptionService(bui
 builder.Services.AddTransient<ServiceBookingService>(sp => new ServiceBookingService(builder.Configuration));
 builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationService(builder.Configuration));
 
+// Configure CORS for production and development
 builder.Services.AddCors(options =>
-    options.AddPolicy("AllowAll", policy =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        var allowedOrigins = new[] {
+            "https://cars24-teal.vercel.app",
+            "http://localhost:3000",
+            "http://localhost:3001"
+        };
+
         policy
-            .WithOrigins(
-                "https://cars24-teal.vercel.app",
-                "http://localhost:3000",
-                "https://cars24-teal-*.vercel.app" // Allow Vercel preview URLs
-            )
-            .SetIsOriginAllowedToAllowWildcardSubdomains()
+            .WithOrigins(allowedOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials()
-    )
-);
+            .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
+// Middleware order is critical for CORS to work properly
+app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("AllowAll");
+app.UseCors("CorsPolicy");
 
 app.MapGet("/", () => "Welcome to Cars24 API");
 

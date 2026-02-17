@@ -1,10 +1,12 @@
 using Cars24API.Models;
 using Cars24API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 
 namespace Cars24API.Controllers
 {
     [ApiController]
+    [EnableCors("CorsPolicy")]
     [Route("api/loanapplications")]
     public class LoanApplicationController : ControllerBase
     {
