@@ -29,13 +29,14 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials()
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
     )
 );
 
 var app = builder.Build();
 
-app.UseCors("AllowAll");
 app.UseRouting();
+app.UseCors("AllowAll");
 
 app.MapGet("/", () => "Welcome to Cars24 API");
 
