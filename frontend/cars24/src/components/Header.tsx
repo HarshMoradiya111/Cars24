@@ -102,6 +102,28 @@ const Header = () => {
             </Button>
           </Link>
 
+          {!user && (
+            <>
+              <Link href="/signup">
+                <Button 
+                  variant="outline"
+                  size="sm" 
+                  className="text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 border-gray-300 hover:border-orange-500 hover:text-orange-500"
+                >
+                  Sign Up
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button 
+                  size="sm" 
+                  className="bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2"
+                >
+                  Sign In
+                </Button>
+              </Link>
+            </>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="inline-flex items-center justify-center px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-orange-500">
@@ -114,8 +136,8 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <span className="hidden sm:inline">Account</span>
-                    <ChevronDown className="ml-0 sm:ml-1 h-4 w-4" />
+                    <Menu className="h-5 w-5" />
+                    <span className="hidden sm:inline ml-1">Menu</span>
                   </>
                 )}
               </Button>
@@ -136,19 +158,7 @@ const Header = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
-              ) : (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="/login"
-                      className="w-full px-4 py-3 text-center text-white bg-orange-500 rounded-md hover:bg-orange-600"
-                    >
-                      LOG IN / SIGN UP
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
+              ) : null}
               {menuItems.map(({ label, icon: Icon, link }) => (
                 <DropdownMenuItem asChild key={label}>
                   <Link href={link} className="flex items-center gap-3 w-full cursor-pointer py-2">

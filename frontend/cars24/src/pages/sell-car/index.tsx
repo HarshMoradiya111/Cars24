@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Check, Car, Image, FileText, DollarSign } from "lucide-react";
+import { Check, Car, Image, FileText, IndianRupee } from "lucide-react";
 import Carform from "@/components/sellcar/Carform";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
@@ -49,7 +49,7 @@ const index = () => {
     { id: 1, name: "Basic Details", icon: Car },
     { id: 2, name: "Images & Specs", icon: Image },
     { id: 3, name: "Features", icon: FileText },
-    { id: 4, name: "Pricing", icon: DollarSign },
+    { id: 4, name: "Pricing", icon: IndianRupee },
   ];
   const updateCarDetails = (updatedDetails: Partial<CarDetails>) => {
     setCarDetails((prev: any) => ({

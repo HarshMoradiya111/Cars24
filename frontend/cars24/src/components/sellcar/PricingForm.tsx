@@ -1,4 +1,4 @@
-import { AlertCircle, CreditCard, DollarSign, Tag, Info } from "lucide-react";
+import { AlertCircle, CreditCard, IndianRupee, Tag, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getRecommendation } from "@/utils/pricing";
 import { detectLocationFromIP } from "@/utils/formatters";
@@ -259,7 +259,7 @@ const PricingForm: React.FC<PricingFormprop> = ({
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
-          <DollarSign /> List My Car
+          <IndianRupee /> List My Car
         </button>
       </div>
     </form>

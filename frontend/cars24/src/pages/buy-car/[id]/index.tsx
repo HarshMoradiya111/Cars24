@@ -927,24 +927,24 @@ const index = () => {
                   )}
                 </div>
               </form>
-            </div>
 
-            {/* Book Appointment Option */}
-            <div className="bg-orange-50 border-2 border-orange-200 rounded-lg shadow-md p-3 sm:p-4 md:p-6 mt-6">
-              <h2 className="text-lg sm:text-xl font-bold text-orange-900 mb-3 flex items-center">
-                <Calendar className="w-5 h-5 mr-2" />
-                Schedule an Inspection
-              </h2>
-              <p className="text-sm sm:text-base text-orange-800 mb-4">
-                Want to inspect this car first? Book a free inspection appointment before or after completing your purchase.
-              </p>
-              <button
-                type="button"
-                onClick={() => router.push(`/bookappointment/${carDetails.id}`)}
-                className="w-full bg-orange-600 text-white py-2 sm:py-3 px-4 rounded-md hover:bg-orange-700 transition-colors font-medium"
-              >
-                 Book Appointment
-              </button>
+              {/* Book Appointment Option */}
+              <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-3 sm:p-4 mt-6">
+                <h2 className="text-lg sm:text-xl font-bold text-orange-900 mb-3 flex items-center">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Schedule an Inspection
+                </h2>
+                <p className="text-sm sm:text-base text-orange-800 mb-4">
+                  Want to inspect this car first? Book a free inspection appointment before or after completing your purchase.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/bookappointment/${carDetails.id}`)}
+                  className="w-full bg-orange-600 text-white py-2 sm:py-3 px-4 rounded-md hover:bg-orange-700 transition-colors font-medium"
+                >
+                   Book Appointment
+                </button>
+              </div>
             </div>
           </div>
         </div>
