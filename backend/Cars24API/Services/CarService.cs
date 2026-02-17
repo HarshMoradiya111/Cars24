@@ -8,9 +8,13 @@ namespace Cars24API.Services
         private readonly IMongoCollection<Car> _cars;
         public CarService(IConfiguration config)
         {
-            var client = new MongoClient(config.GetConnectionString("Cars24DB"));
+            var connectionString = MongoConfig.GetConnectionString(config);
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("MongoDB connection string is not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
 
-            var database = client.GetDatabase(config["MongoDB:DatabaseName"]);
+            var client = new MongoClient(connectionString);
+
+            var database = client.GetDatabase(MongoConfig.GetDatabaseName(config));
             _cars = database.GetCollection<Car>("Cars");
         }
         public async Task<List<Car>> GetAllAsync() =>

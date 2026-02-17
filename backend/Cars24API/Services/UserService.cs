@@ -9,9 +9,13 @@ public class UserService
 
     public UserService(IConfiguration config)
     {
-        var client = new MongoClient(config.GetConnectionString("Cars24DB"));
+        var connectionString = MongoConfig.GetConnectionString(config);
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("MongoDB connection string is not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
 
-        var database = client.GetDatabase(config["MongoDB:DatabaseName"]);
+        var client = new MongoClient(connectionString);
+
+        var database = client.GetDatabase(MongoConfig.GetDatabaseName(config));
         _users = database.GetCollection<User>("Users");
     }
 

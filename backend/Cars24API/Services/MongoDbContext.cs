@@ -9,14 +9,12 @@ namespace Cars24API.Services
 
         public MongoDbContext(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("Cars24DB");
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new ArgumentException("MongoDB connection string 'Cars24DB' is not configured.");
-            }
+            var connectionString = MongoConfig.GetConnectionString(configuration);
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("MongoDB connection string is not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
 
             _client = new MongoClient(connectionString);
-            var databaseName = configuration["MongoDB:DatabaseName"] ?? "Cars24DB";
+            var databaseName = MongoConfig.GetDatabaseName(configuration);
             _database = _client.GetDatabase(databaseName);
         }
 

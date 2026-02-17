@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-string? connectionstring = builder.Configuration.GetConnectionString("Cars24DB");
+var connectionstring = MongoConfig.GetConnectionString(builder.Configuration);
 
 builder.Services.AddTransient<UserService>(sp => new UserService(builder.Configuration));
 builder.Services.AddTransient<CarService>(sp => new CarService(builder.Configuration));
@@ -66,8 +66,8 @@ app.MapGet("/db-check", async () =>
 {
     try
     {
-        if (string.IsNullOrEmpty(connectionstring))
-            return Results.BadRequest("Connection string not configured");
+        if (string.IsNullOrWhiteSpace(connectionstring))
+            return Results.BadRequest("MongoDB connection string not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
 
         var client = new MongoClient(connectionstring);
         await client.ListDatabaseNamesAsync();

@@ -9,8 +9,12 @@ namespace Cars24API.Services
 
         public LoanApplicationService(IConfiguration configuration)
         {
-            var client = new MongoClient(configuration.GetConnectionString("Cars24DB"));
-            var database = client.GetDatabase(configuration["MongoDB:DatabaseName"]);
+            var connectionString = MongoConfig.GetConnectionString(configuration);
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("MongoDB connection string is not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
+
+            var client = new MongoClient(connectionString);
+            var database = client.GetDatabase(MongoConfig.GetDatabaseName(configuration));
             _loanApplications = database.GetCollection<LoanApplication>("LoanApplications");
         }
 

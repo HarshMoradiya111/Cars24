@@ -9,8 +9,12 @@ public class RedemptionService
 
     public RedemptionService(IConfiguration config)
     {
-        var client = new MongoClient(config.GetConnectionString("Cars24DB"));
-        var database = client.GetDatabase(config["MongoDB:DatabaseName"]);
+        var connectionString = MongoConfig.GetConnectionString(config);
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("MongoDB connection string is not configured. Set 'ConnectionStrings__Cars24DB' (recommended) or 'MONGODB_URI'.");
+
+        var client = new MongoClient(connectionString);
+        var database = client.GetDatabase(MongoConfig.GetDatabaseName(config));
         _redemptions = database.GetCollection<Redemption>("Redemptions");
     }
 
