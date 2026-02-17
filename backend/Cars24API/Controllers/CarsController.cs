@@ -62,27 +62,38 @@ namespace Cars24API.Controllers
         [HttpGet("summaries")]
         public async Task<IActionResult> GetCarsummaries([FromQuery] string? userLocation = null, [FromQuery] double? fuelIndex = null)
         {
-            var cars = await _carservice.GetAllAsync();
-            var result = cars.Select(car => new
+            try
             {
-                car.Id,
-                car.Title,
-                km = car.Specs.Km,
-                Fuel = car.Specs.Fuel,
-                Transmission = car.Specs.Transmission,
-                Owner = NormalizeOwnerText(car.Specs.Owner),
-                car.Emi,
-                car.Price,
-                car.Location,
-                image = (car.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
-                RecommendedPrice = _pricingService.Recommend(car.Title, car.Price, car.Location, new Cars24API.Models.PricingRules
+                var cars = await _carservice.GetAllAsync();
+                var result = cars.Select(car => new
                 {
-                    UserLocation = userLocation,
-                    Date = DateTime.UtcNow,
-                    FuelPriceIndex = fuelIndex
-                }).RecommendedPrice
-            });
-            return Ok(result);
+                    car.Id,
+                    Title = car.Title ?? string.Empty,
+                    km = car.Specs?.Km ?? string.Empty,
+                    Fuel = car.Specs?.Fuel ?? string.Empty,
+                    Transmission = car.Specs?.Transmission ?? string.Empty,
+                    Owner = NormalizeOwnerText(car.Specs?.Owner),
+                    car.Emi,
+                    Price = car.Price ?? string.Empty,
+                    car.Location,
+                    image = (car.Images != null && car.Images.Count > 0) ? car.Images[0] : string.Empty,
+                    RecommendedPrice = _pricingService.Recommend(
+                        car.Title ?? string.Empty,
+                        car.Price ?? string.Empty,
+                        car.Location ?? string.Empty,
+                        new Cars24API.Models.PricingRules
+                        {
+                            UserLocation = userLocation,
+                            Date = DateTime.UtcNow,
+                            FuelPriceIndex = fuelIndex
+                        }).RecommendedPrice
+                });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve car summaries", error = ex.Message });
+            }
         }
 
         private static string NormalizeOwnerText(string? owner)

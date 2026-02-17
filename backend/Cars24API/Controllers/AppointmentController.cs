@@ -54,24 +54,38 @@ namespace Cars24API.Controllers
         [HttpGet("user/{userId}/appointments")]
         public async Task<IActionResult> GetAppointmentByUserId(string userId)
         {
-            var user = await _userService.GetByIdAsync(userId);
-            if (user == null)
-                return NotFound();
-            var results = new List<AppointmentDto>();
-            foreach (var appointmentid in user.AppointmentId)
+            try
             {
-                var appointment = await _appointmentService.GetByIdAsynch(appointmentid);
-                if (appointment != null)
+                var user = await _userService.GetByIdAsync(userId);
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+                
+                if (user.AppointmentId == null || user.AppointmentId.Count == 0)
+                    return Ok(new List<AppointmentDto>());
+                
+                var results = new List<AppointmentDto>();
+                foreach (var appointmentid in user.AppointmentId)
                 {
-                    var car = await _carService.GetByIdAsync(appointment.CarId);
-                    results.Add(new AppointmentDto
+                    if (string.IsNullOrWhiteSpace(appointmentid))
+                        continue;
+                        
+                    var appointment = await _appointmentService.GetByIdAsynch(appointmentid);
+                    if (appointment != null)
                     {
-                        Appointment = appointment,
-                        Car = car
-                    });
+                        var car = await _carService.GetByIdAsync(appointment.CarId);
+                        results.Add(new AppointmentDto
+                        {
+                            Appointment = appointment,
+                            Car = car
+                        });
+                    }
                 }
+                return Ok(results);
             }
-            return Ok(results);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve appointments", error = ex.Message });
+            }
         }
         [HttpDelete("cancel/{id}")]
         public async Task<IActionResult> CancelAppointment(string id)

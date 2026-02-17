@@ -63,24 +63,38 @@ namespace Cars24API.Controllers
         [HttpGet("user/{userId}/bookings")]
         public async Task<IActionResult> GetbookingByUserId(string userId)
         {
-            var user = await _userService.GetByIdAsync(userId);
-            if (user == null)
-                return NotFound();
-            var results = new List<bookingDto>();
-            foreach (var bookingid in user.BookingId)
+            try
             {
-                var booking = await _bookingService.GetByIdAsynch(bookingid);
-                if (booking != null)
+                var user = await _userService.GetByIdAsync(userId);
+                if (user == null)
+                    return NotFound(new { message = "User not found" });
+                
+                if (user.BookingId == null || user.BookingId.Count == 0)
+                    return Ok(new List<bookingDto>());
+                
+                var results = new List<bookingDto>();
+                foreach (var bookingid in user.BookingId)
                 {
-                    var car = await _carService.GetByIdAsync(booking.CarId);
-                    results.Add(new bookingDto
+                    if (string.IsNullOrWhiteSpace(bookingid))
+                        continue;
+                        
+                    var booking = await _bookingService.GetByIdAsynch(bookingid);
+                    if (booking != null)
                     {
-                        Booking = booking,
-                        Car = car
-                    });
+                        var car = await _carService.GetByIdAsync(booking.CarId);
+                        results.Add(new bookingDto
+                        {
+                            Booking = booking,
+                            Car = car
+                        });
+                    }
                 }
+                return Ok(results);
             }
-            return Ok(results);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Failed to retrieve bookings", error = ex.Message });
+            }
         }
     }
 }
