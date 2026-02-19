@@ -18,12 +18,13 @@ import {
 import { Heart } from "lucide-react";
 import { useRouter } from "next/router";
 import SafeImage from "@/components/ui/SafeImage";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useWishlist } from "@/context/WishlistContext";
 import { detectLocationFromIP, formatCurrency, normalizeOwnerText, parseAmount } from "@/utils/formatters";
 import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
+import { notifyPriceDropIfNeeded, notifyPurchaseCompleted } from "@/lib/realEventNotifications";
 const fallbackCarDetails = {
   id: "fronx-2023",
   title: "2023 Maruti FRONX DELTA PLUS 1.2L AGS",
@@ -84,6 +85,12 @@ const index = () => {
   const [recommendedPrice, setRecommendedPrice] = useState<any>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const lastRouteCarIdRef = useRef<string | null>(null);
+  const getLoadedCarId = (details: any): string | null => {
+    const v = details?.id ?? details?._id ?? details?.carId;
+    return v ? String(v) : null;
+  };
+
   const mockCars: any[] = [
     {
       id: "1",
@@ -95,7 +102,8 @@ const index = () => {
       emi: "₹8,245/m",
       price: "₹6.80 lakh",
       location: "Rohini, New Delhi",
-      image: "https://images.unsplash.com/photo-1605270396307-d00ba5cda1d0?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image:
+        "https://images.unsplash.com/photo-1605270396307-d00ba5cda1d0?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       images: [
         "https://images.unsplash.com/photo-1605270396307-d00ba5cda1d0?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
@@ -121,7 +129,8 @@ const index = () => {
       emi: "₹18,999/m",
       price: "₹14.50 lakh",
       location: "Gurgaon, Haryana",
-      image: "https://images.unsplash.com/photo-1748214547184-d994bfe53322?q=80&w=1188&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image:
+        "https://images.unsplash.com/photo-1748214547184-d994bfe53322?q=80&w=1188&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       images: [
         "https://images.unsplash.com/photo-1748214547184-d994bfe53322?q=80&w=1188&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg",
@@ -250,16 +259,7 @@ const index = () => {
       if (isRetry) {
         setIsRetrying(true);
       } else {
-      const mockCars: any[] = [
-        {
-          id: "1",
-          images: [
-            "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",  // ← Change this
-            "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg",
-          ],
-        },
-        // ... more cars
-      ];      setLoading(true);
+        setLoading(true);
       }
       setError(undefined);
       
@@ -334,6 +334,15 @@ const index = () => {
 
   useEffect(() => {
     if (!id) return;
+
+    // Clear previous car state only when the route id changes (prevents stale title).
+    const routeCarId = String(id);
+    if (lastRouteCarIdRef.current !== routeCarId) {
+      lastRouteCarIdRef.current = routeCarId;
+      setcarDetails(null);
+      setRecommendedPrice(null);
+      setCurrentImageIndex(0);
+    }
     
     // Attempt IP-based location detection if not set
     if (!userLocation) {
@@ -352,6 +361,12 @@ const index = () => {
       if (basePrice) {
         const carType = detectCarType(carDetails?.title || "");
         const pricing = calculateRecommendedPrice(basePrice, carType, selectedRegion);
+        notifyPriceDropIfNeeded({
+          carId: String((carDetails as any)?.id || id || "unknown"),
+          carName: String((carDetails as any)?.title || "Car"),
+          newRecommendedPrice: pricing.recommendedPrice,
+          url: id ? `/buy-car/${String(id)}` : "/buy-car",
+        });
         setRecommendedPrice(pricing);
       }
     }
@@ -434,6 +449,16 @@ const index = () => {
       toast.error("Please login to continue");
       return;
     }
+
+    // Guard against stale carDetails when navigating between /buy-car/[id] pages.
+    // Only allow purchase when the currently loaded car details match the route id.
+    const routeCarId = id ? String(id) : "";
+    const loadedCarId = getLoadedCarId(carDetails);
+    if (!routeCarId || !carDetails || !loadedCarId || loadedCarId !== routeCarId) {
+      toast.error("Car details are still loading. Please wait and try again.");
+      return;
+    }
+
     try {
       const booking = {
         CarId: id,
@@ -447,9 +472,11 @@ const index = () => {
         loanRequired: formData.loanRequired,
         downPayment: formData.downPayment,
       };
+
       const response = await createBooking(user.id, booking);
       if (response.id) {
         toast.success("Bookings listed Successfully");
+        notifyPurchaseCompleted(String((carDetails as any)?.title || "Car"));
         router.push(`/bookings`);
       }
     } catch (error) {}

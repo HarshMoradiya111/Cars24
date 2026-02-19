@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { createAppointment } from "@/services/appointmentService";
+import { notifyAppointmentConfirmed } from "@/lib/realEventNotifications";
 
 const BookAppointmentPage = () => {
   const router = useRouter();
@@ -68,14 +69,17 @@ const BookAppointmentPage = () => {
       const res = await createAppointment(user.id, payload as any);
       if (res && res.id) {
         toast.success("Appointment booked successfully!");
+        notifyAppointmentConfirmed();
         router.push("/appointments");
       } else {
         toast.warning("Appointment saved locally (offline mode)");
+        notifyAppointmentConfirmed();
         router.push("/appointments");
       }
     } catch (err) {
       console.error("Appointment booking failed:", err);
       toast.warning("Appointment saved locally (offline mode)");
+      notifyAppointmentConfirmed();
       router.push("/appointments");
     }
   };

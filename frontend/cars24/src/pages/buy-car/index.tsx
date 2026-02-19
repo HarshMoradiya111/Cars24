@@ -16,6 +16,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import EmptyStateComponent from "@/components/ui/EmptyState";
 import { useRouter } from "next/router";
 import { formatCurrency, normalizeOwnerText, parseAmount, parseKmValue } from "@/utils/formatters";
+import { notifyPriceDropIfNeeded } from "@/lib/realEventNotifications";
 
 interface Car {
   id: string;
@@ -175,9 +176,21 @@ const index = () => {
         const carType = detectCarType(title);
         const pricing = calculateRecommendedPrice(basePrice, carType, selectedRegion);
         const yearFromData = c?.specs?.year ?? extractYear(title);
-        
+
+        const stableId = c?.id || c?._id || c?.carId || `car-${Date.now()}-${Math.random()}`;
+
+        // Only notify price drops for cars the user explicitly saved.
+        if (isSaved(String(stableId))) {
+          notifyPriceDropIfNeeded({
+            carId: String(stableId),
+            carName: String(title),
+            newRecommendedPrice: pricing.recommendedPrice,
+            url: `/buy-car/${String(stableId)}`,
+          });
+        }
+
         return {
-          id: c?.id || c?._id || c?.carId || `car-${Date.now()}-${Math.random()}`,
+          id: stableId,
           title,
           km: c?.specs?.km || c?.km || "N/A",
           fuel: c?.specs?.fuel || c?.fuel || "N/A",

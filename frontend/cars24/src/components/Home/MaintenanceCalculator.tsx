@@ -14,8 +14,11 @@ interface CalculatorState {
   condition: string;
 }
 
-const MaintenanceCalculator = () => {
-  const [isOpen, setIsOpen] = useState(false);
+type MaintenanceCalculatorProps = {
+  onClose?: () => void;
+};
+
+const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
   const [input, setInput] = useState<CalculatorState>({
     carAge: 5,
     kmDriven: 60000,
@@ -50,22 +53,8 @@ const MaintenanceCalculator = () => {
     { label: "Poor (Neglected)", value: "poor" },
   ];
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="w-full text-left p-4 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <Wrench className="h-5 w-5" />
-          <span className="font-medium">Maintenance Cost Calculator</span>
-        </div>
-      </button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-red-600 text-white p-6 flex justify-between items-center">
@@ -74,7 +63,7 @@ const MaintenanceCalculator = () => {
             Maintenance Cost Calculator
           </h2>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             className="text-2xl hover:opacity-70"
           >
             ✕

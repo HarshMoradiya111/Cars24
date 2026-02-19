@@ -157,26 +157,3 @@ export const NotificationFactories = {
     }),
 };
 
-export function simulateNotificationEvents() {
-  const simulations = [
-    () => NotificationFactories.appointmentConfirmed("Tomorrow", "10:00 AM"),
-    () => NotificationFactories.priceDropped("Honda City 2020", "₹8.5 lakh", "₹8.2 lakh"),
-    () => NotificationFactories.newBid("Maruti Swift 2019", "₹5.2 lakh"),
-    () => NotificationFactories.newMessage("Car Dealer", "Your car is ready for inspection"),
-    () => NotificationFactories.inspectionComplete("Honda City 2020", "87"),
-    () => NotificationFactories.bookingConfirmed("Hyundai Creta 2021", "BK123456"),
-  ];
-
-  const randomDelay = () => Math.random() * 20000 + 10000;
-
-  const scheduleNext = () => {
-    const simulation = simulations[Math.floor(Math.random() * simulations.length)];
-    setTimeout(() => {
-      simulation();
-      scheduleNext();
-    }, randomDelay());
-  };
-
-  scheduleNext();
-  console.log("🔔 Notification simulation started");
-}

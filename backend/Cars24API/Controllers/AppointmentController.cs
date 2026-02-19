@@ -32,6 +32,10 @@ namespace Cars24API.Controllers
                 return BadRequest("Userid and carid is not present");
 
             await _appointmentService.CreateAsync(appointment);
+
+            if (string.IsNullOrWhiteSpace(appointment.Id) || !MongoDB.Bson.ObjectId.TryParse(appointment.Id, out _))
+                return StatusCode(500, new { message = "Appointment created but ID was not generated correctly." });
+
             var user = await _userService.GetByIdAsync(userId);
             if (user == null)
                 return NotFound("User not found");
@@ -66,7 +70,7 @@ namespace Cars24API.Controllers
                 var results = new List<AppointmentDto>();
                 foreach (var appointmentid in user.AppointmentId)
                 {
-                    if (string.IsNullOrWhiteSpace(appointmentid))
+                    if (string.IsNullOrWhiteSpace(appointmentid) || !MongoDB.Bson.ObjectId.TryParse(appointmentid, out _))
                         continue;
                         
                     var appointment = await _appointmentService.GetByIdAsynch(appointmentid);

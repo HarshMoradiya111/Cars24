@@ -80,12 +80,13 @@ export async function enableNotifications(): Promise<string | null> {
 }
 
 export function setupMessageListener(callback: (payload: any) => void) {
-  if (!messaging) return;
+  const currentMessaging = messaging;
+  if (!currentMessaging) return;
 
   isSupported()
     .then((supported) => {
       if (!supported) return;
-      onMessage(messaging, (payload: any) => {
+      onMessage(currentMessaging, (payload: any) => {
         console.log("Foreground message received:", payload);
         callback(payload);
       });

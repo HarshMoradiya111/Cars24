@@ -56,7 +56,9 @@ export default function QuickActions() {
         </div>
       </div>
 
-      {showMaintenance && <MaintenanceCalculator />}
+      {showMaintenance && (
+        <MaintenanceCalculator onClose={() => setShowMaintenance(false)} />
+      )}
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Bell, CheckCircle, AlertCircle, Zap, TestTube } from "lucide-react";
+import { Bell, CheckCircle, AlertCircle, TestTube } from "lucide-react";
 import { enableNotifications } from "@/lib/notifications";
 import {
   getPreferences,
@@ -8,7 +8,7 @@ import {
   updatePreference,
   type NotificationPrefs,
 } from "@/lib/notificationPreferences";
-import { simulateNotificationEvents, testPriceDropNotification, testAppointmentNotification } from "@/lib/notificationEvents";
+import { testPriceDropNotification, testAppointmentNotification } from "@/lib/notificationEvents";
 
 const NotificationSettings = () => {
   const [preferences, setPreferences] = useState<NotificationPrefs>({
@@ -24,7 +24,6 @@ const NotificationSettings = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
-  const [simulationActive, setSimulationActive] = useState(false);
   const [notificationSupported, setNotificationSupported] = useState(true);
   const [isSupportedBrowser, setIsSupportedBrowser] = useState(true);
 
@@ -69,13 +68,6 @@ const NotificationSettings = () => {
     const newValue = !preferences[key];
     setPreferences((prev) => ({ ...prev, [key]: newValue }));
     updatePreference(key, newValue);
-  };
-
-  const handleStartSimulation = () => {
-    if (!simulationActive) {
-      simulateNotificationEvents();
-      setSimulationActive(true);
-    }
   };
 
   const notificationOptions = [
@@ -236,27 +228,6 @@ const NotificationSettings = () => {
             </div>
           </div>
 
-          {/* Continuous Simulation */}
-          <div className="p-6 bg-green-50 border-2 border-green-200 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-green-900 mb-2 flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
-                  Continuous Simulation
-                </h2>
-                <p className="text-green-800">
-                  Start simulating real-time events every 10-30 seconds
-                </p>
-              </div>
-              <button
-                onClick={handleStartSimulation}
-                disabled={simulationActive}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
-              >
-                {simulationActive ? "Simulation Active" : "Start Simulation"}
-              </button>
-            </div>
-          </div>
         </div>
       )}
 

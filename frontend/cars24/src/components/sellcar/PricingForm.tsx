@@ -2,6 +2,7 @@ import { AlertCircle, CreditCard, IndianRupee, Tag, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { getRecommendation } from "@/utils/pricing";
 import { detectLocationFromIP } from "@/utils/formatters";
+import { notifyPriceDropIfNeeded } from "@/lib/realEventNotifications";
 type CarDetails = {
   id: string;
   title: string;
@@ -60,9 +61,10 @@ const PricingForm: React.FC<PricingFormprop> = ({
         setPricingNotes([]);
         return;
       }
-      let userLoc = location;
+      let userLoc: string | undefined = location || undefined;
       if (!userLoc) {
-        userLoc = (await detectLocationFromIP()) || undefined;
+        const detected = await detectLocationFromIP();
+        userLoc = detected || undefined;
       }
       setLoadingRec(true);
       const rec = await getRecommendation({
@@ -73,6 +75,14 @@ const PricingForm: React.FC<PricingFormprop> = ({
       });
       setLoadingRec(false);
       if (rec) {
+        if (typeof rec.recommendedPrice === "number") {
+          notifyPriceDropIfNeeded({
+            carId: String((carDetails as any)?.id || `sell-draft:${carDetails.title || "car"}`),
+            carName: String(carDetails.title || "Car"),
+            newRecommendedPrice: rec.recommendedPrice,
+            url: "/sell-car",
+          });
+        }
         setRecommendedPrice(rec.recommendedPrice ?? null);
         setPricingNotes(rec.pricingNotes ?? []);
       } else {

@@ -22,8 +22,11 @@ namespace Cars24API.Services
             await _appointment.InsertOneAsync(appointment);
         }
 
-        public async Task<Appointment> GetByIdAsynch(string id)
+        public async Task<Appointment?> GetByIdAsynch(string id)
         {
+            if (string.IsNullOrWhiteSpace(id) || !MongoDB.Bson.ObjectId.TryParse(id, out _))
+                return null;
+
             return await _appointment.Find(a => a.Id == id).FirstOrDefaultAsync();
         }
 

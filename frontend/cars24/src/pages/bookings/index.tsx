@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getBookingbyuser } from "@/services/bookingService";
 import { getServiceBookingsByUserId } from "@/lib/serviceBookingApi";
+import { getappointmentbyuser } from "@/services/appointmentService";
 import { BookingListSkeleton, EmptyState, LoadingSpinner } from "@/components/ui/SkeletonLoaders";
 import { Button } from "@/components/ui/button";
 import LoadingState from "@/components/ui/LoadingState";
@@ -135,6 +136,8 @@ const PurchasedCarsPage = () => {
   const [isRetrying, setIsRetrying] = useState(false);
   const [purchasedCars, setpurchasedCars] = useState<any[]>([]);
   const [serviceBookings, setServiceBookings] = useState<any[]>([]);
+  const [appointmentBookings, setAppointmentBookings] = useState<any[]>([]);
+  const [activeCategory, setActiveCategory] = useState<"car" | "service" | "appointment">("car");
   
   const fetchBookings = async (isRetry = false) => {
     try {
@@ -149,6 +152,7 @@ const PurchasedCarsPage = () => {
         console.log('[bookings] No user, using fallback data');
         setpurchasedCars(fallbackPurchasedCars);
         setServiceBookings([]);
+        setAppointmentBookings([]);
         return;
       }
 
@@ -225,6 +229,21 @@ const PurchasedCarsPage = () => {
         setServiceBookings([]);
       }
 
+      try {
+        const appointmentResponse = await getappointmentbyuser(user.id);
+        console.log('[appointments] API Response:', appointmentResponse);
+
+        if (appointmentResponse && Array.isArray(appointmentResponse)) {
+          console.log(`[appointments] ✓ Loaded ${appointmentResponse.length} appointments`);
+          setAppointmentBookings(appointmentResponse);
+        } else {
+          setAppointmentBookings([]);
+        }
+      } catch (aptErr) {
+        console.warn('[appointments] Failed to load appointments:', aptErr);
+        setAppointmentBookings([]);
+      }
+
       setError(null);
     } catch (err: any) {
       const errorMsg = err?.message || "Failed to load bookings";
@@ -232,6 +251,7 @@ const PurchasedCarsPage = () => {
       setError(errorMsg);
       setpurchasedCars(fallbackPurchasedCars);
       setServiceBookings([]);
+      setAppointmentBookings([]);
     } finally {
       setLoading(false);
       setIsRetrying(false);
@@ -241,6 +261,22 @@ const PurchasedCarsPage = () => {
   useEffect(() => {
     fetchBookings();
   }, [user]);
+
+  useEffect(() => {
+    if (loading || isRetrying) return;
+
+    const hasCar = purchasedCars.length > 0;
+    const hasService = serviceBookings.length > 0;
+    const hasAppointment = appointmentBookings.length > 0;
+
+    if (activeCategory === "car" && hasCar) return;
+    if (activeCategory === "service" && hasService) return;
+    if (activeCategory === "appointment" && hasAppointment) return;
+
+    if (hasCar) setActiveCategory("car");
+    else if (hasService) setActiveCategory("service");
+    else if (hasAppointment) setActiveCategory("appointment");
+  }, [activeCategory, appointmentBookings.length, isRetrying, loading, purchasedCars.length, serviceBookings.length]);
   
   const handleRetry = () => {
     fetchBookings(true);
@@ -286,7 +322,7 @@ const PurchasedCarsPage = () => {
     );
   }
   
-  if (purchasedCars.length === 0 && serviceBookings.length === 0 && !loading && !isRetrying) {
+  if (purchasedCars.length === 0 && serviceBookings.length === 0 && appointmentBookings.length === 0 && !loading && !isRetrying) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-5xl mx-auto">
@@ -324,16 +360,69 @@ const PurchasedCarsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 print:py-0 print:px-0 text-black">
-      {purchasedCars.length > 0 && (
+      <div className="max-w-5xl mx-auto mb-6 print:hidden">
+        <h1 className="text-3xl font-bold text-gray-800 text-center">Your Bookings</h1>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Button
+            variant={activeCategory === "car" ? "default" : "outline"}
+            size="sm"
+            className={
+              activeCategory === "car"
+                ? undefined
+                : "hover:bg-primary hover:text-primary-foreground"
+            }
+            onClick={() => setActiveCategory("car")}
+          >
+            Car Booking
+          </Button>
+          <Button
+            variant={activeCategory === "service" ? "default" : "outline"}
+            size="sm"
+            className={
+              activeCategory === "service"
+                ? undefined
+                : "hover:bg-primary hover:text-primary-foreground"
+            }
+            onClick={() => setActiveCategory("service")}
+          >
+            Service Booking
+          </Button>
+          <Button
+            variant={activeCategory === "appointment" ? "default" : "outline"}
+            size="sm"
+            className={
+              activeCategory === "appointment"
+                ? undefined
+                : "hover:bg-primary hover:text-primary-foreground"
+            }
+            onClick={() => setActiveCategory("appointment")}
+          >
+            Appointment
+          </Button>
+        </div>
+      </div>
+
+      {activeCategory === "car" && purchasedCars.length === 0 && (
+        <div className="max-w-5xl mx-auto">
+          <EmptyStateComponent
+            type="no-results"
+            title="No car bookings"
+            message="You don't have any car bookings yet."
+            actionText="Browse Cars"
+            actionHref="/buy-car"
+          />
+        </div>
+      )}
+
+      {activeCategory === "car" && purchasedCars.length > 0 && (
         <div className="mb-8 text-center print:hidden">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Car Booking Confirmation
-          </h1>
+          <h2 className="text-2xl font-bold text-gray-800">Car Booking Confirmation</h2>
           <p className="text-gray-600">Thank you for your purchase!</p>
         </div>
       )}
-      {purchasedCars.map((data: any) => (
-        <div key={data.booking.id} className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl">
+
+      {activeCategory === "car" && purchasedCars.map((data: any) => (
+        <div key={data.booking.id} className="max-w-5xl mx-auto bg-gray-50 rounded-lg overflow-hidden shadow-xl mb-8">
           <div className="bg-blue-900 text-white p-6 rounded-t-lg">
             <div className="flex justify-between items-start">
               <div>
@@ -595,7 +684,19 @@ const PurchasedCarsPage = () => {
         </div>
       ))}
 
-      {serviceBookings.length > 0 && (
+      {activeCategory === "service" && serviceBookings.length === 0 && (
+        <div className="max-w-5xl mx-auto">
+          <EmptyStateComponent
+            type="no-results"
+            title="No service bookings"
+            message="You don't have any service bookings yet."
+            actionText="Book a Service"
+            actionHref="/services"
+          />
+        </div>
+      )}
+
+      {activeCategory === "service" && serviceBookings.length > 0 && (
         <>
           <div className="mb-8 text-center mt-12">
             <h1 className="text-3xl font-bold text-gray-800">
@@ -748,6 +849,89 @@ const PurchasedCarsPage = () => {
               </div>
             </div>
           ))}
+        </>
+      )}
+
+      {activeCategory === "appointment" && appointmentBookings.length === 0 && (
+        <div className="max-w-5xl mx-auto">
+          <EmptyStateComponent
+            type="no-results"
+            title="No appointments"
+            message="You don't have any appointments scheduled yet."
+            actionText="Browse Cars"
+            actionHref="/buy-car"
+          />
+        </div>
+      )}
+
+      {activeCategory === "appointment" && appointmentBookings.length > 0 && (
+        <>
+          <div className="mb-8 text-center mt-12">
+            <h2 className="text-3xl font-bold text-gray-800">Appointments</h2>
+            <p className="text-gray-600">Your scheduled inspections</p>
+          </div>
+
+          <div className="max-w-5xl mx-auto space-y-4">
+            {appointmentBookings.map((item: any) => {
+              const apt = item?.appointment;
+              const car = item?.car;
+              const status = (apt?.status || "upcoming").toString();
+              const dateValue = apt?.scheduledDate ? new Date(apt.scheduledDate) : null;
+              const date = dateValue && !isNaN(dateValue.getTime())
+                ? dateValue.toISOString().split("T")[0]
+                : "N/A";
+              const typeLabel = apt?.appointmentType === "home_inspection" ? "Home Inspection" : "Branch Visit";
+
+              const statusClass =
+                status === "completed"
+                  ? "bg-green-500 text-white"
+                  : status === "cancelled"
+                  ? "bg-red-500 text-white"
+                  : "bg-blue-500 text-white";
+
+              return (
+                <div key={apt?.id || Math.random()} className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <div className={`px-4 py-2 ${statusClass}`}>
+                    <span className="text-white text-sm font-medium capitalize">
+                      {status}
+                    </span>
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-lg font-medium text-gray-900 flex items-center mb-4">
+                      <Car className="w-5 h-5 mr-2 text-gray-500" />
+                      {car?.title || "Car"}
+                    </h3>
+
+                    <div className="space-y-2">
+                      <p className="text-gray-600 flex items-center">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Date: {date}
+                      </p>
+                      <p className="text-gray-600 flex items-center">
+                        <Clock className="w-4 h-4 mr-2" />
+                        Time: {apt?.scheduledTime || "N/A"}
+                      </p>
+                      <p className="text-gray-600 flex items-center">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        Location: {apt?.location || "N/A"}
+                      </p>
+                      <p className="text-gray-600 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-2" />
+                        Type: {typeLabel}
+                      </p>
+                    </div>
+
+                    {apt?.notes ? (
+                      <div className="mt-4 bg-gray-50 p-4 rounded-md">
+                        <p className="text-sm text-gray-700">{apt.notes}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </>
       )}
 
