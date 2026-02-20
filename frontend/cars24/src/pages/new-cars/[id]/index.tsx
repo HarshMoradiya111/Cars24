@@ -343,7 +343,6 @@ const NewCarDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Back Button */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <button
@@ -357,11 +356,8 @@ const NewCarDetailPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Images & Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="relative h-64 sm:h-80 md:h-96">
                 <Image
@@ -388,7 +384,6 @@ const NewCarDetailPage = () => {
                   </>
                 )}
               </div>
-              {/* Thumbnail Navigation */}
               <div className="p-4 flex gap-2 overflow-x-auto">
                 {car.images.map((img, idx) => (
                   <button
@@ -412,7 +407,6 @@ const NewCarDetailPage = () => {
               </div>
             </div>
 
-            {/* Car Info */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-3">
                 <div>
@@ -434,7 +428,6 @@ const NewCarDetailPage = () => {
               <p className="text-gray-700 leading-relaxed">{car.description}</p>
             </div>
 
-            {/* Specifications */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                 Specifications
@@ -451,7 +444,6 @@ const NewCarDetailPage = () => {
               </div>
             </div>
 
-            {/* Features */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                 Key Features
@@ -466,7 +458,6 @@ const NewCarDetailPage = () => {
               </div>
             </div>
 
-            {/* Available Colors */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                 Available Colors
@@ -483,7 +474,6 @@ const NewCarDetailPage = () => {
               </div>
             </div>
 
-            {/* Variants */}
             <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
                 Variants & Pricing
@@ -506,10 +496,8 @@ const NewCarDetailPage = () => {
             </div>
           </div>
 
-          {/* Right Column - Price & CTA */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-4 space-y-4">
-              {/* Price Card */}
               <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-1">Ex-Showroom Price</p>
@@ -537,7 +525,6 @@ const NewCarDetailPage = () => {
                 </Link>
               </div>
 
-              {/* Contact Card */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">
                   Need Help?
@@ -560,7 +547,6 @@ const NewCarDetailPage = () => {
                 </div>
               </div>
 
-              {/* Info Card */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex gap-3">
                   <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />

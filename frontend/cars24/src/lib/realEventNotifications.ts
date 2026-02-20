@@ -20,6 +20,23 @@ export function notifyPurchaseCompleted(carName: string): void {
   });
 }
 
+export function notifyServiceBookingConfirmed(params: {
+  serviceName: string;
+  preferredDate?: string;
+}): void {
+  const { serviceName, preferredDate } = params;
+
+  notifyEvent({
+    type: "booking",
+    title: "Service Booking Confirmed",
+    message: preferredDate
+      ? `Your service booking for ${serviceName || "your service"} is confirmed for ${preferredDate}`
+      : `Your service booking for ${serviceName || "your service"} has been confirmed`,
+    url: "/bookings",
+    iconUrl: "/favicon.ico",
+  });
+}
+
 export function notifyBidUpdated(): void {
   notifyEvent({
     type: "bidUpdate",
@@ -44,12 +61,8 @@ function storageKey(prefix: string, id: string): string {
 }
 
 /**
- * Triggers a price-drop browser notification only when the newly calculated
- * recommended price is lower than the previously stored one.
- *
- * De-dupe strategy:
- * - `lastSeen` tracks most recent recommended price we observed.
- * - `lastNotified` tracks the last recommended price we already notified for.
+ * Notify on a recommended-price drop.
+ * Uses localStorage to avoid duplicate alerts.
  */
 export function notifyPriceDropIfNeeded(params: {
   carId: string;
@@ -69,8 +82,6 @@ export function notifyPriceDropIfNeeded(params: {
 
     const prevSeen = safeNumber(window.localStorage.getItem(lastSeenKey));
     const lastNotified = safeNumber(window.localStorage.getItem(lastNotifiedKey));
-
-    // Always update last-seen so future comparisons are meaningful.
     window.localStorage.setItem(lastSeenKey, String(nextPrice));
 
     const isDrop = prevSeen !== null && nextPrice < prevSeen;
@@ -88,6 +99,5 @@ export function notifyPriceDropIfNeeded(params: {
 
     window.localStorage.setItem(lastNotifiedKey, String(nextPrice));
   } catch {
-    // If storage is blocked (private mode / strict settings), skip de-dupe.
   }
 }

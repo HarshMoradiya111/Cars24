@@ -422,7 +422,6 @@ const index = () => {
             </Link>
           </div>
         )}
-        {/* Mobile Filter Toggle Button */}
         <div className="md:hidden mb-4">
           <Button
             variant="outline"
@@ -602,7 +601,6 @@ const index = () => {
               </div>
             </div>
           </div>
-          {/* cars grid */}
           <div className="md:col-span-3">
             <div className="flex flex-col gap-4 mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
@@ -693,7 +691,6 @@ const index = () => {
               </div>
             </div>
 
-            {/* Cars Grid or Loading State */}
             {loading || isRetrying ? (
               <div className="space-y-6">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
@@ -738,7 +735,6 @@ const index = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAndSortedCars.map((car) => {
-                  // Additional safety check per car
                   if (!car || !car.id) return null;
                   
                   return (
@@ -747,7 +743,6 @@ const index = () => {
                       href={`/buy-car/${car.id}`}
                       className="flex flex-col bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                     >
-                      {/* Image with full width and large height */}
                       <div className="relative w-full h-64 sm:h-72 bg-gray-100 overflow-hidden flex-shrink-0">
                         <SafeImage
                           src={Array.isArray((car as any)?.image) ? (car as any).image?.[0] : (car as any)?.image}
@@ -780,9 +775,7 @@ const index = () => {
                         </button>
                       </div>
 
-                      {/* Car Details Below Image */}
                       <div className="flex-1 p-4 space-y-3 flex flex-col">
-                        {/* Badge */}
                         <div className="flex items-center gap-2">
                           <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                             O
@@ -790,12 +783,10 @@ const index = () => {
                           <span className="text-xs font-semibold text-gray-700">Cars24 Owned Stock</span>
                         </div>
 
-                        {/* Title */}
                         <h3 className="font-bold text-base text-gray-900 line-clamp-2">
                           {car?.title || "Unknown Car"}
                         </h3>
 
-                        {/* Specs Row */}
                         <div className="flex items-center gap-3 text-xs text-gray-600 flex-wrap">
                           <span>{car?.km || "N/A"}</span>
                           <span>•</span>
@@ -806,7 +797,6 @@ const index = () => {
                           <span>{normalizeOwnerText(car?.owner || "N/A")}</span>
                         </div>
 
-                        {/* Pricing Section */}
                         <div className="space-y-2 border-t pt-3">
                           <div>
                             <div className="text-xs text-gray-600 mb-1">Base Price</div>
@@ -827,7 +817,6 @@ const index = () => {
                           )}
                         </div>
 
-                        {/* Location */}
                         <div className="flex items-center gap-1 text-xs text-gray-600 pt-2 border-t mt-auto">
                           <span>📍</span>
                           <span>{car?.location || "N/A"}</span>

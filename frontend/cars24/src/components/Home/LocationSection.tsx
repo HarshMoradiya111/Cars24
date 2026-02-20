@@ -16,7 +16,6 @@ const LocationSection = () => {
   return (
     <div className="py-8 sm:py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-        {/* Section Header */}
         <div className="text-center mb-6 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
             Visit Us in {selectedCity}
@@ -26,7 +25,6 @@ const LocationSection = () => {
           </p>
         </div>
 
-        {/* Location Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 text-center">
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
@@ -59,7 +57,6 @@ const LocationSection = () => {
           </div>
         </div>
 
-        {/* Featured Locations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {cityData.serviceCenters.slice(0, 2).map((center) => (
             <div key={center.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -93,7 +90,6 @@ const LocationSection = () => {
           ))}
         </div>
 
-        {/* View All Link */}
         <div className="text-center">
           <Link
             href="/locations"

@@ -123,7 +123,6 @@ export default function NotificationDebugPage() {
           </div>
         </div>
 
-        {/* System Checks */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">System Checks</h2>
           <div className="space-y-3">
@@ -175,7 +174,6 @@ export default function NotificationDebugPage() {
           </div>
         </div>
 
-        {/* Common Issues */}
         <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-6">
           <h3 className="font-semibold text-amber-900 mb-3 flex items-center gap-2">
             <Info className="w-5 h-5" />
@@ -200,7 +198,6 @@ export default function NotificationDebugPage() {
           </ul>
         </div>
 
-        {/* Actions */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Debug Actions</h2>
           <div className="flex flex-col gap-3">
@@ -231,7 +228,6 @@ export default function NotificationDebugPage() {
           </div>
         </div>
 
-        {/* Logs */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Debug Logs</h2>
           <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-xs max-h-96 overflow-y-auto space-y-1">
@@ -243,7 +239,6 @@ export default function NotificationDebugPage() {
           </div>
         </div>
 
-        {/* Instructions */}
         <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
           <div className="flex items-start gap-3">
             <Bell className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />

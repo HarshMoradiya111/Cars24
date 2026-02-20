@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { createServiceBooking } from "@/lib/serviceBookingApi";
+import { notifyServiceBookingConfirmed } from "@/lib/realEventNotifications";
 import { toast } from "sonner";
 import {
   Wrench,
@@ -146,7 +147,7 @@ const ServiceBookingPage = () => {
       const fetchWallet = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${user.id}`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${user.id}/wallet`
           );
           if (response.ok) {
             const data = await response.json();
@@ -284,6 +285,11 @@ const ServiceBookingPage = () => {
 
       const data = await createServiceBooking(user.id, bookingData);
       toast.success("Service booked successfully!");
+
+      notifyServiceBookingConfirmed({
+        serviceName: selectedService.name,
+        preferredDate: formData.preferredDate,
+      });
 
       if (useWallet) {
         await refreshUser();

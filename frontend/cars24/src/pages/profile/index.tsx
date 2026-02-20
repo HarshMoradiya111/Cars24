@@ -84,7 +84,6 @@ const ProfilePage = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Header */}
             <div className="bg-blue-600 px-6 py-8">
               <div className="flex items-center space-x-4">
                 <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center">
@@ -103,7 +102,6 @@ const ProfilePage = () => {
 
             <div className="p-6">
               <div className="grid md:grid-cols-3 gap-6">
-                {/* Profile Info */}
                 <div className="md:col-span-2">
                   <div>
                     <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
@@ -183,7 +181,7 @@ const ProfilePage = () => {
                           </div>
 
                           <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-700">
-                            Share your link and earn 100 points for each friend who signs up!
+                            Share your link and earn 1000 points for each friend who signs up!
                           </div>
                         </div>
                       </div>
@@ -191,7 +189,6 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Quick Actions */}
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Quick Actions</h2>
                   <div className="space-y-2">

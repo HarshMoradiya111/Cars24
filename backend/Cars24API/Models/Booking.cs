@@ -8,8 +8,8 @@ namespace Cars24API.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }  // Booking ID
-        public string CarId { get; set; } = null!;  // Reference to Car by Id
+        public string? Id { get; set; }
+        public string CarId { get; set; } = null!;
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }

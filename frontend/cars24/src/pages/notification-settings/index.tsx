@@ -117,7 +117,6 @@ const NotificationSettings = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Bell className="h-8 w-8 text-blue-600" />
@@ -130,7 +129,6 @@ const NotificationSettings = () => {
         </p>
       </div>
 
-      {/* Success Message */}
       {showSuccess && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
           <CheckCircle className="text-green-600 h-5 w-5" />
@@ -153,7 +151,6 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* Browser Not Supported Warning */}
       {!notificationSupported && (
         <div className="mb-8 p-6 bg-red-50 border-2 border-red-200 rounded-lg">
           <div className="flex items-start gap-3">
@@ -175,7 +172,6 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* Enable Notifications Section */}
       {!permissionGranted && (
         <div className="mb-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
           <h2 className="text-xl font-semibold text-blue-900 mb-2">
@@ -200,10 +196,8 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* Test Simulation Button */}
       {permissionGranted && (
         <div className="mb-8 space-y-4">
-          {/* Individual Test Buttons */}
           <div className="p-6 bg-purple-50 border-2 border-purple-200 rounded-lg">
             <h2 className="text-xl font-semibold text-purple-900 mb-2 flex items-center gap-2">
               <TestTube className="h-5 w-5" />
@@ -231,7 +225,6 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* Notification Preferences */}
       {permissionGranted && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -269,7 +262,6 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* FCM Token Info (Dev Only) */}
       {process.env.NODE_ENV === "development" && fcmToken && (
         <div className="mt-8 p-4 bg-gray-100 rounded-lg">
           <p className="text-sm text-gray-600 mb-2 font-mono break-all">
@@ -278,7 +270,6 @@ const NotificationSettings = () => {
         </div>
       )}
 
-      {/* Information Section */}
       <div className="mt-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
         <h3 className="font-semibold text-gray-900 mb-3">How Notifications Work</h3>
         <ul className="space-y-2 text-gray-700 text-sm">

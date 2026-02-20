@@ -10,7 +10,6 @@ const LocationsPage = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {/* Header Section */}
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
             <div>
@@ -27,7 +26,6 @@ const LocationsPage = () => {
           </div>
         </div>
 
-        {/* City Info */}
         {selectedCity && cityData && (
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 text-white">
             <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
@@ -40,10 +38,8 @@ const LocationsPage = () => {
           </div>
         )}
 
-        {/* Map and Service Centers */}
         <LocationMap showServiceCenters={true} />
 
-        {/* Information Section */}
         <div className="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -106,7 +102,6 @@ const LocationsPage = () => {
           </div>
         </div>
 
-        {/* Contact Information */}
         <div className="mt-6 sm:mt-8 bg-white rounded-lg shadow-lg p-4 sm:p-6">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Need Help?</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">

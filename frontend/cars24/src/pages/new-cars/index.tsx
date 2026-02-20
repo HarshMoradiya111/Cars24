@@ -155,7 +155,6 @@ const NewCarsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -169,7 +168,6 @@ const NewCarsPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
@@ -195,7 +193,6 @@ const NewCarsPage = () => {
             </Button>
           </div>
 
-          {/* Brand Filter */}
           <div className="mt-4">
             <p className="text-sm font-medium text-gray-700 mb-2">
               Popular Brands
@@ -228,7 +225,6 @@ const NewCarsPage = () => {
           </div>
         </div>
 
-        {/* Benefits */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg p-6 shadow-sm text-center">
             <Shield className="w-10 h-10 text-orange-600 mx-auto mb-3" />
@@ -257,7 +253,6 @@ const NewCarsPage = () => {
           </div>
         </div>
 
-        {/* Cars Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCars.length === 0 ? (
             <div className="col-span-full text-center py-12">
@@ -314,7 +309,6 @@ const NewCarsPage = () => {
           )}
         </div>
 
-        {/* CTA Section */}
         <div className="bg-gradient-to-r from-orange-600 to-orange-800 rounded-lg p-8 mt-12 text-white text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Can't Find What You're Looking For?
@@ -334,7 +328,6 @@ const NewCarsPage = () => {
         </div>
       </div>
 
-      {/* Filter Modal */}
       {showFilterModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -349,7 +342,6 @@ const NewCarsPage = () => {
                 </button>
               </div>
 
-              {/* Price Range Filter */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Price Range
@@ -383,7 +375,6 @@ const NewCarsPage = () => {
                 </div>
               </div>
 
-              {/* Sort By */}
               <div className="mb-6">
                 <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-3">
                   Sort By
@@ -404,7 +395,6 @@ const NewCarsPage = () => {
                 </select>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3">
                 <Button
                   variant="outline"

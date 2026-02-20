@@ -57,7 +57,6 @@ const CitySelector: React.FC = () => {
 
       {isOpen && (
         <div className="fixed sm:absolute top-0 sm:top-full left-0 right-0 sm:left-auto sm:right-0 sm:mt-2 w-full sm:w-80 bg-white border-0 sm:border border-gray-200 rounded-none sm:rounded-lg shadow-2xl z-50 h-full sm:h-auto sm:max-h-96 overflow-hidden">
-          {/* Mobile header */}
           <div className="sm:hidden sticky top-0 bg-white z-10 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Select City</h3>
             <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
@@ -65,7 +64,6 @@ const CitySelector: React.FC = () => {
             </button>
           </div>
 
-          {/* Detect location button */}
           <div className="p-3 border-b border-gray-200">
             <button
               onClick={detectLocation}
@@ -92,7 +90,6 @@ const CitySelector: React.FC = () => {
             )}
           </div>
 
-          {/* Search */}
           <div className="p-3 border-b border-gray-200">
             <input
               type="text"
@@ -103,10 +100,8 @@ const CitySelector: React.FC = () => {
             />
           </div>
 
-          {/* Cities list */}
           <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
             <ul className="py-1">
-              {/* All cities option */}
               <li>
                 <button
                   onClick={() => selectCity(null)}
@@ -121,7 +116,6 @@ const CitySelector: React.FC = () => {
                 </button>
               </li>
 
-              {/* City list */}
               {filtered.length > 0 ? (
                 filtered.map((city) => (
                   <li key={city}>
@@ -146,7 +140,6 @@ const CitySelector: React.FC = () => {
             </ul>
           </div>
 
-          {/* Footer */}
           <div className="sticky bottom-0 p-3 border-t border-gray-200 bg-gray-50">
             <p className="text-xs text-gray-600 text-center">
               Select your city to see cars and service centers

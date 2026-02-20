@@ -172,7 +172,6 @@ const Header = () => {
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div

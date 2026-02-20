@@ -58,7 +58,6 @@ const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-10 text-gray-900">
       <div className="mx-auto max-w-6xl">
-        {/* Back Button */}
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
@@ -78,7 +77,6 @@ const ContactPage = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-bold mb-6">
@@ -199,7 +197,6 @@ const ContactPage = () => {
             </div>
           </div>
 
-          {/* Contact Info */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Contact Information</h3>

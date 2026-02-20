@@ -107,7 +107,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
           Add important features and selling points of your car
         </p>
 
-        {/* Features Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900 flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-500" /> Car Features
@@ -139,7 +138,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
             </button>
           </div>
 
-          {/* Suggested Features */}
           <div className="mt-2">
             <p className="text-sm text-gray-600 mb-2">Suggested Features:</p>
             <div className="flex flex-wrap gap-2">
@@ -166,7 +164,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
               ))}
             </div>
           </div>
-          {/* Features List */}
           {carDetails.features.length > 0 && (
             <div className="mt-4 bg-gray-50 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">
@@ -192,7 +189,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
             </div>
           )}
         </div>
-        {/* Highlights Section */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900 flex items-center">
             <AlertTriangle className="h-5 w-5 mr-2 text-amber-500" /> Car
@@ -225,7 +221,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
             </button>
           </div>
 
-          {/* Suggested Highlights */}
           <div className="mt-2">
             <p className="text-sm text-gray-600 mb-2">Suggested Highlights:</p>
             <div className="flex flex-wrap gap-2">
@@ -253,7 +248,6 @@ const FeaturesForm: React.FC<FeaturesFormProps> = ({
             </div>
           </div>
 
-          {/* Highlights List */}
           {carDetails.highlights.length > 0 && (
             <div className="mt-4 bg-gray-50 rounded-lg p-4">
               <h4 className="text-sm font-medium text-gray-700 mb-2">

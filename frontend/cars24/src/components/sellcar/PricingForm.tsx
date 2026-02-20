@@ -105,7 +105,6 @@ const PricingForm: React.FC<PricingFormprop> = ({
         <p className="text-gray-600">Set your car's price and EMI details</p>
       </div>
 
-      {/* Price Section */}
       <div className="space-y-5">
         <div>
           <label
@@ -159,7 +158,6 @@ const PricingForm: React.FC<PricingFormprop> = ({
           </div>
         </div>
 
-        {/* EMI Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label

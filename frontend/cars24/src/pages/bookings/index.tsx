@@ -454,7 +454,6 @@ const PurchasedCarsPage = () => {
           <div className="p-6">
             <div className="bg-white p-6 rounded-lg shadow-md mb-6 transition-all duration-300 hover:shadow-lg">
               <div className="flex flex-col md:flex-row gap-6">
-                {/* Car Image */}
                 <div className="md:w-2/5 h-64 overflow-hidden rounded-lg">
                   <img
                     src={data.car.images[0]}
@@ -463,7 +462,6 @@ const PurchasedCarsPage = () => {
                   />
                 </div>
 
-                {/* Car Details */}
                 <div className="md:w-3/5">
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">
                     {data.car.title}
@@ -492,7 +490,6 @@ const PurchasedCarsPage = () => {
                     )}
                   </div>
 
-                  {/* Car Specifications */}
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">
                     Specifications
                   </h3>
@@ -535,7 +532,6 @@ const PurchasedCarsPage = () => {
                     </div>
                   </div>
 
-                  {/* Highlights and Features */}
                   <div className="flex flex-wrap gap-2 mt-4">
                     {data.car.highlights.map((highlight: any, index: any) => (
                       <span

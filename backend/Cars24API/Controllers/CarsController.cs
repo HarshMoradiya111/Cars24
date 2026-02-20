@@ -110,7 +110,6 @@ namespace Cars24API.Controllers
                     }
                     catch
                     {
-                        // Skip problematic cars
                         continue;
                     }
                 }

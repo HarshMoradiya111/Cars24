@@ -162,7 +162,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
   
   return (
     <div className="space-y-8 py-4">
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -251,7 +250,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {/* Year */}
           <div>
             <label
               htmlFor="year"
@@ -276,7 +274,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
               ))}
             </select>
           </div>
-          {/* KM Driven */}
           <div>
             <label
               htmlFor="km"
@@ -294,7 +291,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
             />
           </div>
 
-          {/* Fuel Type */}
           <div>
             <label
               htmlFor="fuel"
@@ -317,7 +313,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
             </select>
           </div>
 
-          {/* Transmission */}
           <div>
             <label
               htmlFor="transmission"
@@ -340,7 +335,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
             </select>
           </div>
 
-          {/* Owner */}
           <div>
             <label
               htmlFor="owner"
@@ -363,7 +357,6 @@ const ImagesAndSpecsForm: React.FC<ImagesAndSpecsFormProps> = ({
             </select>
           </div>
 
-          {/* Insurance */}
           <div>
             <label
               htmlFor="insurance"

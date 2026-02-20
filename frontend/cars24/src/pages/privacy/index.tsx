@@ -16,7 +16,6 @@ const PrivacyPage: React.FC = () => {
         <p className="mt-2 text-sm text-gray-600">Last updated: February 17, 2026</p>
 
         <div className="mt-8 space-y-6">
-          {/* Introduction */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Introduction</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -26,7 +25,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Information We Collect */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Information We Collect</h2>
             <div className="space-y-4">
@@ -53,7 +51,6 @@ const PrivacyPage: React.FC = () => {
             </div>
           </section>
 
-          {/* How We Use Your Information */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">How We Use Your Information</h2>
             <ul className="list-disc space-y-2 pl-5 text-sm text-gray-700">
@@ -68,7 +65,6 @@ const PrivacyPage: React.FC = () => {
             </ul>
           </section>
 
-          {/* Information Sharing */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Information Sharing and Disclosure</h2>
             <div className="space-y-3 text-sm text-gray-700">
@@ -86,7 +82,6 @@ const PrivacyPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Data Security */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Data Security</h2>
             <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -104,7 +99,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Your Rights */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Your Privacy Rights</h2>
             <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -124,7 +118,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Cookies */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Cookies and Tracking Technologies</h2>
             <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -138,7 +131,6 @@ const PrivacyPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Children's Privacy */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Children's Privacy</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -148,7 +140,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* International Transfers */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">International Data Transfers</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -158,7 +149,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Data Retention */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Data Retention</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -168,7 +158,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Changes to Policy */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Changes to This Privacy Policy</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -178,7 +167,6 @@ const PrivacyPage: React.FC = () => {
             </p>
           </section>
 
-          {/* Contact Us */}
           <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-3">Contact Us</h2>
             <p className="text-sm text-gray-700 leading-relaxed mb-3">
@@ -197,7 +185,6 @@ const PrivacyPage: React.FC = () => {
             </div>
           </section>
 
-          {/* Key Points Summary */}
           <section className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6 shadow-sm">
             <h2 className="text-xl font-bold text-blue-900 mb-3">📌 Key Points Summary</h2>
             <ul className="list-disc space-y-2 pl-5 text-sm text-blue-900">

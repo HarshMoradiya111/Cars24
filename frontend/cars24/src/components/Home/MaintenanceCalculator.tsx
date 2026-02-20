@@ -56,7 +56,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-red-600 text-white p-6 flex justify-between items-center">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Wrench className="h-6 w-6" />
@@ -71,9 +70,7 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Input Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Car Age */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Car Age (years)
@@ -101,7 +98,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
               />
             </div>
 
-            {/* KM Driven */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Kilometers Driven
@@ -130,7 +126,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
               />
             </div>
 
-            {/* Brand */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Car Brand
@@ -151,7 +146,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
               </select>
             </div>
 
-            {/* Condition */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Maintenance Condition
@@ -175,14 +169,11 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
             </div>
           </div>
 
-          {/* Status Badge */}
           <div className={`p-4 rounded-lg ${estimate.statusColor}`}>
             <p className="font-semibold text-lg">{estimate.status}</p>
           </div>
 
-          {/* Results */}
           <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-            {/* Monthly Estimate */}
             <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
               <p className="text-sm text-gray-600">Monthly Maintenance Cost</p>
               <p className="text-2xl font-bold text-blue-600">
@@ -190,7 +181,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
               </p>
             </div>
 
-            {/* Annual Estimate */}
             <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
               <p className="text-sm text-gray-600">Annual Maintenance Cost</p>
               <p className="text-2xl font-bold text-green-600">
@@ -199,7 +189,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
             </div>
           </div>
 
-          {/* Next Services */}
           {estimate.nextServices.length > 0 && (
             <div className="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
               <h3 className="font-semibold text-amber-900 mb-3 flex items-center gap-2">
@@ -221,7 +210,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
             </div>
           )}
 
-          {/* Insights */}
           {estimate.insights.length > 0 && (
             <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -238,7 +226,6 @@ const MaintenanceCalculator = ({ onClose }: MaintenanceCalculatorProps) => {
             </div>
           )}
 
-          {/* Info Note */}
           <div className="bg-blue-50 p-4 rounded-lg flex gap-3 border-l-4 border-blue-500">
             <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-blue-800">

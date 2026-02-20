@@ -22,6 +22,19 @@ public class UserWalletController : ControllerBase
         _redemptionService = redemptionService;
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetWalletLegacy(string id)
+    {
+        // Legacy alias for older clients.
+        var user = await _userService.GetByIdAsync(id);
+        if (user == null)
+        {
+            return Ok(new { points = 0, message = "User not found" });
+        }
+
+        return Ok(new { points = user.WalletPoints });
+    }
+
     [HttpGet("{id}/wallet")]
     public async Task<IActionResult> GetWallet(string id)
     {

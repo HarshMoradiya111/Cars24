@@ -59,7 +59,7 @@ export const getUserById = async (userId: string) => {
 };
 
 export const getWallet = async (userId: string) => {
-  const response = await fetch(`${API_BASE}/api/wallet/${userId}`);
+  const response = await fetch(`${API_BASE}/api/wallet/${userId}/wallet`);
   if (response.status === 404) {
     return { points: 0, message: "Wallet not found" };
   }

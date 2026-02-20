@@ -140,7 +140,6 @@ const ServicesPage = () => {
   };
 
   const handleCallUs = () => {
-    // Trigger phone call
     window.location.href = 'tel:1800-123-4567';
   };
 
@@ -150,7 +149,6 @@ const ServicesPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -164,7 +162,6 @@ const ServicesPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Benefits Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           {benefits.map((benefit, index) => (
             <div key={index} className="bg-white rounded-lg p-6 shadow-sm text-center">
@@ -177,7 +174,6 @@ const ServicesPage = () => {
           ))}
         </div>
 
-        {/* Services Grid */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">
             Our Services
@@ -236,7 +232,6 @@ const ServicesPage = () => {
           </div>
         </div>
 
-        {/* How It Works */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             How It Works
@@ -279,7 +274,6 @@ const ServicesPage = () => {
           </div>
         </div>
 
-        {/* Contact Section */}
         <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-lg p-8 text-white">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>

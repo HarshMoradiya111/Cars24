@@ -505,9 +505,7 @@ const index = () => {
       <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-            {/* Car Details Summary */}
             <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
-              {/* Car Image */}
               <div className="relative w-full h-48 sm:h-64 md:h-72 lg:h-80 mb-3 sm:mb-4 rounded-lg overflow-hidden bg-gray-100 group">
                 <img
                   key={`car-image-${currentImageIndex}`}
@@ -519,10 +517,8 @@ const index = () => {
                   }}
                 />
               
-              {/* Image Slider Controls - Only show if more than 1 image */}
               {carDetails?.images && Array.isArray(carDetails.images) && carDetails.images.length > 1 && (
                 <>
-                  {/* Previous Button */}
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
@@ -537,7 +533,6 @@ const index = () => {
                     </svg>
                   </button>
 
-                  {/* Next Button */}
                   <button
                     onClick={() =>
                       setCurrentImageIndex((prev) =>
@@ -552,12 +547,10 @@ const index = () => {
                     </svg>
                   </button>
 
-                  {/* Image Counter */}
                   <div className="absolute bottom-12 sm:bottom-3 left-1/2 transform -translate-x-1/2 bg-black/50 text-white text-xs px-2 sm:px-3 py-1 rounded-full z-10">
                     {currentImageIndex + 1} / {carDetails.images.length}
                   </div>
 
-                  {/* Dots Indicator - Hidden on mobile, visible on larger screens */}
                   <div className="hidden sm:flex absolute bottom-3 right-3 gap-1 z-10">
                     {carDetails.images.map((_: any, idx: number) => (
                       <button
@@ -571,7 +564,6 @@ const index = () => {
                     ))}
                   </div>
 
-                  {/* Thumbnail Strip - Hidden on mobile */}
                   <div className="hidden sm:flex absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-2 gap-2 overflow-x-auto">
                     {carDetails.images.map((img: string, idx: number) => (
                       <button
@@ -684,7 +676,6 @@ const index = () => {
                   </div>
                 </div>
               </div>
-              {/* Specs Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
                 <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
                   <p className="text-xs sm:text-sm text-gray-600">Year</p>
@@ -717,7 +708,6 @@ const index = () => {
                   </ul>
                 </div>
               )}
-              {/* Highlights */}
               <div className="bg-blue-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4">
                 <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-2">
                   Car Highlights
@@ -731,7 +721,6 @@ const index = () => {
                   ))}
                 </ul>
               </div>
-              {/* Features */}
               <div className="bg-gray-100 p-3 sm:p-4 rounded-lg">
                 <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-2">Features</h3>
                 <ul className="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700">
@@ -741,7 +730,7 @@ const index = () => {
                 </ul>
               </div>
             </div>
-{/* booking form  */}
+
             <div className="bg-white rounded-lg shadow-md p-3 sm:p-4 md:p-6">
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
                 Complete Your Purchase
@@ -955,7 +944,6 @@ const index = () => {
                 </div>
               </form>
 
-              {/* Book Appointment Option */}
               <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-3 sm:p-4 mt-6">
                 <h2 className="text-lg sm:text-xl font-bold text-orange-900 mb-3 flex items-center">
                   <Calendar className="w-5 h-5 mr-2" />

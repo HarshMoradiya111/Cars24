@@ -47,9 +47,7 @@ const countries = [
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-gray-50 to-gray-100 border-t border-gray-200">
-      {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        {/* Top Section: Logo and Description */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
           <div className="lg:col-span-4">
             <div className="flex items-center mb-3">
@@ -64,7 +62,6 @@ const Footer = () => {
               reliability, and the best deals in the automotive market.
             </p>
             
-            {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <Phone className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -90,7 +87,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Links Grid */}
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12">
             <div className="text-center">
               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 pb-2 border-b-2 border-blue-600 inline-block">
@@ -148,7 +144,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Global Presence */}
         <div className="py-8 border-b border-gray-200">
           <h3 className="text-sm font-bold text-gray-900 text-center uppercase tracking-wider mb-6">
             Global Presence
@@ -167,7 +162,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section: Copyright and Social */}
         <div className="pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-center sm:text-left">

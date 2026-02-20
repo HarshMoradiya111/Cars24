@@ -65,7 +65,6 @@ const FinancePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -79,7 +78,6 @@ const FinancePage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* EMI Calculator */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
           <div className="flex items-center gap-3 mb-6">
             <Calculator className="w-8 h-8 text-blue-600" />
@@ -88,7 +86,6 @@ const FinancePage = () => {
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
-              {/* Loan Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Loan Amount
@@ -112,7 +109,6 @@ const FinancePage = () => {
                 </div>
               </div>
 
-              {/* Interest Rate */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Interest Rate (% per annum)
@@ -137,7 +133,6 @@ const FinancePage = () => {
                 </div>
               </div>
 
-              {/* Tenure */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Loan Tenure (Years)
@@ -203,7 +198,6 @@ const FinancePage = () => {
           </div>
         </div>
 
-        {/* Benefits */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <TrendingUp className="w-10 h-10 text-blue-600 mb-4" />
@@ -234,7 +228,6 @@ const FinancePage = () => {
           </div>
         </div>
 
-        {/* How It Works */}
         <div className="bg-white rounded-lg shadow-sm p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             How It Works

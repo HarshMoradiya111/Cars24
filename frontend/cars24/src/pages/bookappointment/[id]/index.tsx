@@ -99,7 +99,6 @@ const BookAppointmentPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              {/* Date Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <Calendar className="inline-block w-4 h-4 mr-2" />
@@ -116,7 +115,6 @@ const BookAppointmentPage = () => {
                 />
               </div>
 
-              {/* Time Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <Clock className="inline-block w-4 h-4 mr-2" />
@@ -138,7 +136,6 @@ const BookAppointmentPage = () => {
                 </select>
               </div>
 
-              {/* Location */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <MapPin className="inline-block w-4 h-4 mr-2" />
@@ -155,7 +152,6 @@ const BookAppointmentPage = () => {
                 />
               </div>
 
-              {/* Appointment Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Appointment Type
@@ -209,7 +205,6 @@ const BookAppointmentPage = () => {
                 </div>
               </div>
 
-              {/* Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Additional Notes
@@ -224,7 +219,6 @@ const BookAppointmentPage = () => {
                 />
               </div>
 
-              {/* Requirements Notice */}
               <div className="bg-blue-50 p-4 rounded-lg">
                 <h3 className="text-sm font-medium text-blue-800 flex items-center">
                   <AlertCircle className="w-4 h-4 mr-2" />

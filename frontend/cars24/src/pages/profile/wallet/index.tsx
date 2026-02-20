@@ -27,7 +27,7 @@ const WalletPage = () => {
     if (!user?.id) return;
     setLoading(true);
     try {
-      await refreshUser(); // Refresh full user data from backend
+      await refreshUser();
       const data = await getWallet(user.id);
       if (data?.message) {
         toast.message(data.message);
@@ -67,7 +67,7 @@ const WalletPage = () => {
         });
       }
       toast.success("Redeemed successfully");
-      loadRedemptions(); // Refresh history
+      loadRedemptions();
     } catch (err: any) {
       toast.error(err?.message || "Redeem failed");
     } finally {
@@ -131,7 +131,6 @@ const WalletPage = () => {
           </div>
         </div>
 
-        {/* Redemption History */}
         <div className="bg-white rounded-lg shadow p-6 space-y-4">
           <h2 className="text-xl font-bold">Transaction History</h2>
           {redemptions.length === 0 ? (

@@ -120,7 +120,6 @@ const ApplyLoanPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
         <button
           onClick={() => router.push("/finance")}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
@@ -129,7 +128,6 @@ const ApplyLoanPage = () => {
           Back to Finance
         </button>
 
-        {/* Application Form */}
         <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Loan Application Form
@@ -139,7 +137,6 @@ const ApplyLoanPage = () => {
           </p>
 
           <form onSubmit={handleSubmitApplication} className="space-y-6">
-            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name *
@@ -157,7 +154,6 @@ const ApplyLoanPage = () => {
               )}
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number *
@@ -175,7 +171,6 @@ const ApplyLoanPage = () => {
               )}
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address *
@@ -193,7 +188,6 @@ const ApplyLoanPage = () => {
               )}
             </div>
 
-            {/* Loan Summary */}
             <div className="bg-blue-50 rounded-lg p-6 space-y-3">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Loan Summary</h3>
               <div className="grid grid-cols-2 gap-4">
@@ -234,7 +228,6 @@ const ApplyLoanPage = () => {
               </div>
             </div>
 
-            {/* Submit Button */}
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"

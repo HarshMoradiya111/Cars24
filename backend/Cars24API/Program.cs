@@ -17,7 +17,6 @@ builder.Services.AddTransient<RedemptionService>(sp => new RedemptionService(bui
 builder.Services.AddTransient<ServiceBookingService>(sp => new ServiceBookingService(builder.Configuration));
 builder.Services.AddTransient<LoanApplicationService>(sp => new LoanApplicationService(builder.Configuration));
 
-// Configure CORS for production and development
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
@@ -38,7 +37,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Custom global exception handling middleware
 app.Use(async (context, next) =>
 {
     try
@@ -55,7 +53,7 @@ app.Use(async (context, next) =>
     }
 });
 
-// Middleware order is critical for CORS to work properly
+// CORS must run after routing.
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("CorsPolicy");

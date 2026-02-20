@@ -34,7 +34,6 @@ const LocationMap: React.FC<LocationMapProps> = ({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Map */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="p-3 sm:p-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white">
           <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
@@ -68,7 +67,6 @@ const LocationMap: React.FC<LocationMapProps> = ({
         </div>
       </div>
 
-      {/* Service Centers */}
       {showServiceCenters && (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-3 sm:p-4 border-b">
