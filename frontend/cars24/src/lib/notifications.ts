@@ -63,7 +63,7 @@ export async function enableNotifications(): Promise<string | null> {
       return null;
     }
 
-    console.log("✅ FCM Token obtained:", token.substring(0, 20) + "...");
+    console.log("FCM Token obtained:", token.substring(0, 20) + "...");
     console.log(`📱 Platform: ${platform}`);
     return token;
   } catch (error) {

@@ -23,21 +23,21 @@ export function notifyEvent(event: NotificationEvent): void {
   const enabledTypes = Object.entries(prefs)
     .filter(([_, enabled]) => enabled)
     .map(([type]) => type);
-  console.log("📋 Enabled notification types:", enabledTypes);
+  console.log("Enabled notification types:", enabledTypes);
 
   if (!prefs[event.type]) {
-    console.warn(`🚫 Notification blocked: "${event.type}" is disabled by user preferences`);
-    console.log(`💡 Enable "${event.type}" in notification settings to receive these alerts`);
+    console.warn(`Notification blocked: "${event.type}" is disabled by user preferences`);
+    console.log(`Enable "${event.type}" in notification settings to receive these alerts`);
     return;
   }
 
   if (typeof window === "undefined" || !("Notification" in window)) {
-    console.warn("⚠️ Notifications not supported in this browser");
+    console.warn("Notifications not supported in this browser");
     return;
   }
 
   if (Notification.permission !== "granted") {
-    console.warn("⚠️ Notification permission not granted. Please enable notifications first.");
+    console.warn("Notification permission not granted. Please enable notifications first.");
     return;
   }
 
@@ -55,12 +55,12 @@ export function notifyEvent(event: NotificationEvent): void {
       });
       return true;
     } catch (e) {
-      console.warn("⚠️ Service worker notification failed:", e);
+      console.warn("Service worker notification failed:", e);
       return false;
     }
   };
 
-  console.log(`✅ Showing notification: ${event.type} - ${event.title}`);
+  console.log(`Showing notification: ${event.type} - ${event.title}`);
   try {
     const notification = new Notification(event.title, {
       body: event.message,
@@ -77,18 +77,18 @@ export function notifyEvent(event: NotificationEvent): void {
       };
     }
   } catch (e) {
-    console.warn("⚠️ Notification constructor not available. Using service worker.");
+    console.warn("Notification constructor not available. Using service worker.");
     void showViaServiceWorker();
   }
 }
 
 export function testPriceDropNotification(): void {
-  console.log("🧪 Testing price drop notification...");
+  console.log("Testing price drop notification...");
   NotificationFactories.priceDropped("Honda City 2020", "₹8.5 lakh", "₹8.2 lakh");
 }
 
 export function testAppointmentNotification(): void {
-  console.log("🧪 Testing appointment notification...");
+  console.log("Testing appointment notification...");
   NotificationFactories.appointmentConfirmed("Tomorrow", "10:00 AM");
 }
 

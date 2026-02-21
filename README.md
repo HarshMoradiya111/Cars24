@@ -1,190 +1,247 @@
-Watch live Website 
-https://cars24-i1k7y1v4l-harsh-moradiyas-projects.vercel.app/
+# 🚗 Cars24 — Intelligent Used Car Marketplace
 
+A modern full-stack web application for buying, selling, and managing used cars with intelligent pricing, maintenance insights, geo-location filtering, notifications, and referral rewards.
 
-# 🚗 CARS24 - Used Car Marketplace
-
-A modern fullstack application for buying, selling, and managing used cars online.
-
----
-
-## 🎯 Quick Start
-
-### What You Need
-- Node.js (for frontend)
-- .NET (for backend)
-- Git
-
-### Get Running in 2 Minutes
-
-**Terminal 1 - Start Backend:**
-```bash
-cd Cars24/backend/Cars24API
-dotnet run
-```
-Backend will run on `http://localhost:5203`
-
-**Terminal 2 - Start Frontend:**
-```bash
-cd Cars24/frontend/cars24
-npm install
-npm run dev
-```
-Frontend will run on `http://localhost:3000`
-
-Visit `http://localhost:3000` in your browser! 🎉
+🌐 **Live Demo**  
+https://cars24-teal.vercel.app
 
 ---
 
-## 📁 Project Layout
+# 📌 Overview
+
+Cars24 is a full-stack automotive marketplace platform that enables users to:
+
+- Browse and search used cars
+- Filter vehicles by specifications and location
+- View intelligent price recommendations
+- Estimate maintenance costs
+- Book inspections or purchases
+- Receive real-time notifications
+- Earn referral rewards via wallet system
+
+The system integrates intelligent decision-support tools to improve vehicle discovery, pricing transparency, and ownership awareness.
+
+---
+
+# ⚡ Local Setup
+
+## Prerequisites
+
+- Node.js  
+- .NET SDK  
+- MongoDB (running locally)  
+- Git  
+
+Ensure MongoDB is running at:
+
+mongodb://localhost:27017
+
+---
+
+## ▶️ Run Backend
+
+cd backend/Cars24API  
+dotnet run  
+
+Backend runs on:  
+http://localhost:5203  
+
+---
+
+## ▶️ Run Frontend
+
+cd frontend/cars24  
+npm install  
+npm run dev  
+
+Frontend runs on:  
+http://localhost:3000  
+
+Open in browser:  
+http://localhost:3000  
+
+---
+
+# 🏗️ Architecture
+
+User Browser (Frontend)  
+        ↓  
+   Next.js Application  
+        ↓ HTTP API  
+   ASP.NET Core Backend  
+        ↓  
+      MongoDB  
+
+- Frontend: UI, interactions, client logic  
+- Backend: API, business logic, database access  
+- Database: vehicle, user, booking, wallet data  
+
+---
+
+# 📁 Project Structure
 
 ```
 Cars24/
-├── frontend/cars24/          👈 User Interface (Next.js + React)
-│   ├── src/pages/            📄 Web pages (home, buy, sell, etc)
-│   ├── src/components/       🧩 Reusable UI pieces
-│   ├── src/lib/              🔧 Utilities & API connections
-│   └── public/               🎨 Images & static files
+├── README.md
+├── add_sample_cars.bat
+├── cars24.sln
 │
-├── backend/Cars24API/        👈 Server & Database (ASP.NET)
-│   ├── Controllers/          🛣️ API routes
-│   ├── Models/               📊 Data structures
-│   ├── Services/             ⚙️ Business logic
-│   └── appsettings.json      ⚙️ Configuration
+├── backend/
+│   └── Cars24API/
+│       ├── appsettings.json
+│       ├── appsettings.example.json
+│       ├── Cars24API.csproj
+│       ├── Dockerfile
+│       ├── Program.cs
+│       ├── Controllers/        # API endpoints
+│       ├── Models/             # Data models
+│       ├── Services/           # Business logic
+│       ├── Properties/
+│       ├── bin/
+│       └── obj/
 │
-└── README.md                 📖 This file
+├── frontend/
+│   └── cars24/
+│       ├── package.json
+│       ├── tsconfig.json
+│       ├── next.config.ts
+│       ├── .env.local
+│       ├── public/             # Static assets
+│       └── src/
+│           ├── pages/          # Application pages
+│           ├── components/     # UI components
+│           ├── lib/            # Utilities & helpers
+│           ├── context/        # Global state
+│           ├── services/       # API services
+│           ├── styles/         # Styling
+│           └── utils/          # Helpers
 ```
 
----
 
-## 🏗️ How It Works
+# 🌟 Key Features
 
-```
-Your Browser (Frontend)
-        ↓ You click something
-  Next.js App Loads
-        ↓ Needs car data?
-  Sends Request
-        ↓ (HTTP)
-  Backend API
-        ↓ Fetches from
-  MongoDB Database
-        ↓ Sends back
-  Frontend Shows Results
-```
-
-**Frontend** = What you see & interact with  
-**Backend** = Behind-the-scenes server & database
+## 🚗 Vehicle Marketplace
+- Browse available cars with specifications  
+- View images, price, and location  
+- Book vehicle inspections or purchases  
+- Dynamic listing updates  
 
 ---
 
-## 🌟 Cool Features
-
-### 🚗 Buy & Sell Cars
-- Browse available cars with detailed specs
-- Filter by price, brand, location
-- Book appointments for test drives
-- Instant price estimation
-
-### 💰 Maintenance Calculator
-- Estimate maintenance costs for any car
-- Brand-specific pricing (Maruti, Honda, BMW, etc)
-- Interactive cost breakdown
-- Located in: `frontend/cars24/src/components/Home/MaintenanceCalculator.tsx`
-
-### � Dynamic Pricing Engine
-- **Rule-based price recommendations** based on market conditions
-- **Seasonal multipliers**: SUVs gain value in monsoon; hatchbacks peak in summer
-- **Regional adjustments**: Metro, Hilly, and Rural pricing variations
-- **Car type analysis**: Different cars perform differently in different seasons/regions
-- Shows both Base Price and Recommended Price on all car listings
-- Example: "SUV demand increases during monsoon in hilly regions"
-- Located in: `frontend/cars24/src/lib/pricingEngine.ts`
-
-#### How It Works
-1. **Select Region**: Choose Metro, Hilly, or Rural from the filter panel
-2. **Dynamic Calculation**: Prices auto-adjust based on:
-   - Current season (detected automatically)
-   - Selected region
-   - Car type (SUV, Sedan, Hatchback, etc.)
-3. **Explanation Provided**: Each car shows why its recommended price differs from base price
-
-#### Examples
-- **SUV in Hilly Region during Monsoon**: +20% (high demand for off-road capability)
-- **Hatchback in Metro**: +10% (compact cars preferred in cities)
-- **Coupe in Rural Area**: -20% (low demand for sports cars outside metros)
-
-### �🔔 Smart Notifications
-- Get notified when prices drop
-- Appointment reminders
-- New car listings alerts
-- Push notifications via Firebase
-- Located in: `frontend/cars24/src/lib/`
+## 🔎 Advanced Search & Filtering
+- Predictive search suggestions  
+- Fuzzy brand matching  
+- Filters: fuel, year, mileage, transmission  
+- Relevance-based results  
 
 ---
 
-## 🛠️ Configuration
-
-### Frontend Setup (`.env.local`)
-```
-NEXT_PUBLIC_API_URL=http://localhost:5203/api
-NEXT_PUBLIC_FIREBASE_API_KEY=your-key-here
-```
-
-### Backend Setup (`appsettings.json`)
-```
-MongoDB connection string
-API port: 5203
-```
+## 📍 Geo-Location Filtering
+- City-based vehicle listings  
+- Location selector integration  
+- Region-specific availability  
+- Practical purchase relevance  
 
 ---
 
-## 📚 Technology Stack
+## 💲 Dynamic Pricing Engine
+Intelligent price recommendation based on:
 
-| Layer | Tech | Version |
-|-------|------|---------|
-| **Frontend** | Next.js | 15 |
-| | React | 19 |
-| | Tailwind CSS | Latest |
-| **Backend** | ASP.NET Core | 9 |
-| | C# | Latest |
-| **Database** | MongoDB | Latest |
-| **Notifications** | Firebase | v12.8.0 |
+- Region (Metro / Rural / Hilly)  
+- Season (Monsoon / Summer / Winter)  
+- Vehicle type (SUV / Hatchback / Sedan)  
 
----
+Displays:
 
-## 🚀 Deployment
+- Base Price  
+- Recommended Price  
+- Adjustment reason  
 
-Ready to go live?
-
-**Frontend:** Deploy on Vercel, Netlify, or Render  
-**Backend:** Deploy on Azure, Heroku, or Render  
-
-Just set your environment variables and you're good! 🎉
+Example:  
+SUV demand increases in hilly regions during monsoon  
 
 ---
 
-## 📖 Need More Info?
+## 🛠️ Maintenance Cost Calculator
+Predicts ownership cost using:
 
-- **Frontend Details:** See `frontend/cars24/README.md`
-- **Backend Details:** See `backend/Cars24API/README.md`
-- **Project Setup:** See `SETUP_GUIDE.md`
+- Vehicle age  
+- Kilometers driven  
+- Brand service cost patterns  
 
----
+Outputs:
 
-## 💡 Pro Tips
-
-✅ Always start backend first, then frontend  
-✅ Check both terminals for errors  
-✅ Database must be running (MongoDB)  
-✅ Use `.env.local` for sensitive info  
+- Maintenance level (Low / Medium / High)  
+- Estimated service cost  
+- Upcoming maintenance insight  
 
 ---
 
-## 👤 Built By
+## 🔔 Real-Time Notifications
+Browser-based notifications for:
 
-[Harsh Moradiya](https://github.com/HarshMoradiya111)
+- Booking confirmation  
+- Price updates  
+- Marketplace events  
+- System alerts  
+
+Triggered automatically by user actions.
 
 ---
 
-**Happy coding! 🚀**
+## 🎁 Referral & Wallet Reward System
+- Unique referral codes  
+- Reward after successful booking/sale  
+- Points credited to both users  
+- Wallet balance tracking  
+- Engagement incentive mechanism  
+
+---
+
+# 📚 Technology Stack
+
+Layer: Frontend — Next.js, React, Tailwind CSS  
+Layer: Backend — ASP.NET Core (C#)  
+Layer: Database — MongoDB  
+Layer: Notifications — Browser Notifications  
+Layer: Deployment — Vercel + Render  
+
+---
+
+# 🚀 Deployment
+
+Frontend deployed on: Vercel  
+Backend deployed on: Render  
+
+Environment variables configure API connection and database access.
+
+---
+
+# 📸 Screenshots
+
+## Home Page  
+![alt text](image.png)
+
+
+## Vehicle Listing  
+![alt text](<Car Listing Page.png>)
+
+## Car Details & Pricing  
+![alt text](<car detail page.png>)
+
+## Wallet & Referral  
+![alt text](<Refferal System.png>)
+
+---
+
+# 👤 Author
+
+Harsh Moradiya  
+Full-Stack Developer  
+MscIT Student  
+
+---
+
+# 📄 License
+
+This project was developed for academic and internship purposes.
