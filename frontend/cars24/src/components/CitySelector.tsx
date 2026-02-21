@@ -100,7 +100,7 @@ const CitySelector: React.FC = () => {
             />
           </div>
 
-          <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+          <div className="overflow-y-auto h-[70vh] sm:h-60">
             <ul className="py-1">
               <li>
                 <button
